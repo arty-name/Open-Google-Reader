@@ -1,0 +1,19 @@
+
+function onload() {
+  lib();
+  ui();
+}
+
+if (!('readyState' in document)) {
+  // GreaseMonkey, fuck you very much! I don't need your overprotection.
+  var script = document.createElement('script');
+  script.innerHTML = lib.toString() + ui.toString() + 'lib(); ui();';
+  document.body.appendChild(script);
+  
+} else if (document.readyState.match(/complete|loaded/)) {
+  onload();
+  
+} else {
+  window.addEventListener('DOMContentLoaded', onload, false);
+}
+

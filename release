@@ -1,0 +1,4 @@
+#!/bin/bash
+cat 10meta  20prefix  30ui  40lib  50onload  60killDefault  70postfix   > build/open-google-reader.js
+cp build/open-google-reader.js build/open-google-reader.user.js
+
