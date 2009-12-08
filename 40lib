@@ -102,37 +102,9 @@ function lib() {
     // in Opera querySelectorAll returns StaticNodeList, which is unavailable for
     // monkey-patching, thus we patch querySelectorAll itself
     var qsa = HTMLElement.prototype.querySelectorAll;
-    
-    if (qsa) {
+    if (qsa && qsa.toString().match(/native|source/)) { // ignore maemo
       HTMLElement.prototype.querySelectorAll = function() {
         return Array.NodeListToArray(qsa.apply(this, arguments));
-      };
-      
-    } else {
-      // patch older geckos with quite dumb but small and sufficient selector implementation
-      // todo: class detection for proper buttons highlighting
-      function findParent(element, node){
-        while (node && node.parentNode != element) {
-          node = node.parentNode;
-        }
-        return node;
-      }
-      function selectAll(selector) {
-        selector = selector.replace(/.* /, '');
-        var tag = selector.replace(/\W.*$/, '');
-        var class_ = (tag != selector) ? selector.replace(/^\w+\./, '') : undefined;
-        
-        var nodes = Array.NodeListToArray(document.getElementsByTagName(tag));
-        if (!class_) return nodes;
-        
-        class_ = new RegExp('\\b' + class_ + '\\b', 'i');
-        return nodes.filter(function(node){ return class_.test(node.className); });
-      }
-      HTMLElement.prototype.querySelector = function(selector) {
-        return selectAll(selector).find(findParent.curry(this));
-      }
-      HTMLElement.prototype.querySelectorAll = function(selector) {
-        return selectAll(selector).filter(findParent.curry(this));
       };
     }
   })();
@@ -154,20 +126,6 @@ function lib() {
     var siblings = Array.toArray(this.parentNode.childNodes); // NB: <section> doesn't go to .children :(
     return this.nextElementSibling ? siblings.slice(siblings.indexOf(this) + 1) : [];
   };
-  
-  // patch older geckos
-  if (!document.body.previousElementSibling) {
-    HTMLElement.prototype.__defineGetter__('nextElementSibling', function() {
-      var node = this.nextSibling;
-      while (node && node.nodeType != 1) node = node.nextSibling;
-      return node;
-    });
-    HTMLElement.prototype.__defineGetter__('previousElementSibling', function() {
-      var node = this.previousSibling;
-      while (node && node.nodeType != 1) node = node.previousSibling;
-      return node;
-    });
-  }
   
   window.AjaxRequest = function (url, options) {
     var request = new XMLHttpRequest();

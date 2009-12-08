@@ -1,0 +1,49 @@
+function maemo() {
+  // patch older geckos
+
+  if (!document.body.previousElementSibling) {
+    HTMLElement.prototype.__defineGetter__('nextElementSibling', function() {
+      var node = this.nextSibling;
+      while (node && node.nodeType != 1) node = node.nextSibling;
+      return node;
+    });
+    HTMLElement.prototype.__defineGetter__('previousElementSibling', function() {
+      var node = this.previousSibling;
+      while (node && node.nodeType != 1) node = node.previousSibling;
+      return node;
+    });
+  }
+
+  (function(){
+    if (!HTMLElement.prototype.querySelector) {
+      // quite dumb but small and sufficient selector implementation
+      function findParent(element, node){
+        while (node && node.parentNode != element) {
+          node = node.parentNode;
+        }
+        return node;
+      }
+      function selectAll(selector) {
+        selector = selector.replace(/.* /, '');
+        var tag = selector.replace(/\W.*$/, '');
+        var class_ = (tag != selector) ? selector.replace(/^\w+\./, '') : undefined;
+        
+        var nodes = Array.NodeListToArray(document.getElementsByTagName(tag));
+        if (!class_) return nodes;
+        
+        class_ = new RegExp('\\b' + class_ + '\\b', 'i');
+        return nodes.filter(function(node){ return class_.test(node.className); });
+      }
+      HTMLElement.prototype.querySelector = function(selector) {
+        return selectAll(selector).find(findParent.curry(this));
+      }
+      HTMLElement.prototype.querySelectorAll = function(selector) {
+        return selectAll(selector).filter(findParent.curry(this));
+      };
+    }
+  })();
+}
+
+var script = document.createElement('script');
+script.innerHTML = maemo.toString() + 'maemo();';
+document.body.appendChild(script);
