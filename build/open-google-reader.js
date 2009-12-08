@@ -757,7 +757,7 @@ function ui() {
     return footer;
   }
   
-  function clickHandler(event){
+  function clickHandler(event){ try{
     var target;
     target = event.findElement('section.entry a');
     if (target && !torrentRE.test(target.href)) {
@@ -774,9 +774,9 @@ function ui() {
     if (target && buttonHandlers[target.className]) {
       buttonHandlers[target.className]();
     }
-  }
+  } catch(e) { LOG(e) }}
 
-  function keyHandler(event){
+  function keyHandler(event){ try{
     var target = event.target;
     
     if (event.ctrlKey || event.altKey) return;
@@ -817,7 +817,7 @@ function ui() {
     if (matched) {
       event.preventDefault();
     }
-  }
+  } catch(e) { LOG(e) }}
 
   function scrollHandler(event){
     if (!currentItem) {
@@ -1071,6 +1071,7 @@ function ui() {
 // TODO: adding comments
 // alter title by rules: share altered
 // scrollable body? 
+// fix shift by loading images
 
 //T fSw58iMBAAA.n4MagCKYiSlHjFxiiXRhow.Lkzkgowf6PcgUz9BPdb_NQ
 //annotation  test
@@ -1150,6 +1151,8 @@ function lib() {
     return false;
   };
 
+  // gecko doesn't allow patching of querySelectorAll,
+  // but allows to bring Array methods to NodeList
   'invoke pluck find include filter forEach map'.split(' ').forEach(function(method){
     NodeList.prototype[method] = function(what) {
       return Array.NodeListToArray(this)[method](what);
@@ -1168,7 +1171,7 @@ function lib() {
     var fun = this;
     var args = Array.toArray(arguments); // only Opera supports .concat for arguments
     return function() {
-      fun.apply(null, args.concat(arguments));
+      return fun.apply(null, args.concat(Array.toArray(arguments)));
     }
   };
   
@@ -1182,10 +1185,42 @@ function lib() {
   };
   
   (function(){
+    // in Opera querySelectorAll returns StaticNodeList, which is unavailable for
+    // monkey-patching, thus we patch querySelectorAll itself
     var qsa = HTMLElement.prototype.querySelectorAll;
-    HTMLElement.prototype.querySelectorAll = function() {
-      return Array.NodeListToArray(qsa.apply(this, arguments));
-    };
+    
+    if (qsa) {
+      HTMLElement.prototype.querySelectorAll = function() {
+        return Array.NodeListToArray(qsa.apply(this, arguments));
+      };
+      
+    } else {
+      // patch older geckos with quite dumb but small and sufficient selector implementation
+      // todo: class detection for proper buttons highlighting
+      function findParent(element, node){
+        while (node && node.parentNode != element) {
+          node = node.parentNode;
+        }
+        return node;
+      }
+      function selectAll(selector) {
+        selector = selector.replace(/.* /, '');
+        var tag = selector.replace(/\W.*$/, '');
+        var class_ = (tag != selector) ? selector.replace(/^\w+\./, '') : undefined;
+        
+        var nodes = Array.NodeListToArray(document.getElementsByTagName(tag));
+        if (!class_) return nodes;
+        
+        class_ = new RegExp('\\b' + class_ + '\\b', 'i');
+        return nodes.filter(function(node){ return class_.test(node.className); });
+      }
+      HTMLElement.prototype.querySelector = function(selector) {
+        return selectAll(selector).find(findParent.curry(this));
+      }
+      HTMLElement.prototype.querySelectorAll = function(selector) {
+        return selectAll(selector).filter(findParent.curry(this));
+      };
+    }
   })();
   
   HTMLElement.prototype.addClassName = function(class_) {
@@ -1198,7 +1233,7 @@ function lib() {
   
   HTMLElement.prototype.previousSiblings = function(class_) {
     var siblings = Array.toArray(this.parentNode.childNodes);// NB: <section> doesn't go to .children :(
-    return siblings.slice(0, siblings.indexOf(this) - 1);
+    return siblings.slice(0, siblings.indexOf(this));
   };
   
   HTMLElement.prototype.nextSiblings = function(class_) {

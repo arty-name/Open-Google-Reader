@@ -743,7 +743,7 @@ function ui() {
     return footer;
   }
   
-  function clickHandler(event){
+  function clickHandler(event){ try{
     var target;
     target = event.findElement('section.entry a');
     if (target && !torrentRE.test(target.href)) {
@@ -760,9 +760,9 @@ function ui() {
     if (target && buttonHandlers[target.className]) {
       buttonHandlers[target.className]();
     }
-  }
+  } catch(e) { LOG(e) }}
 
-  function keyHandler(event){
+  function keyHandler(event){ try{
     var target = event.target;
     
     if (event.ctrlKey || event.altKey) return;
@@ -803,7 +803,7 @@ function ui() {
     if (matched) {
       event.preventDefault();
     }
-  }
+  } catch(e) { LOG(e) }}
 
   function scrollHandler(event){
     if (!currentItem) {
@@ -1057,6 +1057,7 @@ function ui() {
 // TODO: adding comments
 // alter title by rules: share altered
 // scrollable body? 
+// fix shift by loading images
 
 //T fSw58iMBAAA.n4MagCKYiSlHjFxiiXRhow.Lkzkgowf6PcgUz9BPdb_NQ
 //annotation  test
