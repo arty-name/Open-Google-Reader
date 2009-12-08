@@ -380,28 +380,27 @@ function ui() {
       'button.star, button.share, button.share2 { background: none; border: none; } '+
       'button { cursor: pointer; } ' +
       '';
-    var style = DOM('style');
-    style.appendChild(document.createTextNode(css));
-    document.body.previousElementSibling.appendChild(style);
+    document.body.previousElementSibling.appendChild(
+      DOM('style', undefined, [document.createTextNode(css)])
+    );
   }
 
   // create container with buttons
   function createHeader() {
-    var header = DOM('header');
-    
-    header.appendChild(createButton('reload',  '⟳ Reload'));
-    header.appendChild(createButton('unread',  'Unread'));
-    header.appendChild(createButton('starred', '☆ Starred'));
-    header.appendChild(createButton('shared',  '⚐ Shared'));
-    header.appendChild(createButton('shared2', '⚐ Shared2'));
-    header.appendChild(createButton('next',    '▽ Next'));
-    header.appendChild(createButton('prev',    '△ Previous'));
-    
-    var link = DOM('a', {className: 'resetView', href: 'http://google.com/reader/view#'});
-    link.innerHTML = 'Normal View';
-    header.appendChild(link);
-    
-    return header;
+    return DOM('header', undefined, [
+      createButton('reload',  '⟳ Reload'),
+      createButton('unread',  'Unread'),
+      createButton('starred', '☆ Starred'),
+      createButton('shared',  '⚐ Shared'),
+      createButton('shared2', '⚐ Shared2'),
+      createButton('next',    '▽ Next'),
+      createButton('prev',    '△ Previous'),
+      DOM('a', {
+        className: 'resetView',
+        href: 'http://google.com/reader/view#',
+        innerHTML: 'Normal View'
+      })
+    ]);
   }
 
   function createButton(class_, text) {
@@ -409,12 +408,10 @@ function ui() {
   }
   
   /*function createFooter() {
-    var footer = DOM('footer');
-    
-    footer.appendChild(createButton('next', '▽ Next'));
-    footer.appendChild(createButton('prev', '△ Previous'));
-    
-    return footer;
+    return DOM('footer', undefined, [
+      createButton('next', '▽ Next'),
+      createButton('prev', '△ Previous')
+    ]);
   }*/
 
   // update unread count now, every minute and on every window focus
@@ -647,12 +644,8 @@ function ui() {
       data[tag] = data.categories.include(tags[tag]);
     });
     
-    var container = DOM('section', {className: 'entry'});
-    
-    var header = DOM('h2');
-
     // create entry's main link
-    var linkProps = {}
+    var linkProps = {innerHTML: getTitle(data)};
     if (data.alternate) {
       linkProps.href = data.alternate[0].href;
       if (!linkProps.href.match(torrentRE)) {
@@ -660,34 +653,18 @@ function ui() {
       }
     }
     var headerLink = DOM('a', linkProps);
-    headerLink.innerHTML = getTitle(data);
     data.domain = headerLink.hostname;
 
-    header.appendChild(createButton('star', getButtonImage(data, 'star')));
-    header.appendChild(headerLink);
-    
-    var subHeader = DOM('cite');
-    subHeader.innerHTML = getAuthor(data);
-    
-    var article = DOM('article');
-    article.innerHTML = getBody(data);
-    
-    container.appendChild(subHeader);
-    container.appendChild(header);
-    container.appendChild(article);
-    container.appendChild(createEntryFooter(data));
-    
-    // show comments from other users
-    var annotations;
-    if (data.annotations.length || data.comments.length) {
-      annotations = document.createDocumentFragment();
-      data.annotations.concat(data.comments).forEach(function(data){
-        var text = DOM('q', {cite: data.author})
-        text.innerHTML = data.content || data.htmlContent;
-        annotations.appendChild(text);
-      });
-      container.insertBefore(annotations, article);
-    }
+    var container = DOM('section', {className: 'entry'}, [
+      DOM('cite', {innerHTML: getAuthor(data)}),
+      DOM('h2', undefined, [
+        createButton('star', getButtonImage(data, 'star')),
+        headerLink
+      ]),
+      createAnnotations(data),
+      DOM('article', {innerHTML: getBody(data)}),
+      createEntryFooter(data)
+    ]);
     
     // store entry's original data for future reference
     storage[data.id] = data;
@@ -729,29 +706,45 @@ function ui() {
     
     return author + site + favicon + via;
   }
+  
+  // show comments from other users
+  function createAnnotations(data) {
+    var annotations = document.createDocumentFragment();
+    
+    if (data.annotations.length || data.comments.length) {
+      data.annotations.concat(data.comments).forEach(function(data){
+        var text = DOM('q', {
+          cite: data.author,
+          innerHTML: data.content || data.htmlContent
+        })
+        annotations.appendChild(text);
+      });
+    }
+    
+    return annotations;
+  }
 
   // entry footer contains buttons and tags
   function createEntryFooter(data) {
-    var footer = DOM('footer');
-    
+    var footer = DOM('footer', undefined, [
+      createButton('star',   getButtonImage(data, 'star') + ' Star'),
+      createButton('share',  getButtonImage(data, 'share') + ' Share'),
+      createButton('share2', getButtonImage(data, 'share2') + ' Share2')
+    ]);
+
     // filter out custom user tags, only original tags remain
     var tags = data.categories.filter(function(tag){
       return !tag.match(/^user\//);
     }).join(', ');
     
     if (tags.length) {
-      var tagsSpan = DOM('span');
-      tagsSpan.innerHTML = 'Tags: ' + tags;
-      footer.appendChild(tagsSpan);
+      var tagsSpan = DOM('span', {innerHTML: 'Tags: ' + tags});
+      footer.insertBefore(tagsSpan, footer.firstChild);
     }
     
-    footer.appendChild(createButton('star',   getButtonImage(data, 'star') + ' Star'));
-    footer.appendChild(createButton('share',  getButtonImage(data, 'share') + ' Share'));
-    footer.appendChild(createButton('share2', getButtonImage(data, 'share2') + ' Share2'));
-    
-    var input = DOM('textarea', {rows: 1, columns: 60});
+    /*var input = DOM('textarea', {rows: 1, columns: 60});
     input.addEventListener('focus', function(){ this.rows = 5; }, false);
-    input.addEventListener('blur',  function(){ this.rows = 1; }, false);
+    input.addEventListener('blur',  function(){ this.rows = 1; }, false);*/
     //footer.appendChild(input);
 
     return footer;
@@ -1188,37 +1181,9 @@ function lib() {
     // in Opera querySelectorAll returns StaticNodeList, which is unavailable for
     // monkey-patching, thus we patch querySelectorAll itself
     var qsa = HTMLElement.prototype.querySelectorAll;
-    
-    if (qsa) {
+    if (qsa && qsa.toString().match(/native|source/)) { // ignore maemo
       HTMLElement.prototype.querySelectorAll = function() {
         return Array.NodeListToArray(qsa.apply(this, arguments));
-      };
-      
-    } else {
-      // patch older geckos with quite dumb but small and sufficient selector implementation
-      // todo: class detection for proper buttons highlighting
-      function findParent(element, node){
-        while (node && node.parentNode != element) {
-          node = node.parentNode;
-        }
-        return node;
-      }
-      function selectAll(selector) {
-        selector = selector.replace(/.* /, '');
-        var tag = selector.replace(/\W.*$/, '');
-        var class_ = (tag != selector) ? selector.replace(/^\w+\./, '') : undefined;
-        
-        var nodes = Array.NodeListToArray(document.getElementsByTagName(tag));
-        if (!class_) return nodes;
-        
-        class_ = new RegExp('\\b' + class_ + '\\b', 'i');
-        return nodes.filter(function(node){ return class_.test(node.className); });
-      }
-      HTMLElement.prototype.querySelector = function(selector) {
-        return selectAll(selector).find(findParent.curry(this));
-      }
-      HTMLElement.prototype.querySelectorAll = function(selector) {
-        return selectAll(selector).filter(findParent.curry(this));
       };
     }
   })();
@@ -1240,20 +1205,6 @@ function lib() {
     var siblings = Array.toArray(this.parentNode.childNodes); // NB: <section> doesn't go to .children :(
     return this.nextElementSibling ? siblings.slice(siblings.indexOf(this) + 1) : [];
   };
-  
-  // patch older geckos
-  if (!document.body.previousElementSibling) {
-    HTMLElement.prototype.__defineGetter__('nextElementSibling', function() {
-      var node = this.nextSibling;
-      while (node && node.nodeType != 1) node = node.nextSibling;
-      return node;
-    });
-    HTMLElement.prototype.__defineGetter__('previousElementSibling', function() {
-      var node = this.previousSibling;
-      while (node && node.nodeType != 1) node = node.previousSibling;
-      return node;
-    });
-  }
   
   window.AjaxRequest = function (url, options) {
     var request = new XMLHttpRequest();
