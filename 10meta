@@ -6,5 +6,6 @@
 // @description  Replaces native Google Reader's interface with fully customizable one.
 // @include      http://www.google.com/reader/view/
 // @include      http://www.google.com/reader/view/1
+// @run-at       document-start
 // ==/UserScript==
 
