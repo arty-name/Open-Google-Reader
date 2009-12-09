@@ -12,6 +12,11 @@ function maemo() {
       while (node && node.nodeType != 1) node = node.previousSibling;
       return node;
     });
+    HTMLElement.prototype.__defineGetter__('firstElementChild', function() {
+      var node = this.firstChild;
+      while (node && node.nodeType != 1) node = node.nextSibling;
+      return node;
+    });
   }
 
   (function(){
