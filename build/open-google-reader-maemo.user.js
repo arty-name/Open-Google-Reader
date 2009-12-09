@@ -4,8 +4,10 @@
 // @date         2009-12-07
 // @author       Artemy Tregubenko <me@arty.name>
 // @description  Replaces native Google Reader's interface with fully customizable one.
+// @homepage     http://github.com/arty-name/Open-Google-Reader
 // @include      http://www.google.com/reader/view/
 // @include      http://www.google.com/reader/view/1
+// @run-at       document-start
 // ==/UserScript==
 
 (function(){
@@ -30,14 +32,19 @@ function ui() {
   
   // filters to manipulate on entry content
   var entryAlterations = [
+    function(data){ // html entites
+      if ((data.title || '').match(/&\S+;/))
+        data.title = data.title.replace(/&\S+;/g, function(m){
+          return DOM('i', {innerHTML: m}).textContent });
+    },
     function(data){ // better titles for dirty.ru and bash.org.ru
       if ((data.title || '').match(/(Пост №)|(Цитата #)/))
-        data.title = trimToNWords(getBody(data).stripTags(), 8) 
+        data.title = trimToNWords(getBody(data).stripTags(), 8);
     },
     function(data){ // better title for Simon Willison quotes
       var m;
       if ((m = (data.title || '').match(/A quote from (.+)$/)))
-        data.title = m[1] + ': ' + trimToNWords(getBody(data).stripTags(), 8)
+        data.title = m[1] + ': ' + trimToNWords(getBody(data).stripTags(), 8);
     },
     function(data){ // remove iframes
       var body = getBody(data);
@@ -801,8 +808,8 @@ function ui() {
     matched = true;
     switch (key) {
       case 'K': case 'Л': buttonHandlers.prev(); break;
-      case 'V': case 'М': openTab(currentItem.querySelector('a'), event); break;
-      case 'C': case 'С': openTab(currentItem.querySelectorAll('a')[1], event); break;
+      case 'V': case 'М': currentItem && openTab(currentItem.querySelector('a'), event); break;
+      case 'C': case 'С': currentItem && openTab(currentItem.querySelectorAll('a')[1], event); break;
       //case 'W': case 'Ц': buttonHandlers.share2(); break;
       case 'S': case 'Ы': buttonHandlers[event.shiftKey ? 'share' : 'star'](); break;
       default: matched = false;
@@ -1270,6 +1277,11 @@ function maemo() {
     HTMLElement.prototype.__defineGetter__('previousElementSibling', function() {
       var node = this.previousSibling;
       while (node && node.nodeType != 1) node = node.previousSibling;
+      return node;
+    });
+    HTMLElement.prototype.__defineGetter__('firstElementChild', function() {
+      var node = this.firstChild;
+      while (node && node.nodeType != 1) node = node.nextSibling;
       return node;
     });
   }
