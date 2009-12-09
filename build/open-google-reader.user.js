@@ -6,6 +6,7 @@
 // @description  Replaces native Google Reader's interface with fully customizable one.
 // @include      http://www.google.com/reader/view/
 // @include      http://www.google.com/reader/view/1
+// @run-at       document-start
 // ==/UserScript==
 
 (function(){
@@ -801,8 +802,8 @@ function ui() {
     matched = true;
     switch (key) {
       case 'K': case 'Л': buttonHandlers.prev(); break;
-      case 'V': case 'М': openTab(currentItem.querySelector('a'), event); break;
-      case 'C': case 'С': openTab(currentItem.querySelectorAll('a')[1], event); break;
+      case 'V': case 'М': currentItem && openTab(currentItem.querySelector('a'), event); break;
+      case 'C': case 'С': currentItem && openTab(currentItem.querySelectorAll('a')[1], event); break;
       //case 'W': case 'Ц': buttonHandlers.share2(); break;
       case 'S': case 'Ы': buttonHandlers[event.shiftKey ? 'share' : 'star'](); break;
       default: matched = false;
