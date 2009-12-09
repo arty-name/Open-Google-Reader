@@ -76,6 +76,8 @@ Installation
 ------------
 
 Opera: http://github.com/arty-name/Open-Google-Reader/raw/master/build/open-google-reader.js
+  (I highly recommend UJS Manager http://unite.opera.com/application/401/ )
+
 Chrome & Firefox: http://github.com/arty-name/Open-Google-Reader/raw/master/build/open-google-reader.user.js
 Maemo: http://github.com/arty-name/Open-Google-Reader/raw/master/build/open-google-reader-maemo.user.js
 
