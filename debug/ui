@@ -22,7 +22,7 @@ function ui() {
           return DOM('i', {innerHTML: m}).textContent });
     },
     function(data){ // better titles for dirty.ru and bash.org.ru
-      if ((data.title || '').match(/(Пост №)|(Цитата #)/))
+      if ((data.title || '').match(/(Пост №)|(Цитата #)|(@ [\d-]+[\d:]+)/))
         data.title = trimToNWords(getBody(data).stripTags(), 8);
     },
     function(data){ // better title for Simon Willison quotes
