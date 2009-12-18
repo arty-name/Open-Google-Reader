@@ -26,6 +26,7 @@ Features
  * filtering of unwanted entries
  * links open in background by default
  * hotkey to open first link in entry body
+ * single click to assign tag
  * smart scolling with spacebar
  * site favicons
  * "sharing" an item also "likes" it
