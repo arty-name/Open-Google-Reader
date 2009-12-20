@@ -22,25 +22,23 @@ function ui() {
           return DOM('i', {innerHTML: m}).textContent });
     },
     function(data){ // direct youtube links
-      var body = getBody(data);
-      if (body && body.match(/<embed src="http:\/\/(www\.)?youtube/))
-        data.summary.content = data.summary.content.replace(
+      if (data.body.match(/<embed src="http:\/\/(www\.)?youtube/))
+        data.body = data.summary.content.replace(
           /<embed src="(http:\/\/(?:www\.)?youtube[^"]*)".*<\/embed>/ig,
           function(m, m1){ return '<a href="' + m1.replace('/v/', '/watch?v=') + '">video</a>'; });
     },
     function(data){ // better titles for dirty.ru and bash.org.ru
       if ((data.title || '').match(/(Пост №)|(Цитата #)|(@ [\d-]+[\d:]+)/))
-        data.title = trimToNWords(getBody(data).stripTags(), 8);
+        data.title = trimToNWords(data.body.stripTags(), 8);
     },
     function(data){ // better title for Simon Willison quotes
       var m;
       if ((m = (data.title || '').match(/A quote from (.+)$/)))
-        data.title = m[1] + ': ' + trimToNWords(getBody(data).stripTags(), 8);
+        data.title = m[1] + ': ' + trimToNWords(data.body.stripTags(), 8);
     },
     function(data){ // remove iframes
-      var body = getBody(data);
-      if (/<iframe/i.test(body)) 
-        data.body = body.replace(/<iframe.*?>.*?<\/iframe>/ig, '');
+      if (/<iframe/i.test(data.body)) 
+        data.body = data.body.replace(/<iframe.*?>.*?<\/iframe>/ig, '');
     }
   ];
   // END OF CONFIGURABLE PART
@@ -576,11 +574,15 @@ function ui() {
       return;
     }
     
+    item.body =
+      item.content && item.content.content ||
+      item.summary && item.summary.content || '';
+    
     // check if entry needs alteration
     entryAlterations.invoke('call', null, item);
     
     // if entry matches filter, mark it as read and skip it
-    if (matchesFilters(getTitle(item), getBody(item))) {
+    if (matchesFilters(getTitle(item), item.body)) {
       item.read = false;
       toggleEntryTag(item, 'read');
       if (unreadCount) {
@@ -619,11 +621,6 @@ function ui() {
        (data.content && data.content.content)).stripTags(), 8);
   }
   
-  function getBody(data) {
-    return data.content && data.content.content ||
-           data.summary && data.summary.content || '';
-  }
-  
   // check entry's title and body against filters
   function matchesFilters(title, body) {
     title = title.toLowerCase();
@@ -660,7 +657,7 @@ function ui() {
         headerLink
       ]),
       createAnnotations(data),
-      DOM('article', {innerHTML: getBody(data)}),
+      DOM('article', {innerHTML: data.body}),
       createEntryFooter(data)
     ]);
     
