@@ -6,16 +6,16 @@ function ui() {
   
   
   // lowercase words to filter entries out by title
-  var titleFilters = settings.titleFilters;
+  var titleFilters = settings.titleFilters || [];
 
   // words to filter entries out by body (hmtl included)
-  var bodyFilters = settings.bodyFilters;
+  var bodyFilters = settings.bodyFilters || [];
 
   // regular expression to detect links which do not get target=_blank
-  var torrentRE = settings.torrentRE;
+  var torrentRE = settings.torrentRE || /b41b964aeda4a6d58bb22fcbc345248a/;
   
   // filters to manipulate on entry content
-  var entryAlterations = settings.entryAlterations;
+  var entryAlterations = settings.entryAlterations || [];
   
 
   // static user id 

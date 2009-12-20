@@ -12,4 +12,6 @@ if (document.location.href.match(/^http:..www.google.com.reader.view.1?$/)) {
 		document.body.appendChild(script);
 		script.onload = function(){ lib(); ui(); };
 	}, false);
+  
+  var settings = {};
 }
