@@ -15,48 +15,44 @@
 
 if (!document.location.href.match(/^http:..www.google.com.reader.view.1?$/)) return;
 
-function ui() {
+var settings = {
 
-  // CONFIGURABLE PART:
-  
   // only required to be loaded on 404 url, i.e. http://www.google.com/reader/view/1
-  var userId = '';
+  userId: '',
   
   // lowercase words to filter entries out by title
-  var titleFilters = 'подкаст podcast apple канобувости evernote bpocлых знакоmства лохотрон'.split(' ');
-
+  titleFilters: [],
+  
   // words to filter entries out by body (hmtl included)
-  var bodyFilters = ['Тайгер', 'программистов Контакта', 'реверансы на сайтах знакомств', 'G00GLE', 'любoвницы и cпoнсoры', 'Читайте статью и смотрите видео', 'с помощью специальной системы обнаружения', 'восстановить свою родословную'];
-
+  bodyFilters: [],
+  
   // regular expression to detect links which do not get target=_blank
-  var torrentRE = /\.torrent$/;
+  torrentRE: /\.torrent$/,
   
   // filters to manipulate on entry content
-  var entryAlterations = [
-    function(data){ // html entites
-      if ((data.title || '').match(/&\S+;/))
-        data.title = data.title.replace(/&\S+;/g, function(m){
-          return DOM('i', {innerHTML: m}).textContent });
-    },
-    function(data){ // better titles for dirty.ru and bash.org.ru
-      if ((data.title || '').match(/(Пост №)|(Цитата #)/))
-        data.title = trimToNWords(getBody(data).stripTags(), 8);
-    },
-    function(data){ // better title for Simon Willison quotes
-      var m;
-      if ((m = (data.title || '').match(/A quote from (.+)$/)))
-        data.title = m[1] + ': ' + trimToNWords(getBody(data).stripTags(), 8);
-    },
-    function(data){ // remove iframes
-      var body = getBody(data);
-      if (/<iframe/i.test(body)) 
-        data.body = body.replace(/<iframe.*?>.*?<\/iframe>/ig, '');
-    }
-  ];
-  // END OF CONFIGURABLE PART
+  entryAlterations: []
+  
+};
+function ui() {
+
+  // only required to be loaded on 404 url, i.e. http://www.google.com/reader/view/1
+  var userId = settings.userId || '';
   
   
   
+  // lowercase words to filter entries out by title
+  var titleFilters = settings.titleFilters;
+
+  // words to filter entries out by body (hmtl included)
+  var bodyFilters = settings.bodyFilters;
+
+  // regular expression to detect links which do not get target=_blank
+  var torrentRE = settings.torrentRE;
+  
+  // filters to manipulate on entry content
+  var entryAlterations = settings.entryAlterations;
+  
+
   // static user id 
   userId = userId || window._USER_ID || '-'
   
@@ -586,11 +582,15 @@ function ui() {
       return;
     }
     
+    item.body =
+      item.content && item.content.content ||
+      item.summary && item.summary.content || '';
+    
     // check if entry needs alteration
     entryAlterations.invoke('call', null, item);
     
     // if entry matches filter, mark it as read and skip it
-    if (matchesFilters(getTitle(item), getBody(item))) {
+    if (matchesFilters(getTitle(item), item.body)) {
       item.read = false;
       toggleEntryTag(item, 'read');
       if (unreadCount) {
@@ -618,7 +618,7 @@ function ui() {
         // if found userId, store it and update global tags values
         userId = match[1];
         tags = initTags();
-        //alert('Looks like your user ID is ' + userId + '. Write this value to `userId` in settings.');
+        alert('Looks like your user ID is ' + userId + '. Write this value to `userId` in settings.');
       }
     }
   }
@@ -627,11 +627,6 @@ function ui() {
     return data.title ||
       trimToNWords(((data.summary && data.summary.content) ||
        (data.content && data.content.content)).stripTags(), 8);
-  }
-  
-  function getBody(data) {
-    return data.content && data.content.content ||
-           data.summary && data.summary.content || '';
   }
   
   // check entry's title and body against filters
@@ -670,7 +665,7 @@ function ui() {
         headerLink
       ]),
       createAnnotations(data),
-      DOM('article', {innerHTML: getBody(data)}),
+      DOM('article', {innerHTML: data.body}),
       createEntryFooter(data)
     ]);
     
