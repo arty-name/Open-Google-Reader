@@ -24,7 +24,7 @@ function ui() {
     function(data){ // direct youtube links
       if (data.body.match(/<embed src="http:\/\/(www\.)?youtube/))
         data.body = data.summary.content.replace(
-          /<embed src="(http:\/\/(?:www\.)?youtube[^"]*)".*<\/embed>/ig,
+          /<embed src="(http:\/\/(?:www\.)?youtube[^"]*)".*?<\/embed>/ig,
           function(m, m1){ return '<a href="' + m1.replace('/v/', '/watch?v=') + '">video</a>'; });
     },
     function(data){ // better titles for dirty.ru and bash.org.ru
