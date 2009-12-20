@@ -21,6 +21,13 @@ function ui() {
         data.title = data.title.replace(/&\S+;/g, function(m){
           return DOM('i', {innerHTML: m}).textContent });
     },
+    function(data){ // direct youtube links
+      var body = getBody(data);
+      if (body && body.match(/<embed src="http:\/\/(www\.)?youtube/))
+        data.summary.content = data.summary.content.replace(
+          /<embed src="(http:\/\/(?:www\.)?youtube[^"]*)".*<\/embed>/ig,
+          function(m, m1){ return '<a href="' + m1.replace('/v/', '/watch?v=') + '">video</a>'; });
+    },
     function(data){ // better titles for dirty.ru and bash.org.ru
       if ((data.title || '').match(/(Пост №)|(Цитата #)|(@ [\d-]+[\d:]+)/))
         data.title = trimToNWords(getBody(data).stripTags(), 8);
