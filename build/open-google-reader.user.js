@@ -997,6 +997,9 @@ function ui() {
       srcTitle: (data.feed || data.origin).title,
       srcUrl: data.origin.htmlUrl
     };
+    if (!share) {
+      parameters.tags = tags.share2;
+    }
 
     return AjaxRequest(editEntryUrl + '?client=userscript&ck=' + (new Date()).getTime(), {
       method: 'post',
