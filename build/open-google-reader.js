@@ -426,7 +426,7 @@ function ui() {
       'section.entry > footer { clear: both; display: block; margin-left: 0; } ' +
       'section.entry > footer > span { float: right; } ' +
       'section.entry + div.spacer { float: left; width: 50%; } ' +
-      'button.star { color: #efd334; } button.share, button.share2 { color: #cd8f4b; } button.edit { color: blue; } '+
+      'button.star { color: #bfb016; } button.share, button.share2 { color: #dc9765; } button.edit { color: #74d774; } '+
       'button.star, button.share, button.share2, button.edit { background: none; border: none; } '+
       'button { cursor: pointer; } ' +
       'textarea { width: 95%; } ' +
@@ -728,6 +728,7 @@ function ui() {
       case 'star':   return (data.star   ? '★' : '☆'); 
       case 'share':  return (data.share  ? '⚑' : '⚐')
       case 'share2': return (data.share2 ? '⚑' : '⚐'); 
+      case 'edit':   return '✍'; 
     }
     return '';
   }
@@ -781,7 +782,7 @@ function ui() {
       createButton('star',   getButtonImage(data, 'star') + ' Star'),
       createButton('share',  getButtonImage(data, 'share') + ' Share'),
       createButton('share2', getButtonImage(data, 'share2') + ' Share2'),
-      createButton('edit',   'Edit')
+      createButton('edit',   getButtonImage(data, 'edit') + ' Edit/Comment')
     ]);
 
     // filter out custom user tags, only original tags remain
