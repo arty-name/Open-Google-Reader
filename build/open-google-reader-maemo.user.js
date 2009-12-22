@@ -15,7 +15,9 @@
 
 if (!document.location.href.match(/^http:..www.google.com.reader.view.1?$/)) return;
 
-var settings = {
+var settings = {};
+
+settings = {
 
   // only required to be loaded on 404 url, i.e. http://www.google.com/reader/view/1
   userId: '',
@@ -38,19 +40,18 @@ function ui() {
   // only required to be loaded on 404 url, i.e. http://www.google.com/reader/view/1
   var userId = settings.userId || '';
   
-  
-  
   // lowercase words to filter entries out by title
-  var titleFilters = settings.titleFilters;
+  var titleFilters = settings.titleFilters || [];
 
   // words to filter entries out by body (hmtl included)
-  var bodyFilters = settings.bodyFilters;
+  var bodyFilters = settings.bodyFilters || [];
 
   // regular expression to detect links which do not get target=_blank
-  var torrentRE = settings.torrentRE;
+  var torrentRE = settings.torrentRE || /b41b964aeda4a6d58bb22fcbc345248a/;
   
   // filters to manipulate on entry content
-  var entryAlterations = settings.entryAlterations;
+  // NB: set data.altered = true if you want these changes to be shared when you click "share"
+  var entryAlterations = settings.entryAlterations || [];
   
 
   // static user id 
@@ -64,6 +65,9 @@ function ui() {
   
   // url to manipulate tags on
   var editTagUrl = 'http://www.google.com/reader/api/0/edit-tag';
+  
+  // url to post edited entries to
+  var editEntryUrl = 'http://www.google.com/reader/api/0/item/edit';
   
   // sort orders
   var sort = {
@@ -151,10 +155,14 @@ function ui() {
       toggleEntryTag(currentItem, 'star');
     },
     share: function(){
+      if (checkIfAltered(currentItem, true)) return;
+      
       toggleEntryTag(currentItem, 'share');
       toggleEntryTag(currentItem, 'like');
     },
     share2: function(){ // this one adds specific tag
+      if (checkIfAltered(currentItem)) return;
+
       toggleEntryTag(currentItem, 'share2');
       toggleEntryTag(currentItem, 'like');
     },
@@ -302,6 +310,43 @@ function ui() {
         // show next page, leaving last line of current page on the screen
         container.scrollTop = targetScroll + 20;
       }
+    },
+    edit: function(event, forceHide) {
+      if (!currentItem) return;
+      
+      var data = storage[currentItem.id];
+      if (!data.inputs && forceHide) return;
+
+      var title = currentItem.querySelector('a');
+      var body  = currentItem.querySelector('article');
+      
+      if (!data.inputs) {
+        data.inputs = {
+          shown: false,
+          title:   DOM('input',    {value: getTitle(data)}),
+          body:    DOM('textarea', {value: data.body, rows: 10, cols: 60}),
+          comment: DOM('textarea', {value: '', rows: 3, cols: 60})
+        };
+        
+        title.parentNode.appendChild(data.inputs.title);
+        body.parentNode.insertBefore(data.inputs.comment, body.nextElementSibling);
+        body.parentNode.insertBefore(data.inputs.body, body.nextElementSibling);
+      }
+      
+      if (forceHide) {
+        data.inputs.shown = true;
+      }
+      
+      var nodeDisplay = data.inputs.shown ? '' : 'none';
+      var inputDisplay = data.inputs.shown ? 'none' : '';
+      
+      title.style.display = nodeDisplay;
+      body.style.display  = nodeDisplay;
+      data.inputs.title.style.display   = inputDisplay;
+      data.inputs.body.style.display    = inputDisplay;
+      data.inputs.comment.style.display = inputDisplay;
+
+      data.inputs.shown = !data.inputs.shown;
     }
   };
   
@@ -370,6 +415,7 @@ function ui() {
       'section.entry > h2 * { display: inline; } ' + 
       'section.entry > h2 > a { text-decoration: none; line-height: 1em; } ' + 
       'section.entry > h2 > button { font-size: inherit; width: 1em; padding-right: 1.1em; } ' + 
+      'section.entry > h2 > input { width: 95%; font-size: inherit; } ' + 
       'section.entry > article { display: block; overflow-x: auto; clear: both; } ' + 
       'section.entry > article > p { line-height: 1.15em; } ' + 
       'section.entry > cite, section.entry > article, section.entry > footer { margin-left: .5em; } ' +
@@ -380,9 +426,10 @@ function ui() {
       'section.entry > footer { clear: both; display: block; margin-left: 0; } ' +
       'section.entry > footer > span { float: right; } ' +
       'section.entry + div.spacer { float: left; width: 50%; } ' +
-      'button.star { color: #efd334; } button.share, button.share2 { color: #cd8f4b; } '+
-      'button.star, button.share, button.share2 { background: none; border: none; } '+
+      'button.star { color: #efd334; } button.share, button.share2 { color: #cd8f4b; } button.edit { color: blue; } '+
+      'button.star, button.share, button.share2, button.edit { background: none; border: none; } '+
       'button { cursor: pointer; } ' +
+      'textarea { width: 95%; } ' +
       '';
     document.body.previousElementSibling.appendChild(
       DOM('style', undefined, [document.createTextNode(css)])
@@ -436,7 +483,7 @@ function ui() {
     updateUnreadCount.time = time;
     
     // request data
-    new AjaxRequest('http://www.google.com/reader/api/0/unread-count', {
+    AjaxRequest('http://www.google.com/reader/api/0/unread-count', {
       method: 'get',
       parameters: {
         allcomments: 'true',
@@ -480,7 +527,7 @@ function ui() {
     if (subscriptions) return continuation();
     
     // otherwise load data
-    return new AjaxRequest('http://www.google.com/reader/api/0/subscription/list', {
+    return AjaxRequest('http://www.google.com/reader/api/0/subscription/list', {
       method: 'get',
       parameters: {
         output: 'json',
@@ -507,7 +554,7 @@ function ui() {
     }
     
     // request data from special url for given view
-    dataRequest = new AjaxRequest(entriesUrl + tags[view], {
+    dataRequest = AjaxRequest(entriesUrl + tags[view], {
       method: 'GET',
       parameters: getViewParameters(view),
       onSuccess: function(response){
@@ -698,6 +745,7 @@ function ui() {
       return feed.id == data.origin.streamId;
     });
     if (feed) {
+      data.feed = feed;
       site = feed.title;
     }
     
@@ -732,7 +780,8 @@ function ui() {
     var footer = DOM('footer', undefined, [
       createButton('star',   getButtonImage(data, 'star') + ' Star'),
       createButton('share',  getButtonImage(data, 'share') + ' Share'),
-      createButton('share2', getButtonImage(data, 'share2') + ' Share2')
+      createButton('share2', getButtonImage(data, 'share2') + ' Share2'),
+      createButton('edit',   'Edit')
     ]);
 
     // filter out custom user tags, only original tags remain
@@ -777,9 +826,14 @@ function ui() {
     
     if (event.ctrlKey || event.altKey) return;
     if (target && (target.nodeName.match(/input|textarea/i))) return;
-    if (!event.ctrlKey && event.keyCode == 32) event.preventDefault();
+    if (!event.ctrlKey && event.keyCode == 32) event.preventDefault(); // space
     
     hideShadow();
+    
+    if (event.keyCode == 27) { // ESC
+      buttonHandlers.edit(undefined, true);
+      return;
+    }
     
     var matched = true;
     var key = String.fromCharCode(event.keyCode).toUpperCase();
@@ -808,6 +862,7 @@ function ui() {
       case 'C': case 'С': currentItem && openTab(currentItem.querySelectorAll('a')[1], event); break;
       //case 'W': case 'Ц': buttonHandlers.share2(); break;
       case 'S': case 'Ы': buttonHandlers[event.shiftKey ? 'share' : 'star'](); break;
+      case 'Y': case 'Н': buttonHandlers.edit(); break;
       default: matched = false;
     }
     if (matched) {
@@ -883,7 +938,11 @@ function ui() {
   }
 
   function makeEntryActive(entry) {
-    currentItem && currentItem.removeClassName('active'); 
+    if (currentItem) {
+      currentItem.removeClassName('active');
+      buttonHandlers.edit(undefined, true);
+    }
+      
     currentItem = entry;
     currentItem.addClassName('active');
     
@@ -921,17 +980,45 @@ function ui() {
     }
   }
   
+  function checkIfAltered(entry, share) {
+    var data = storage[entry.id] || entry;
+    var edited = data.inputs && data.inputs.shown;
+    if (!data.altered && !edited) return false;
+
+    var parameters = {
+      T: token,
+      url: entry.querySelector('a').href,
+      title: edited ? data.inputs.title.value : data.title,
+      snippet: edited ? data.inputs.body.value : data.body,
+      annotation: edited ? data.inputs.comment.value : '',
+      linkify: false,
+      share: !!share,
+      srcTitle: (data.feed || data.origin).title,
+      srcUrl: data.origin.htmlUrl
+    };
+
+    return AjaxRequest(editEntryUrl + '?client=userscript&ck=' + (new Date()).getTime(), {
+      method: 'post',
+      parameters: parameters,
+      onSuccess: function() {
+        if (entry != currentItem) return;
+        buttonHandlers.edit(undefined, true);
+      },
+      onFailure: updateToken.curry(checkIfAltered.curry(entry, share))
+    });
+  }
+  
   function toggleEntryTag(entry, tag) {
     var data = storage[entry.id] || entry;
+    
     var parameters = {
-      async: true,
       T: token,
       i: data.id,
       s: data.origin.streamId
     };
     parameters[data[tag] ? 'r' : 'a'] = tags[tag]; 
     
-    new AjaxRequest(editTagUrl, {
+    AjaxRequest(editTagUrl, {
       method: 'post',
       parameters: parameters,
       onSuccess: function() {
@@ -945,7 +1032,7 @@ function ui() {
   }
   
   function updateToken(oncomplete) {
-    new AjaxRequest('http://www.google.com/reader/api/0/token', {
+    AjaxRequest('http://www.google.com/reader/api/0/token', {
       method: 'get',
       parameters: {
         ck: (new Date()).getTime(),
@@ -1064,11 +1151,12 @@ function ui() {
 }
 
 
-// TODO: adding comments
-// alter title by rules: share altered
+// TODO: 
 // scrollable body? 
 // fix shift by loading images
+// clear storage of removed items
 
+// http://www.google.com/reader/api/0/item/edit?ck=1261440351303&
 //T fSw58iMBAAA.n4MagCKYiSlHjFxiiXRhow.Lkzkgowf6PcgUz9BPdb_NQ
 //annotation  test
 //linkify false
