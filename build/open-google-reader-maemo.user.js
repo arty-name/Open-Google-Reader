@@ -13,6 +13,10 @@
 
 (function(){
 
+// OVERVIEW
+// To get general idea of how that script works,
+// see OVERVIEW below or in file 30ui
+
 if (!document.location.href.match(/^http:..www.google.com.reader.view.1?$/)) return;
 
 var settings = {};
@@ -35,6 +39,43 @@ settings = {
   entryAlterations: []
   
 };
+/*
+  OVERVIEW
+  
+  At first all native Google Reader data is removed from page (`clearDocument`)
+  and replaced with new structure (`createLayout`): panel
+  with buttons (`createHeader`) and container for entries. New css styles
+  are also added (`addStyles`).
+  
+  Then code requests entries data from google (`getViewData`). Data for each
+  entry is filtered (`titleFilters` and `bodyFilters`),
+  preprocessed (`entryAlterations`) and new entry (`createEntry`) is appended
+  to the container. When you switch to another view, it does the same, but first
+  it resets page (`resetView` and `resetContainer`).
+  
+  When you click any button, code (`clickHandler`) looks at button's class,
+  picks from `buttonHandlers` a function with the same name and runs it.
+  Same functions are used when you press a button on a keyboard (`keyHandler`).
+  Maybe I should rename `buttonHandlers` to `actions`.
+  
+  Sharing an entry, liking it, starring it or marking it as read is just
+  assigning specific tags (using `toggleEntryTag`). These are based on userId
+  and created via `createTags`. Same tags are appended to base url to request
+  specific view like "shared entries", "starred entries", "unread entries" or
+  "entries tagged with X". Commenting and altering the entry is actually
+  creating a new entry (`checkIfAltered`).
+  
+  Tagging an entry (and hence almost any other operation) requires a token.
+  Tokens are valid for short time, and need to be re-requested (`updateToken`).
+  
+  When you have read almost all entries (`checkNeedMoreEntries`), new portion
+  of data is requested. To get it you need `continuation` from previous request.
+  
+  
+  Generally functions are declared directly below the function which uses them
+  in the same order, so you can read code from top to bottom.
+*/
+
 function ui() {
 
   // only required to be loaded on 404 url, i.e. http://www.google.com/reader/view/1
