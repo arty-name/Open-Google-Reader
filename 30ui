@@ -758,11 +758,6 @@ function ui() {
       footer.insertBefore(tagsSpan, footer.firstChild);
     }
     
-    /*var input = DOM('textarea', {rows: 1, columns: 60});
-    input.addEventListener('focus', function(){ this.rows = 5; }, false);
-    input.addEventListener('blur',  function(){ this.rows = 1; }, false);*/
-    //footer.appendChild(input);
-
     return footer;
   }
   
@@ -1116,22 +1111,4 @@ function ui() {
     }, 10);
   }
 }
-
-
-// TODO: 
-// scrollable body? 
-// fix shift by loading images
-// clear storage of removed items
-
-// http://www.google.com/reader/api/0/item/edit?ck=1261440351303&
-//T fSw58iMBAAA.n4MagCKYiSlHjFxiiXRhow.Lkzkgowf6PcgUz9BPdb_NQ
-//annotation  test
-//linkify false
-//share false
-//snippet <a href="http://www.youtube.com/watch?v=sMSWVW9o3So"><img src="http://img.youtube.com/vi/sMSWVW9o3So/2.jpg"></a><br><br>Я уверен, вы думали, что пейнтбол - это всего лишь развлечение для планктона. Но <a href="http://www.bonyurt.com/">эти</a> креативные испанцы доказывают, что пэйнтбол - это вполне себе Искусство.
-//srcTitle  Dirty.Ru - Больше 10
-//srcUrl  http://dirty.ru/
-//title Современное искусство
-//url http://dirty.ru/comments/259633/#new
-
 
