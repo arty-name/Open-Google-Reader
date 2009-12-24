@@ -150,6 +150,10 @@ function lib() {
     
     var method = (options.method || 'get').toUpperCase();
     
+    options.parameters = options.parameters || {};
+    options.parameters.client = options.parameters.client || 'userscript';
+    options.parameters.ck = options.parameters.ck || (new Date()).getTime();
+    
     var params = [];
     for (var param in options.parameters) {
       params.push(param + '=' + encodeURIComponent(options.parameters[param]));
