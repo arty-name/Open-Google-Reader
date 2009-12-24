@@ -1089,6 +1089,10 @@ function ui() {
         container.scrollTop = targetScroll + 20;
       }
     },
+    
+    // create new shared entry with altered title/content
+    // adding comment is creating new entry too
+    // `forceHide` is used to hide inputs i.e. when moving to another entry
     edit: function(event, forceHide) {
       if (!currentItem) return;
       
@@ -1099,6 +1103,8 @@ function ui() {
       var body  = currentItem.querySelector('article');
       
       if (!data.inputs) {
+        // create inputs if needed and put them to corresponding places
+        
         data.inputs = {
           shown: false,
           title:   DOM('input',    {value: getTitle(data)}),
@@ -1114,6 +1120,8 @@ function ui() {
       if (forceHide) {
         data.inputs.shown = true;
       }
+      
+      // toggle visibility of nodes and `shown` state
       
       var nodeDisplay = data.inputs.shown ? '' : 'none';
       var inputDisplay = data.inputs.shown ? 'none' : '';
