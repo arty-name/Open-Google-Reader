@@ -397,15 +397,19 @@ function ui() {
       return;
     }
     
+    // make useful shortcuts for title and content
     item.body =
       item.content && item.content.content ||
       item.summary && item.summary.content || '';
+      
+    item.originalTitle = item.title;
+    item.title = item.title || trimToNWords(item.body.stripTags(), 8);
     
     // check if entry needs alteration
     entryAlterations.invoke('call', null, item);
     
     // if entry matches filter, mark it as read and skip it
-    if (matchesFilters(getTitle(item), item.body)) {
+    if (matchesFilters(item.title, item.body)) {
       item.read = false;
       toggleEntryTag(item, 'read');
       if (unreadCount) {
@@ -438,12 +442,6 @@ function ui() {
     }
   }
   
-  function getTitle(data) {
-    return data.title ||
-      trimToNWords(((data.summary && data.summary.content) ||
-       (data.content && data.content.content)).stripTags(), 8);
-  }
-  
   // check entry's title and body against filters
   function matchesFilters(title, body) {
     title = title.toLowerCase();
@@ -463,7 +461,7 @@ function ui() {
     });
     
     // create entry's main link
-    var linkProps = {innerHTML: getTitle(data)};
+    var linkProps = {innerHTML: data.title};
     if (data.alternate) {
       linkProps.href = data.alternate[0].href;
       if (!linkProps.href.match(torrentRE)) {
@@ -1107,7 +1105,7 @@ function ui() {
         
         data.inputs = {
           shown: false,
-          title:   DOM('input',    {value: getTitle(data)}),
+          title:   DOM('input',    {value: data.title}),
           body:    DOM('textarea', {value: data.body, rows: 10, cols: 60}),
           comment: DOM('textarea', {value: '', rows: 3, cols: 60})
         };
