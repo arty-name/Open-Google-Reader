@@ -525,12 +525,9 @@ function ui() {
     
     // request data
     AjaxRequest('http://www.google.com/reader/api/0/unread-count', {
-      method: 'get',
       parameters: {
         allcomments: 'true',
-        output: 'json',
-        ck: (new Date()).getTime(),
-        client: 'userscript'
+        output: 'json'
       },
       onSuccess: function(response) {
         var data = response.responseJSON;
@@ -569,12 +566,7 @@ function ui() {
     
     // otherwise load data
     return AjaxRequest('http://www.google.com/reader/api/0/subscription/list', {
-      method: 'get',
-      parameters: {
-        output: 'json',
-        ck: (new Date()).getTime(),
-        client: 'userscript'
-      },
+      parameters: {output: 'json'},
       onSuccess: function(response) {
         subscriptions = response.responseJSON.subscriptions;
         continuation();
@@ -596,7 +588,6 @@ function ui() {
     
     // request data from special url for given view
     dataRequest = AjaxRequest(entriesUrl + tags[view], {
-      method: 'GET',
       parameters: getViewParameters(view),
       onSuccess: function(response){
         var data = response.responseJSON;
@@ -641,12 +632,7 @@ function ui() {
   };
   
   function getViewParameters(view) {
-    // these are common values
-    var parameters = {
-      n: limit,
-      ck: (new Date()).getTime(),
-      client: 'userscript'
-    }
+    var parameters = {n: limit};
     // add continuation if known
     if (continuation) parameters.c = continuation;
     
@@ -1037,7 +1023,7 @@ function ui() {
       parameters.tags = tags.share2;
     }
 
-    return AjaxRequest(editEntryUrl + '?client=userscript&ck=' + (new Date()).getTime(), {
+    return AjaxRequest(editEntryUrl, {
       method: 'post',
       parameters: parameters,
       onSuccess: function() {
@@ -1073,11 +1059,6 @@ function ui() {
   
   function updateToken(oncomplete) {
     AjaxRequest('http://www.google.com/reader/api/0/token', {
-      method: 'get',
-      parameters: {
-        ck: (new Date()).getTime(),
-        client: 'userscript'
-      },
       onSuccess: function(response) {
         token = response.responseText;
         oncomplete();
@@ -1341,6 +1322,10 @@ function lib() {
     };
     
     var method = (options.method || 'get').toUpperCase();
+    
+    options.parameters = options.parameters || {};
+    options.parameters.client = options.parameters.client || 'userscript';
+    options.parameters.ck = options.parameters.ck || (new Date()).getTime();
     
     var params = [];
     for (var param in options.parameters) {
