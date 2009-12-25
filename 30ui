@@ -92,7 +92,7 @@ function ui() {
   var currentItem;
   
   // name of current view
-  var currentView = 'unread';
+  var currentView;
   
   // number of unread items to display in title
   var unreadCount = 0;
@@ -109,9 +109,9 @@ function ui() {
   
   // 
   var continuation;
-  var limit = 20;
-  var displayedItems = [];
-  var noMoreItems = false;
+  var limit;
+  var displayedItems;
+  var noMoreItems;
   var inBackground = false;
 
 
@@ -120,7 +120,7 @@ function ui() {
   // start regular updating of unread items count 
   initUnreadCount();
   // get entries for current view when we have subscriptions data
-  ensureSubscriptions(getViewData.curry(currentView));
+  ensureSubscriptions(switchToView.curry('unread'));
   
   // attach listeners for clicks, keypresses and mousewheel
   document.addEventListener('click', clickHandler, false);
@@ -187,6 +187,7 @@ function ui() {
     var css =
       'html, body { position: absolute; height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; } ' + 
       'body > header { position: fixed; top: 0; left: 0; right: 0; height: 2em; z-index: 100; background-color: window; } ' + 
+      'body>header.unread button.unread, body>header.star button.starred, body>header.share button.shared, body>header.share2 button.shared2 { font-weight: bold; } ' + 
       //'body > footer { position: fixed; bottom: 0; left: 0; right: 0; height: 2em; z-index: 100; background-color: window; } ' + 
       'body > header > a.resetView { position: absolute; right: 0; } ' + 
       'body > div.container { position: absolute; top: 2em; bottom: 0; left: 0; right: 0; overflow-y: scroll; padding: 0 .5em; } ' + 
@@ -695,6 +696,10 @@ function ui() {
     
     resetView();
     resetContainer();
+
+    container.previousElementSibling.removeClassName(currentView);
+    container.previousElementSibling.addClassName(view);
+    
     currentView = view;
     getViewData(currentView);
   }
