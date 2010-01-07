@@ -780,19 +780,20 @@ function ui() {
   
   function toggleEntryTag(entry, tag) {
     var data = storage[entry.id] || entry;
+    var state = data[tag];
     
     var parameters = {
       T: token,
       i: data.id,
       s: data.origin.streamId
     };
-    parameters[data[tag] ? 'r' : 'a'] = tags[tag]; 
+    parameters[state ? 'r' : 'a'] = tags[tag]; 
     
     AjaxRequest(editTagUrl, {
       method: 'post',
       parameters: parameters,
       onSuccess: function() {
-        data[tag] = !data[tag];
+        data[tag] = !state;
         entry.querySelectorAll && entry.querySelectorAll('button.' + tag).forEach(function(button){
           button.innerHTML = button.innerHTML.replace(/^./, getButtonImage(data, tag));
         });
