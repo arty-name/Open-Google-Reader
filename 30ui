@@ -737,6 +737,7 @@ function ui() {
   }
   
   function markAsRead(entry) {
+    if (!entry.id) return;
     var data = storage[entry.id];
     if (!data.read) {
       toggleEntryTag(entry, 'read');
@@ -748,6 +749,7 @@ function ui() {
   }
   
   function checkIfAltered(entry, share) {
+    if (!entry.id) return false;
     var data = storage[entry.id] || entry;
     var edited = data.inputs && data.inputs.shown;
     if (!data.altered && !edited) return false;
@@ -773,12 +775,18 @@ function ui() {
       onSuccess: function() {
         if (entry != currentItem) return;
         actions.edit(undefined, true);
+        
+        container.insertBefore(DOM('section', {className: 'entry'}, [
+          DOM('h2', undefined, [DOM('a', {href: parameters.url, innerHTML: parameters.title})]),
+          DOM('article', {innerHTML: parameters.snippet})
+        ]), entry.nextElementSibling);
       },
       onFailure: updateToken.curry(checkIfAltered.curry(entry, share))
     });
   }
   
   function toggleEntryTag(entry, tag) {
+    if (!entry.id) return;
     var data = storage[entry.id] || entry;
     var state = data[tag];
     
@@ -1098,7 +1106,7 @@ function ui() {
     // adding comment is creating new entry too
     // `forceHide` is used to hide inputs i.e. when moving to another entry
     edit: function(event, forceHide) {
-      if (!currentItem) return;
+      if (!currentItem || !currentItem.id) return;
       
       var data = storage[currentItem.id];
       if (!data.inputs && forceHide) return;
