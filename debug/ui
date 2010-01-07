@@ -85,7 +85,7 @@ function ui() {
   var shadow;
   
   
-  // hash of available actions
+  // hash of available actions, defined at the bottom of file
   var actions;
   
   // handle of currently selected item
