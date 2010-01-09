@@ -178,6 +178,7 @@ function ui() {
     var head = body.previousElementSibling;
     while (head.firstChild) head.removeChild(head.firstChild);
     head.appendChild(DOM('title'));
+    head.appendChild(DOM('link', {href: '/reader/ui/favicon.ico', rel: 'SHORTCUT ICON'}));
 
     Array.toArray(document.styleSheets).forEach(function(ss){ ss.disabled = true; });
   }
