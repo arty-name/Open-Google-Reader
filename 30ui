@@ -300,6 +300,7 @@ function ui() {
       string = '(' + unreadCount + ') ';
     }
     document.title = string + 'Google Reader';
+    container.previousElementSibling.firstElementChild.nextElementSibling.innerHTML = 'Unread ' + string;
   }
   
   // call continuation when subscriptions are loaded
