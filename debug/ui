@@ -406,7 +406,7 @@ function ui() {
       item.summary && item.summary.content || '';
       
     item.originalTitle = item.title;
-    item.title = item.title || trimToNWords(item.body.stripTags(), 8);
+    item.title = item.title || trimToNWords(item.body.stripTags(), 8) || '»';
     
     // check if entry needs alteration
     entryAlterations.invoke('call', null, item);
