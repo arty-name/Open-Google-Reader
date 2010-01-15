@@ -104,7 +104,7 @@ A: By default it works exactly on:
 
 Q: Page at http://www.google.com/reader/view/ takes too long to load, how can I
    speed it up?
-A: That page contains lots of user data, which slow page down. You can use same
+A: That page contains lots of user data, which slows page down. You can use same
    interface on page http://www.google.com/reader/view/1, which loads in a
    blink of eye. The only downside is that you'd have to copy your `userId` from
    popup dialog to userscript.
