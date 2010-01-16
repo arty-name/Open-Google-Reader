@@ -6,5 +6,3 @@
 
 if (!document.location.href.match(/^http:..www.google.com.reader.view.1?$/)) return;
 
-var settings = {};
-

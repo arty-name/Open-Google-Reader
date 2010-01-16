@@ -7,7 +7,9 @@ function onload() {
 if (!('readyState' in document)) {
   // GreaseMonkey, fuck you very much! I don't need your overprotection.
   var script = document.createElement('script');
-  script.innerHTML = lib.toString() + ui.toString() + 'lib(); ui();';
+  script.innerHTML =
+    defineSettings.toString() + lib.toString() + ui.toString() +
+    'defineSettings(); lib(); ui();';
   document.body.appendChild(script);
   
 } else if (document.readyState.match(/complete|loaded/)) {

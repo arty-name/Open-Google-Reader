@@ -13,9 +13,17 @@
 
 (function(){
 
+// OVERVIEW
+// To get general idea of how that script works,
+// see OVERVIEW below or in file 30ui
+
 if (!document.location.href.match(/^http:..www.google.com.reader.view.1?$/)) return;
 
-var settings = {
+defineSettings();
+
+function defineSettings() {
+
+settings = {
 
   // only required to be loaded on 404 url, i.e. http://www.google.com/reader/view/1
   userId: '',
@@ -33,24 +41,61 @@ var settings = {
   entryAlterations: []
   
 };
+
+}
+/*
+  OVERVIEW
+  
+  At first all native Google Reader data is removed from page (`clearDocument`)
+  and replaced with new structure (`createLayout`): panel
+  with buttons (`createHeader`) and container for entries. New css styles
+  are also added (`addStyles`).
+  
+  Then code requests entries data from google (`getViewData`). Data for each
+  entry is filtered (`titleFilters` and `bodyFilters`),
+  preprocessed (`entryAlterations`) and new entry (`createEntry`) is appended
+  to the container. When you switch to another view, it does the same, but first
+  it resets page (`resetView` and `resetContainer`).
+  
+  When you click any button, code (`clickHandler`) looks at button's class,
+  picks from `actions` a function with the same name and runs it.
+  Same functions are used when you press a button on a keyboard (`keyHandler`).
+  
+  Sharing an entry, liking it, starring it or marking it as read is just
+  assigning specific tags (using `toggleEntryTag`). These are based on userId
+  and created via `createTags`. Same tags are appended to base url to request
+  specific view like "shared entries", "starred entries", "unread entries" or
+  "entries tagged with X". Commenting and altering the entry is actually
+  creating a new entry (`checkIfAltered`).
+  
+  Tagging an entry (and hence almost any other operation) requires a token.
+  Tokens are valid for short time, and need to be re-requested (`updateToken`).
+  
+  When you have read almost all entries (`checkNeedMoreEntries`), new portion
+  of data is requested. To get it you need `continuation` from previous request.
+  
+  
+  Generally functions are declared directly below the function which uses them
+  in the same order, so you can read code from top to bottom.
+*/
+
 function ui() {
 
   // only required to be loaded on 404 url, i.e. http://www.google.com/reader/view/1
   var userId = settings.userId || '';
   
-  
-  
   // lowercase words to filter entries out by title
-  var titleFilters = settings.titleFilters;
+  var titleFilters = settings.titleFilters || [];
 
   // words to filter entries out by body (hmtl included)
-  var bodyFilters = settings.bodyFilters;
+  var bodyFilters = settings.bodyFilters || [];
 
   // regular expression to detect links which do not get target=_blank
-  var torrentRE = settings.torrentRE;
+  var torrentRE = settings.torrentRE || /b41b964aeda4a6d58bb22fcbc345248a/;
   
   // filters to manipulate on entry content
-  var entryAlterations = settings.entryAlterations;
+  // NB: set data.altered = true if you want these changes to be shared when you click "share"
+  var entryAlterations = settings.entryAlterations || [];
   
 
   // static user id 
@@ -64,6 +109,9 @@ function ui() {
   
   // url to manipulate tags on
   var editTagUrl = 'http://www.google.com/reader/api/0/edit-tag';
+  
+  // url to post edited entries to
+  var editEntryUrl = 'http://www.google.com/reader/api/0/item/edit';
   
   // sort orders
   var sort = {
@@ -82,14 +130,14 @@ function ui() {
   var shadow;
   
   
-  // hash of available actions
-  var buttonHandlers;
+  // hash of available actions, defined at the bottom of file
+  var actions;
   
   // handle of currently selected item
   var currentItem;
   
   // name of current view
-  var currentView = 'unread';
+  var currentView;
   
   // number of unread items to display in title
   var unreadCount = 0;
@@ -106,9 +154,9 @@ function ui() {
   
   // 
   var continuation;
-  var limit = 20;
-  var displayedItems = [];
-  var noMoreItems = false;
+  var limit;
+  var displayedItems;
+  var noMoreItems;
   var inBackground = false;
 
 
@@ -117,7 +165,7 @@ function ui() {
   // start regular updating of unread items count 
   initUnreadCount();
   // get entries for current view when we have subscriptions data
-  ensureSubscriptions(getViewData.curry(currentView));
+  ensureSubscriptions(switchToView.curry('unread'));
   
   // attach listeners for clicks, keypresses and mousewheel
   document.addEventListener('click', clickHandler, false);
@@ -128,182 +176,6 @@ function ui() {
   window.addEventListener('resize', resizeHandler, false);
   window.addEventListener('focus', function(){ inBackground = false; }, false);
   window.addEventListener('blur',  function(){ inBackground = true;  }, false);
-  
-  
-  // on button click get its className and call corresponding handler
-  buttonHandlers = {
-    
-    // view switchers
-    unread: switchToView.curry('unread'), 
-    starred: switchToView.curry('star'), 
-    shared: switchToView.curry('share'), 
-    shared2: switchToView.curry('share2'),
-    
-    reload: function() {
-      resetView();
-      resetContainer();
-      updateUnreadCount(true);
-      getViewData(currentView);
-    },
-    
-    // star/share management
-    star: function(){
-      toggleEntryTag(currentItem, 'star');
-    },
-    share: function(){
-      toggleEntryTag(currentItem, 'share');
-      toggleEntryTag(currentItem, 'like');
-    },
-    share2: function(){ // this one adds specific tag
-      toggleEntryTag(currentItem, 'share2');
-      toggleEntryTag(currentItem, 'like');
-    },
-
-    // dumb "show next/previous entry" buttons
-    next: function() {
-      if (!currentItem) {
-        makeEntryActive(container.firstElementChild);
-      } else {
-        if (currentItem.nextElementSibling && /\bentry\b/i.test(currentItem.nextElementSibling.className)) { 
-          makeEntryActive(currentItem.nextElementSibling);
-          container.scrollTop = currentItem.offsetTop;
-        }
-      }
-    },
-    prev: function() {
-      if (!currentItem) return;
-      if (currentItem.previousElementSibling) {
-        makeEntryActive(currentItem.previousElementSibling);
-      }
-      container.scrollTop = currentItem.offsetTop;
-    },
-    
-    // smart paging: if current entry is short, show next, but otherwise
-    // scroll current entry to show next page or next large image
-    space: function(event) {
-      
-      // shift+space = previous entry
-      if (event.shiftKey && currentItem) {
-        buttonHandlers.prev();
-        return;
-      }
-      // first use focuses first item
-      if (!currentItem) {
-        buttonHandlers.next();
-        return;
-      }
-      
-      // find all images in article
-      var viewHeight = container.clientHeight;
-      var images = currentItem.querySelectorAll('article img');
-      // find large images (height > half of a viewport height)
-      var largeImages = images.map(function(image){
-        return image.height > viewHeight * .5;
-      });
-      
-      if (largeImages.length > 0) {
-        // try finding large image which *is* on screen, but still needs scrolling
-        var foundIndex = undefined;
-        var found = largeImages.find(function(image, index){ 
-          var viewportImageTop = image.offsetTop - container.scrollTop;
-          var viewportImageBottom = viewportImageTop + image.height;
-          
-          if (viewportImageTop < viewHeight * .5 && viewportImageBottom > viewHeight) {
-            foundIndex = index;
-          }
-          return foundIndex != undefined;
-        });
-        
-        if (found) {
-          var invisibleHeight = found.offsetTop + found.height - container.scrollTop - viewHeight;
-          
-          if (invisibleHeight > viewHeight) {
-            // can scroll whole screen
-            container.scrollTop += viewHeight;
-          } else if (invisibleHeight > viewHeight * .4) {
-            // instantly show remaining part
-            container.scrollTop = found.offsetTop + found.height - viewHeight;
-          } else { 
-            // smooth scroll to show remaining part 
-            scrollTo(found.offsetTop + found.height - viewHeight);
-          }
-          
-          return;
-        }
-        
-        // try finding large image which *will be* on screen
-        var nextIndex = undefined;
-        var next = largeImages.find(function(image, index){ 
-          var viewportImageTop = image.offsetTop - container.scrollTop;
-          var viewportImageBottom = viewportImageTop + image.height;
-          
-          if (image != found &&
-              viewportImageTop > 0 && viewportImageTop < viewHeight &&
-              viewportImageBottom > viewHeight) {
-            nextIndex = index;
-          }
-          return nextIndex != undefined;
-        });
-        
-        if (next) {
-          if (next.height < viewHeight) {
-            // can show whole image on a screen
-            var diff = (next.offsetTop - Math.max(0, viewHeight - next.height) / 4) - container.scrollTop;
-            if (diff < viewHeight * .5) {
-              scrollTo(container.scrollTop + diff);
-            } else {
-              container.scrollTop += diff;
-            }
-          } else {
-            var viewportImageTop = next.offsetTop - container.scrollTop;
-            if (viewportImageTop < viewHeight * .5) {
-              // large part already visible, smooth scroll needed
-              scrollTo(next.offsetTop);
-            } else {
-              // can do instant scroll
-              container.scrollTop = next.offsetTop;
-            }
-          }
-          return;
-        }
-      }
-      
-      var invisibleHeight = (currentItem.offsetTop + currentItem.clientHeight) -
-        (container.scrollTop + container.clientHeight);
-        
-      // if only buttons line is invisible, go to next entry
-      if (invisibleHeight < 30) {
-        buttonHandlers.next();
-      
-      // if there's no full page to show,
-      // smooth scroll to show remainder
-      // and use shadow to indicate unread part
-      } else if (invisibleHeight < container.clientHeight) {
-        scrollTo(container.scrollTop + invisibleHeight);
-        shadow.style.height = container.clientHeight - invisibleHeight - 40 + 'px';
-        setTimeout(hideShadow, 1000);
-        
-      // otherwise show next page
-      // or smaller image that's partially shown
-      } else {
-        var targetScroll = container.scrollTop + viewHeight;
-        
-        // find image that's already partially shown and is less then viewHeight
-        images.find(function(image){ 
-          if (image.offsetTop <= targetScroll && image.offsetTop + image.height > targetScroll) {
-            if (image.height > viewHeight && image.offsetTop < targetScroll) {
-              return false;
-            }
-            targetScroll = image.offsetTop - 20; // +- magic neutralizes effect of scrolling not whole viewHeight
-            return true;
-          } else return false;
-        });
-        
-        // show next page, leaving last line of current page on the screen
-        container.scrollTop = targetScroll + 20;
-      }
-    }
-  };
   
   
   function initTags() {
@@ -317,7 +189,7 @@ function ui() {
       like: tagPrefix + 'like',
       star: tagPrefix + 'starred',
       share: tagPrefix + 'broadcast',
-      share2: 'user/' + userId + '/label/w', // my specific tag "W"
+      tagW: 'user/' + userId + '/label/w', // my specific tag "W"
       friends: tagPrefix + 'broadcast-friends-comments'
     }
   }
@@ -351,6 +223,7 @@ function ui() {
     var head = body.previousElementSibling;
     while (head.firstChild) head.removeChild(head.firstChild);
     head.appendChild(DOM('title'));
+    head.appendChild(DOM('link', {href: '/reader/ui/favicon.ico', rel: 'SHORTCUT ICON'}));
 
     Array.toArray(document.styleSheets).forEach(function(ss){ ss.disabled = true; });
   }
@@ -360,6 +233,7 @@ function ui() {
     var css =
       'html, body { position: absolute; height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; } ' + 
       'body > header { position: fixed; top: 0; left: 0; right: 0; height: 2em; z-index: 100; background-color: window; } ' + 
+      'body>header.unread button.unread, body>header.star button.starred, body>header.share button.shared, body>header.tagW button.taggedW { font-weight: bold; } ' + 
       //'body > footer { position: fixed; bottom: 0; left: 0; right: 0; height: 2em; z-index: 100; background-color: window; } ' + 
       'body > header > a.resetView { position: absolute; right: 0; } ' + 
       'body > div.container { position: absolute; top: 2em; bottom: 0; left: 0; right: 0; overflow-y: scroll; padding: 0 .5em; } ' + 
@@ -370,6 +244,7 @@ function ui() {
       'section.entry > h2 * { display: inline; } ' + 
       'section.entry > h2 > a { text-decoration: none; line-height: 1em; } ' + 
       'section.entry > h2 > button { font-size: inherit; width: 1em; padding-right: 1.1em; } ' + 
+      'section.entry > h2 > input { width: 95%; font-size: inherit; } ' + 
       'section.entry > article { display: block; overflow-x: auto; clear: both; } ' + 
       'section.entry > article > p { line-height: 1.15em; } ' + 
       'section.entry > cite, section.entry > article, section.entry > footer { margin-left: .5em; } ' +
@@ -380,9 +255,10 @@ function ui() {
       'section.entry > footer { clear: both; display: block; margin-left: 0; } ' +
       'section.entry > footer > span { float: right; } ' +
       'section.entry + div.spacer { float: left; width: 50%; } ' +
-      'button.star { color: #efd334; } button.share, button.share2 { color: #cd8f4b; } '+
-      'button.star, button.share, button.share2 { background: none; border: none; } '+
+      'button.star { color: #bfb016; } button.share, button.tagW { color: #dc9765; } button.edit { color: #74d774; } '+
+      'button.star, button.share, button.tagW, button.edit { background: none; border: none; } '+
       'button { cursor: pointer; } ' +
+      'textarea { width: 95%; } ' +
       '';
     document.body.previousElementSibling.appendChild(
       DOM('style', undefined, [document.createTextNode(css)])
@@ -396,7 +272,7 @@ function ui() {
       createButton('unread',  'Unread'),
       createButton('starred', '☆ Starred'),
       createButton('shared',  '⚐ Shared'),
-      createButton('shared2', '⚐ Shared2'),
+      createButton('taggedW', '⚐ TaggedW'),
       createButton('next',    '▽ Next'),
       createButton('prev',    '△ Previous'),
       DOM('a', {
@@ -436,13 +312,10 @@ function ui() {
     updateUnreadCount.time = time;
     
     // request data
-    new AjaxRequest('http://www.google.com/reader/api/0/unread-count', {
-      method: 'get',
+    AjaxRequest('http://www.google.com/reader/api/0/unread-count', {
       parameters: {
         allcomments: 'true',
-        output: 'json',
-        ck: (new Date()).getTime(),
-        client: 'userscript'
+        output: 'json'
       },
       onSuccess: function(response) {
         var data = response.responseJSON;
@@ -456,7 +329,7 @@ function ui() {
         // if user is not reading now, show new entries
         // NB: even if already shown 20, because existing continuation won't contain new entries
         if (currentView == 'unread' && inBackground && !currentItem && count > unreadCount) {
-          buttonHandlers.reload();
+          actions.reload();
         }
         
         unreadCount = count;
@@ -472,6 +345,7 @@ function ui() {
       string = '(' + unreadCount + ') ';
     }
     document.title = string + 'Google Reader';
+    container.previousElementSibling.firstElementChild.nextElementSibling.innerHTML = 'Unread ' + string;
   }
   
   // call continuation when subscriptions are loaded
@@ -480,13 +354,8 @@ function ui() {
     if (subscriptions) return continuation();
     
     // otherwise load data
-    return new AjaxRequest('http://www.google.com/reader/api/0/subscription/list', {
-      method: 'get',
-      parameters: {
-        output: 'json',
-        ck: (new Date()).getTime(),
-        client: 'userscript'
-      },
+    return AjaxRequest('http://www.google.com/reader/api/0/subscription/list', {
+      parameters: {output: 'json'},
       onSuccess: function(response) {
         subscriptions = response.responseJSON.subscriptions;
         continuation();
@@ -507,8 +376,7 @@ function ui() {
     }
     
     // request data from special url for given view
-    dataRequest = new AjaxRequest(entriesUrl + tags[view], {
-      method: 'GET',
+    dataRequest = AjaxRequest(entriesUrl + tags[view], {
       parameters: getViewParameters(view),
       onSuccess: function(response){
         var data = response.responseJSON;
@@ -553,12 +421,7 @@ function ui() {
   };
   
   function getViewParameters(view) {
-    // these are common values
-    var parameters = {
-      n: limit,
-      ck: (new Date()).getTime(),
-      client: 'userscript'
-    }
+    var parameters = {n: limit};
     // add continuation if known
     if (continuation) parameters.c = continuation;
     
@@ -582,15 +445,19 @@ function ui() {
       return;
     }
     
+    // make useful shortcuts for title and content
     item.body =
       item.content && item.content.content ||
       item.summary && item.summary.content || '';
+      
+    item.originalTitle = item.title;
+    item.title = item.title || trimToNWords(item.body.stripTags(), 8) || '»';
     
     // check if entry needs alteration
     entryAlterations.invoke('call', null, item);
     
     // if entry matches filter, mark it as read and skip it
-    if (matchesFilters(getTitle(item), item.body)) {
+    if (matchesFilters(item.title, item.body)) {
       item.read = false;
       toggleEntryTag(item, 'read');
       if (unreadCount) {
@@ -623,12 +490,6 @@ function ui() {
     }
   }
   
-  function getTitle(data) {
-    return data.title ||
-      trimToNWords(((data.summary && data.summary.content) ||
-       (data.content && data.content.content)).stripTags(), 8);
-  }
-  
   // check entry's title and body against filters
   function matchesFilters(title, body) {
     title = title.toLowerCase();
@@ -643,12 +504,12 @@ function ui() {
 
   function createEntry(data) {
     // simplify tag detection on entry
-    ['read', 'star', 'share', 'share2'].forEach(function(tag){
+    ['read', 'star', 'share', 'tagW'].forEach(function(tag){
       data[tag] = data.categories.include(tags[tag]);
     });
     
     // create entry's main link
-    var linkProps = {innerHTML: getTitle(data)};
+    var linkProps = {innerHTML: data.title};
     if (data.alternate) {
       linkProps.href = data.alternate[0].href;
       if (!linkProps.href.match(torrentRE)) {
@@ -678,9 +539,10 @@ function ui() {
   
   function getButtonImage(data, button) {
     switch (button) {
-      case 'star':   return (data.star   ? '★' : '☆'); 
-      case 'share':  return (data.share  ? '⚑' : '⚐')
-      case 'share2': return (data.share2 ? '⚑' : '⚐'); 
+      case 'star':   return (data.star  ? '★' : '☆'); 
+      case 'share':  return (data.share ? '⚑' : '⚐')
+      case 'tagW':   return (data.tagW  ? '⚑' : '⚐'); 
+      case 'edit':   return '✍'; 
     }
     return '';
   }
@@ -698,6 +560,7 @@ function ui() {
       return feed.id == data.origin.streamId;
     });
     if (feed) {
+      data.feed = feed;
       site = feed.title;
     }
     
@@ -730,9 +593,10 @@ function ui() {
   // entry footer contains buttons and tags
   function createEntryFooter(data) {
     var footer = DOM('footer', undefined, [
-      createButton('star',   getButtonImage(data, 'star') + ' Star'),
-      createButton('share',  getButtonImage(data, 'share') + ' Share'),
-      createButton('share2', getButtonImage(data, 'share2') + ' Share2')
+      createButton('star',  getButtonImage(data, 'star') + ' Star'),
+      createButton('share', getButtonImage(data, 'share') + ' Share'),
+      createButton('tagW',  getButtonImage(data, 'tagW') + ' TagW'),
+      createButton('edit',  getButtonImage(data, 'edit') + ' Edit/Comment')
     ]);
 
     // filter out custom user tags, only original tags remain
@@ -745,11 +609,6 @@ function ui() {
       footer.insertBefore(tagsSpan, footer.firstChild);
     }
     
-    /*var input = DOM('textarea', {rows: 1, columns: 60});
-    input.addEventListener('focus', function(){ this.rows = 5; }, false);
-    input.addEventListener('blur',  function(){ this.rows = 1; }, false);*/
-    //footer.appendChild(input);
-
     return footer;
   }
   
@@ -767,8 +626,8 @@ function ui() {
     }
     
     target = event.findElement('button');
-    if (target && buttonHandlers[target.className]) {
-      buttonHandlers[target.className]();
+    if (target && actions[target.className]) {
+      actions[target.className]();
     }
   } catch(e) { LOG(e) }}
 
@@ -777,21 +636,26 @@ function ui() {
     
     if (event.ctrlKey || event.altKey) return;
     if (target && (target.nodeName.match(/input|textarea/i))) return;
-    if (!event.ctrlKey && event.keyCode == 32) event.preventDefault();
+    if (!event.ctrlKey && event.keyCode == 32) event.preventDefault(); // space
     
     hideShadow();
+    
+    if (event.keyCode == 27) { // ESC
+      actions.edit(undefined, true);
+      return;
+    }
     
     var matched = true;
     var key = String.fromCharCode(event.keyCode).toUpperCase();
     switch (key) {
-      case 'R': case 'К': buttonHandlers.reload(); break;
+      case 'R': case 'К': actions.reload(); break;
       case 'W': case 'Ц': 
-      case 'U': case 'Г': buttonHandlers.unread(); break;
+      case 'U': case 'Г': actions.unread(); break;
       case 'E': case 'У': 
-      case 'I': case 'Ш': buttonHandlers.starred(); break;
-      case 'O': case 'Щ': buttonHandlers.shared(); break;
-      case 'J': case 'О': buttonHandlers.next(); break;
-      case ' ':           buttonHandlers.space(event);  break;
+      case 'I': case 'Ш': actions.starred(); break;
+      case 'O': case 'Щ': actions.shared(); break;
+      case 'J': case 'О': actions.next(); break;
+      case ' ':           actions.space(event);  break;
       default: matched = false;
     }
     if (matched) {
@@ -803,11 +667,12 @@ function ui() {
     
     matched = true;
     switch (key) {
-      case 'K': case 'Л': buttonHandlers.prev(); break;
+      case 'K': case 'Л': actions.prev(); break;
       case 'V': case 'М': currentItem && openTab(currentItem.querySelector('a'), event); break;
       case 'C': case 'С': currentItem && openTab(currentItem.querySelectorAll('a')[1], event); break;
-      //case 'W': case 'Ц': buttonHandlers.share2(); break;
-      case 'S': case 'Ы': buttonHandlers[event.shiftKey ? 'share' : 'star'](); break;
+      //case 'W': case 'Ц': actions.tagW(); break;
+      case 'S': case 'Ы': actions[event.shiftKey ? 'share' : 'star'](); break;
+      case 'Y': case 'Н': actions.edit(); break;
       default: matched = false;
     }
     if (matched) {
@@ -878,12 +743,20 @@ function ui() {
     
     resetView();
     resetContainer();
+
+    container.previousElementSibling.removeClassName(currentView);
+    container.previousElementSibling.addClassName(view);
+    
     currentView = view;
     getViewData(currentView);
   }
 
   function makeEntryActive(entry) {
-    currentItem && currentItem.removeClassName('active'); 
+    if (currentItem) {
+      currentItem.removeClassName('active');
+      actions.edit(undefined, true);
+    }
+      
     currentItem = entry;
     currentItem.addClassName('active');
     
@@ -911,6 +784,7 @@ function ui() {
   }
   
   function markAsRead(entry) {
+    if (!entry.id) return;
     var data = storage[entry.id];
     if (!data.read) {
       toggleEntryTag(entry, 'read');
@@ -921,21 +795,60 @@ function ui() {
     }
   }
   
-  function toggleEntryTag(entry, tag) {
+  function checkIfAltered(entry, share) {
+    if (!entry.id) return false;
     var data = storage[entry.id] || entry;
+    var edited = data.inputs && data.inputs.shown;
+    if (!data.altered && !edited) return false;
+
     var parameters = {
-      async: true,
+      T: token,
+      url: entry.querySelector('a').href,
+      title: edited ? data.inputs.title.value : data.title,
+      snippet: edited ? data.inputs.body.value : data.body,
+      annotation: edited ? data.inputs.comment.value : '',
+      linkify: false,
+      share: !!share,
+      srcTitle: (data.feed || data.origin).title,
+      srcUrl: data.origin.htmlUrl
+    };
+    if (!share) {
+      parameters.tags = tags.tagW;
+    }
+
+    return AjaxRequest(editEntryUrl, {
+      method: 'post',
+      parameters: parameters,
+      onSuccess: function() {
+        if (entry != currentItem) return;
+        actions.edit(undefined, true);
+        
+        container.insertBefore(DOM('section', {className: 'entry'}, [
+          DOM('h2', undefined, [DOM('a', {href: parameters.url, innerHTML: parameters.title})]),
+          DOM('article', {innerHTML: parameters.snippet})
+        ]), entry.nextElementSibling);
+      },
+      onFailure: updateToken.curry(checkIfAltered.curry(entry, share))
+    });
+  }
+  
+  function toggleEntryTag(entry, tag) {
+    if (!entry.id) return;
+    var data = storage[entry.id] || entry;
+    var state = data[tag];
+    
+    var parameters = {
       T: token,
       i: data.id,
       s: data.origin.streamId
     };
-    parameters[data[tag] ? 'r' : 'a'] = tags[tag]; 
+    parameters[state ? 'r' : 'a'] = tags[tag]; 
     
-    new AjaxRequest(editTagUrl, {
+    AjaxRequest(editTagUrl, {
       method: 'post',
       parameters: parameters,
       onSuccess: function() {
-        data[tag] = !data[tag];
+        data[tag] = !state;
         entry.querySelectorAll && entry.querySelectorAll('button.' + tag).forEach(function(button){
           button.innerHTML = button.innerHTML.replace(/^./, getButtonImage(data, tag));
         });
@@ -945,12 +858,7 @@ function ui() {
   }
   
   function updateToken(oncomplete) {
-    new AjaxRequest('http://www.google.com/reader/api/0/token', {
-      method: 'get',
-      parameters: {
-        ck: (new Date()).getTime(),
-        client: 'userscript'
-      },
+    AjaxRequest('http://www.google.com/reader/api/0/token', {
       onSuccess: function(response) {
         token = response.responseText;
         oncomplete();
@@ -1061,24 +969,232 @@ function ui() {
       container.scrollTop = parseInt(y);
     }, 10);
   }
+  
+  
+  // on button click get its className and call corresponding handler
+  actions = {
+    
+    // view switchers
+    unread: switchToView.curry('unread'), 
+    starred: switchToView.curry('star'), 
+    shared: switchToView.curry('share'), 
+    taggedW: switchToView.curry('tagW'),
+    
+    reload: function() {
+      resetView();
+      resetContainer();
+      updateUnreadCount(true);
+      getViewData(currentView);
+    },
+    
+    // star/share management
+    star: function(){
+      toggleEntryTag(currentItem, 'star');
+    },
+    share: function(){
+      if (checkIfAltered(currentItem, true)) return;
+      
+      toggleEntryTag(currentItem, 'share');
+      toggleEntryTag(currentItem, 'like');
+    },
+    tagW: function(){ // this one adds specific tag
+      if (checkIfAltered(currentItem)) return;
+
+      toggleEntryTag(currentItem, 'tagW');
+      toggleEntryTag(currentItem, 'like');
+    },
+
+    // dumb "show next/previous entry" buttons
+    next: function() {
+      if (!currentItem) {
+        makeEntryActive(container.firstElementChild);
+      } else {
+        if (currentItem.nextElementSibling && /\bentry\b/i.test(currentItem.nextElementSibling.className)) { 
+          makeEntryActive(currentItem.nextElementSibling);
+          container.scrollTop = currentItem.offsetTop;
+        }
+      }
+    },
+    prev: function() {
+      if (!currentItem) return;
+      if (currentItem.previousElementSibling) {
+        makeEntryActive(currentItem.previousElementSibling);
+      }
+      container.scrollTop = currentItem.offsetTop;
+    },
+    
+    // smart paging: if current entry is short, show next, but otherwise
+    // scroll current entry to show next page or next large image
+    space: function(event) {
+      
+      // shift+space = previous entry
+      if (event.shiftKey && currentItem) {
+        actions.prev();
+        return;
+      }
+      // first use focuses first item
+      if (!currentItem) {
+        actions.next();
+        return;
+      }
+      
+      // find all images in article
+      var viewHeight = container.clientHeight;
+      var images = currentItem.querySelectorAll('article img');
+      // find large images (height > half of a viewport height)
+      var largeImages = images.map(function(image){
+        return image.height > viewHeight * .5;
+      });
+      
+      if (largeImages.length > 0) {
+        // try finding large image which *is* on screen, but still needs scrolling
+        var foundIndex = undefined;
+        var found = largeImages.find(function(image, index){ 
+          var viewportImageTop = image.offsetTop - container.scrollTop;
+          var viewportImageBottom = viewportImageTop + image.height;
+          
+          if (viewportImageTop < viewHeight * .5 && viewportImageBottom > viewHeight) {
+            foundIndex = index;
+          }
+          return foundIndex != undefined;
+        });
+        
+        if (found) {
+          var invisibleHeight = found.offsetTop + found.height - container.scrollTop - viewHeight;
+          
+          if (invisibleHeight > viewHeight) {
+            // can scroll whole screen
+            container.scrollTop += viewHeight;
+          } else if (invisibleHeight > viewHeight * .4) {
+            // instantly show remaining part
+            container.scrollTop = found.offsetTop + found.height - viewHeight;
+          } else { 
+            // smooth scroll to show remaining part 
+            scrollTo(found.offsetTop + found.height - viewHeight);
+          }
+          
+          return;
+        }
+        
+        // try finding large image which *will be* on screen
+        var nextIndex = undefined;
+        var next = largeImages.find(function(image, index){ 
+          var viewportImageTop = image.offsetTop - container.scrollTop;
+          var viewportImageBottom = viewportImageTop + image.height;
+          
+          if (image != found &&
+              viewportImageTop > 0 && viewportImageTop < viewHeight &&
+              viewportImageBottom > viewHeight) {
+            nextIndex = index;
+          }
+          return nextIndex != undefined;
+        });
+        
+        if (next) {
+          if (next.height < viewHeight) {
+            // can show whole image on a screen
+            var diff = (next.offsetTop - Math.max(0, viewHeight - next.height) / 4) - container.scrollTop;
+            if (diff < viewHeight * .5) {
+              scrollTo(container.scrollTop + diff);
+            } else {
+              container.scrollTop += diff;
+            }
+          } else {
+            var viewportImageTop = next.offsetTop - container.scrollTop;
+            if (viewportImageTop < viewHeight * .5) {
+              // large part already visible, smooth scroll needed
+              scrollTo(next.offsetTop);
+            } else {
+              // can do instant scroll
+              container.scrollTop = next.offsetTop;
+            }
+          }
+          return;
+        }
+      }
+      
+      var invisibleHeight = (currentItem.offsetTop + currentItem.clientHeight) -
+        (container.scrollTop + container.clientHeight);
+        
+      // if only buttons line is invisible, go to next entry
+      if (invisibleHeight < 30) {
+        actions.next();
+      
+      // if there's no full page to show,
+      // smooth scroll to show remainder
+      // and use shadow to indicate unread part
+      } else if (invisibleHeight < container.clientHeight) {
+        scrollTo(container.scrollTop + invisibleHeight);
+        shadow.style.height = container.clientHeight - invisibleHeight - 40 + 'px';
+        setTimeout(hideShadow, 1000);
+        
+      // otherwise show next page
+      // or smaller image that's partially shown
+      } else {
+        var targetScroll = container.scrollTop + viewHeight;
+        
+        // find image that's already partially shown and is less then viewHeight
+        images.find(function(image){ 
+          if (image.offsetTop <= targetScroll && image.offsetTop + image.height > targetScroll) {
+            if (image.height > viewHeight && image.offsetTop < targetScroll) {
+              return false;
+            }
+            targetScroll = image.offsetTop - 20; // +- magic neutralizes effect of scrolling not whole viewHeight
+            return true;
+          } else return false;
+        });
+        
+        // show next page, leaving last line of current page on the screen
+        container.scrollTop = targetScroll + 20;
+      }
+    },
+    
+    // create new shared entry with altered title/content
+    // adding comment is creating new entry too
+    // `forceHide` is used to hide inputs i.e. when moving to another entry
+    edit: function(event, forceHide) {
+      if (!currentItem || !currentItem.id) return;
+      
+      var data = storage[currentItem.id];
+      if (!data.inputs && forceHide) return;
+
+      var title = currentItem.querySelector('a');
+      var body  = currentItem.querySelector('article');
+      
+      if (!data.inputs) {
+        // create inputs if needed and put them to corresponding places
+        
+        data.inputs = {
+          shown: false,
+          title:   DOM('input',    {value: data.title}),
+          body:    DOM('textarea', {value: data.body, rows: 10, cols: 60}),
+          comment: DOM('textarea', {value: '', rows: 3, cols: 60})
+        };
+        
+        title.parentNode.appendChild(data.inputs.title);
+        body.parentNode.insertBefore(data.inputs.comment, body.nextElementSibling);
+        body.parentNode.insertBefore(data.inputs.body, body.nextElementSibling);
+      }
+      
+      if (forceHide) {
+        data.inputs.shown = true;
+      }
+      
+      // toggle visibility of nodes and `shown` state
+      
+      var nodeDisplay = data.inputs.shown ? '' : 'none';
+      var inputDisplay = data.inputs.shown ? 'none' : '';
+      
+      title.style.display = nodeDisplay;
+      body.style.display  = nodeDisplay;
+      data.inputs.title.style.display   = inputDisplay;
+      data.inputs.body.style.display    = inputDisplay;
+      data.inputs.comment.style.display = inputDisplay;
+
+      data.inputs.shown = !data.inputs.shown;
+    }
+  };
 }
-
-
-// TODO: adding comments
-// alter title by rules: share altered
-// scrollable body? 
-// fix shift by loading images
-
-//T fSw58iMBAAA.n4MagCKYiSlHjFxiiXRhow.Lkzkgowf6PcgUz9BPdb_NQ
-//annotation  test
-//linkify false
-//share false
-//snippet <a href="http://www.youtube.com/watch?v=sMSWVW9o3So"><img src="http://img.youtube.com/vi/sMSWVW9o3So/2.jpg"></a><br><br>Я уверен, вы думали, что пейнтбол - это всего лишь развлечение для планктона. Но <a href="http://www.bonyurt.com/">эти</a> креативные испанцы доказывают, что пэйнтбол - это вполне себе Искусство.
-//srcTitle  Dirty.Ru - Больше 10
-//srcUrl  http://dirty.ru/
-//title Современное искусство
-//url http://dirty.ru/comments/259633/#new
-
 
 function lib() {
   // Following code is Prototype.js replacement for stupid Firefox's GreaseMonkey 
@@ -1232,6 +1348,10 @@ function lib() {
     
     var method = (options.method || 'get').toUpperCase();
     
+    options.parameters = options.parameters || {};
+    options.parameters.client = options.parameters.client || 'userscript';
+    options.parameters.ck = options.parameters.ck || (new Date()).getTime();
+    
     var params = [];
     for (var param in options.parameters) {
       params.push(param + '=' + encodeURIComponent(options.parameters[param]));
@@ -1270,7 +1390,9 @@ function onload() {
 if (!('readyState' in document)) {
   // GreaseMonkey, fuck you very much! I don't need your overprotection.
   var script = document.createElement('script');
-  script.innerHTML = lib.toString() + ui.toString() + 'lib(); ui();';
+  script.innerHTML =
+    defineSettings.toString() + lib.toString() + ui.toString() +
+    'defineSettings(); lib(); ui();';
   document.body.appendChild(script);
   
 } else if (document.readyState.match(/complete|loaded/)) {

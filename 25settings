@@ -1,3 +1,7 @@
+defineSettings();
+
+function defineSettings() {
+
 settings = {
 
   // only required to be loaded on 404 url, i.e. http://www.google.com/reader/view/1
@@ -16,3 +20,5 @@ settings = {
   entryAlterations: []
   
 };
+
+}
