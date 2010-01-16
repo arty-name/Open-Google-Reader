@@ -144,7 +144,7 @@ function ui() {
       like: tagPrefix + 'like',
       star: tagPrefix + 'starred',
       share: tagPrefix + 'broadcast',
-      share2: 'user/' + userId + '/label/w', // my specific tag "W"
+      tagW: 'user/' + userId + '/label/w', // my specific tag "W"
       friends: tagPrefix + 'broadcast-friends-comments'
     }
   }
@@ -178,6 +178,7 @@ function ui() {
     var head = body.previousElementSibling;
     while (head.firstChild) head.removeChild(head.firstChild);
     head.appendChild(DOM('title'));
+    head.appendChild(DOM('link', {href: '/reader/ui/favicon.ico', rel: 'SHORTCUT ICON'}));
 
     Array.toArray(document.styleSheets).forEach(function(ss){ ss.disabled = true; });
   }
@@ -187,7 +188,7 @@ function ui() {
     var css =
       'html, body { position: absolute; height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; } ' + 
       'body > header { position: fixed; top: 0; left: 0; right: 0; height: 2em; z-index: 100; background-color: window; } ' + 
-      'body>header.unread button.unread, body>header.star button.starred, body>header.share button.shared, body>header.share2 button.shared2 { font-weight: bold; } ' + 
+      'body>header.unread button.unread, body>header.star button.starred, body>header.share button.shared, body>header.tagW button.taggedW { font-weight: bold; } ' + 
       //'body > footer { position: fixed; bottom: 0; left: 0; right: 0; height: 2em; z-index: 100; background-color: window; } ' + 
       'body > header > a.resetView { position: absolute; right: 0; } ' + 
       'body > div.container { position: absolute; top: 2em; bottom: 0; left: 0; right: 0; overflow-y: scroll; padding: 0 .5em; } ' + 
@@ -209,8 +210,8 @@ function ui() {
       'section.entry > footer { clear: both; display: block; margin-left: 0; } ' +
       'section.entry > footer > span { float: right; } ' +
       'section.entry + div.spacer { float: left; width: 50%; } ' +
-      'button.star { color: #bfb016; } button.share, button.share2 { color: #dc9765; } button.edit { color: #74d774; } '+
-      'button.star, button.share, button.share2, button.edit { background: none; border: none; } '+
+      'button.star { color: #bfb016; } button.share, button.tagW { color: #dc9765; } button.edit { color: #74d774; } '+
+      'button.star, button.share, button.tagW, button.edit { background: none; border: none; } '+
       'button { cursor: pointer; } ' +
       'textarea { width: 95%; } ' +
       '';
@@ -226,7 +227,7 @@ function ui() {
       createButton('unread',  'Unread'),
       createButton('starred', '☆ Starred'),
       createButton('shared',  '⚐ Shared'),
-      createButton('shared2', '⚐ Shared2'),
+      createButton('taggedW', '⚐ TaggedW'),
       createButton('next',    '▽ Next'),
       createButton('prev',    '△ Previous'),
       DOM('a', {
@@ -299,6 +300,7 @@ function ui() {
       string = '(' + unreadCount + ') ';
     }
     document.title = string + 'Google Reader';
+    container.previousElementSibling.firstElementChild.nextElementSibling.innerHTML = 'Unread ' + string;
   }
   
   // call continuation when subscriptions are loaded
@@ -404,7 +406,7 @@ function ui() {
       item.summary && item.summary.content || '';
       
     item.originalTitle = item.title;
-    item.title = item.title || trimToNWords(item.body.stripTags(), 8);
+    item.title = item.title || trimToNWords(item.body.stripTags(), 8) || '»';
     
     // check if entry needs alteration
     entryAlterations.invoke('call', null, item);
@@ -457,7 +459,7 @@ function ui() {
 
   function createEntry(data) {
     // simplify tag detection on entry
-    ['read', 'star', 'share', 'share2'].forEach(function(tag){
+    ['read', 'star', 'share', 'tagW'].forEach(function(tag){
       data[tag] = data.categories.include(tags[tag]);
     });
     
@@ -492,9 +494,9 @@ function ui() {
   
   function getButtonImage(data, button) {
     switch (button) {
-      case 'star':   return (data.star   ? '★' : '☆'); 
-      case 'share':  return (data.share  ? '⚑' : '⚐')
-      case 'share2': return (data.share2 ? '⚑' : '⚐'); 
+      case 'star':   return (data.star  ? '★' : '☆'); 
+      case 'share':  return (data.share ? '⚑' : '⚐')
+      case 'tagW':   return (data.tagW  ? '⚑' : '⚐'); 
       case 'edit':   return '✍'; 
     }
     return '';
@@ -546,10 +548,10 @@ function ui() {
   // entry footer contains buttons and tags
   function createEntryFooter(data) {
     var footer = DOM('footer', undefined, [
-      createButton('star',   getButtonImage(data, 'star') + ' Star'),
-      createButton('share',  getButtonImage(data, 'share') + ' Share'),
-      createButton('share2', getButtonImage(data, 'share2') + ' Share2'),
-      createButton('edit',   getButtonImage(data, 'edit') + ' Edit/Comment')
+      createButton('star',  getButtonImage(data, 'star') + ' Star'),
+      createButton('share', getButtonImage(data, 'share') + ' Share'),
+      createButton('tagW',  getButtonImage(data, 'tagW') + ' TagW'),
+      createButton('edit',  getButtonImage(data, 'edit') + ' Edit/Comment')
     ]);
 
     // filter out custom user tags, only original tags remain
@@ -623,7 +625,7 @@ function ui() {
       case 'K': case 'Л': actions.prev(); break;
       case 'V': case 'М': currentItem && openTab(currentItem.querySelector('a'), event); break;
       case 'C': case 'С': currentItem && openTab(currentItem.querySelectorAll('a')[1], event); break;
-      //case 'W': case 'Ц': actions.share2(); break;
+      //case 'W': case 'Ц': actions.tagW(); break;
       case 'S': case 'Ы': actions[event.shiftKey ? 'share' : 'star'](); break;
       case 'Y': case 'Н': actions.edit(); break;
       default: matched = false;
@@ -766,7 +768,7 @@ function ui() {
       srcUrl: data.origin.htmlUrl
     };
     if (!share) {
-      parameters.tags = tags.share2;
+      parameters.tags = tags.tagW;
     }
 
     return AjaxRequest(editEntryUrl, {
@@ -931,7 +933,7 @@ function ui() {
     unread: switchToView.curry('unread'), 
     starred: switchToView.curry('star'), 
     shared: switchToView.curry('share'), 
-    shared2: switchToView.curry('share2'),
+    taggedW: switchToView.curry('tagW'),
     
     reload: function() {
       resetView();
@@ -950,10 +952,10 @@ function ui() {
       toggleEntryTag(currentItem, 'share');
       toggleEntryTag(currentItem, 'like');
     },
-    share2: function(){ // this one adds specific tag
+    tagW: function(){ // this one adds specific tag
       if (checkIfAltered(currentItem)) return;
 
-      toggleEntryTag(currentItem, 'share2');
+      toggleEntryTag(currentItem, 'tagW');
       toggleEntryTag(currentItem, 'like');
     },
 
