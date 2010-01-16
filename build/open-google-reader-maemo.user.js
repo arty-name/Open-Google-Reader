@@ -928,7 +928,7 @@ function ui() {
     LOG(exception);
   }
   
-  function scrollTo(offset){
+  function scrollTo(offset){ container.scrollTop = offset; return; 
     var steps = 15;
     
     // interval handler
