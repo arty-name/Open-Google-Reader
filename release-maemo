@@ -1,5 +1,6 @@
 #!/bin/bash
 cat 10meta  20prefix  25settings  30ui  40lib  45maemo  50onload  60killDefault  70postfix | \
 sed 's/keypress/keyup/' \
+| sed 's/function scrollTo(offset){/function scrollTo(offset){ container.scrollTop = offset; return; /' \
 > build/open-google-reader-maemo.user.js
 
