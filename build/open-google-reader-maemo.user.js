@@ -19,7 +19,9 @@
 
 if (!document.location.href.match(/^http:..www.google.com.reader.view.1?$/)) return;
 
-var settings = {};
+defineSettings();
+
+function defineSettings() {
 
 settings = {
 
@@ -39,6 +41,8 @@ settings = {
   entryAlterations: []
   
 };
+
+}
 /*
   OVERVIEW
   
@@ -1440,7 +1444,9 @@ function onload() {
 if (!('readyState' in document)) {
   // GreaseMonkey, fuck you very much! I don't need your overprotection.
   var script = document.createElement('script');
-  script.innerHTML = lib.toString() + ui.toString() + 'lib(); ui();';
+  script.innerHTML =
+    defineSettings.toString() + lib.toString() + ui.toString() +
+    'defineSettings(); lib(); ui();';
   document.body.appendChild(script);
   
 } else if (document.readyState.match(/complete|loaded/)) {
