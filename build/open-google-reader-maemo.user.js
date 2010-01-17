@@ -648,7 +648,7 @@ function ui() {
     var matched = true;
     var key = String.fromCharCode(event.keyCode).toUpperCase();
     switch (key) {
-      case 'R': case 'К': actions.reload(); break;
+      case 'R': case 'К': actions[event.shiftKey ? 'fullReload' : 'reload'](); break;
       case 'W': case 'Ц': 
       case 'U': case 'Г': actions.unread(); break;
       case 'E': case 'У': 
@@ -985,6 +985,24 @@ function ui() {
       resetContainer();
       updateUnreadCount(true);
       getViewData(currentView);
+    },
+    
+    fullReload: function() {
+      reloadFeed(0);
+      
+      function reloadFeed(index) {
+        if (!subscriptions[index]) return;
+        AjaxRequest(entriesUrl + encodeURIComponent(subscriptions[index].id), {
+          parameters: {xt: tags.read},
+          onSuccess: function(response) {
+            if (response.responseJSON.items.length > 0) {
+              updateUnreadCount();
+            }
+            index++;
+            reloadFeed(index);
+          }
+        });
+      }
     },
     
     // star/share management
