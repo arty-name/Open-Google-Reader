@@ -60,7 +60,7 @@ shift+s - share entry
 v/shift+v - open main link of current entry in background/foreground
 c/shift+c - open first link in current entry in background/foreground
 spacebar - go to next entry / next page of same entry / next large image
-r - reload
+r/shift+r - reload/forced reload
 w/e - show unread/starred entries
 u/i - show unread/starred entries
 o - show shared entries
