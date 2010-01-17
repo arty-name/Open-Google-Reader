@@ -993,13 +993,18 @@ function ui() {
       function reloadFeed(index) {
         if (!subscriptions[index]) return;
         AjaxRequest(entriesUrl + encodeURIComponent(subscriptions[index].id), {
-          parameters: {xt: tags.read},
+          parameters: {refresh: true, xt: tags.read},
           onSuccess: function(response) {
             if (response.responseJSON.items.length > 0) {
               updateUnreadCount();
             }
             index++;
             reloadFeed(index);
+          },
+          onComplete: function(response) {
+            if (response.status != 200) {
+              LOG(response.statusText);
+            }
           }
         });
       }

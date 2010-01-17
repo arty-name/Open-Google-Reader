@@ -193,7 +193,7 @@ function ui() {
       'body > header > a.resetView { position: absolute; right: 0; } ' + 
       'body > div.container { position: absolute; top: 2em; bottom: 0; left: 0; right: 0; overflow-y: scroll; padding: 0 .5em; } ' + 
       'div.shadow { position: absolute; top: 2em; left: 0; right: 0; background: black; opacity: .5; } ' + 
-      'section.entry, section.message { padding-left: 1.4em; padding-right: .5em; clear: both; display: block; border: 0 solid #bbb; border-bottom-width: 2px; margin-bottom: .2em; float: left; width: 95%; } ' + 
+      'section.entry { padding-left: 1.4em; padding-right: .5em; clear: both; display: block; border: 0 solid #bbb; border-bottom-width: 2px; margin-bottom: .2em; float: left; width: 95%; } ' + 
       'section.entry.active { border-color: #333; } ' + 
       'section.entry > h2 { font-family: sans-serif; margin-top: .1em; margin-bottom: .3em; margin-left: .3em; text-indent: -1.4em; } ' + 
       'section.entry > h2 * { display: inline; } ' + 
@@ -948,13 +948,18 @@ function ui() {
       function reloadFeed(index) {
         if (!subscriptions[index]) return;
         AjaxRequest(entriesUrl + encodeURIComponent(subscriptions[index].id), {
-          parameters: {xt: tags.read},
+          parameters: {refresh: true, xt: tags.read},
           onSuccess: function(response) {
             if (response.responseJSON.items.length > 0) {
               updateUnreadCount();
             }
             index++;
             reloadFeed(index);
+          },
+          onComplete: function(response) {
+            if (response.status != 200) {
+              LOG(response.statusText);
+            }
           }
         });
       }
