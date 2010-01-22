@@ -252,7 +252,8 @@ function ui() {
       'section.entry > q { display: block; font-style: italic; margin: .5em; border: 2px dotted grey; padding: 0 .2em; }' +
       'section.entry > q:before { content: attr(cite) ": «" }  section.entry > q:after { content: "»" }' +
       'section.entry > footer { clear: both; display: block; margin-left: 0; } ' +
-      'section.entry > footer > span { float: right; } ' +
+      'section.entry > footer > span.buttons { white-space: nowrap; } ' +
+      'section.entry > footer > span.tags { float: right; opacity: .5; } ' +
       'section.entry + div.spacer { float: left; width: 50%; } ' +
       'button.star { color: #bfb016; } button.share, button.tagW { color: #dc9765; } button.edit { color: #74d774; } '+
       'button.star, button.share, button.tagW, button.edit { background: none; border: none; } '+
@@ -627,12 +628,12 @@ function ui() {
 
   // entry footer contains buttons and tags
   function createEntryFooter(data) {
-    var footer = DOM('footer', undefined, [
+    var footer = DOM('footer', undefined, [DOM('span', {className: 'buttons'}, [
       createButton('star',  getButtonImage(data, 'star') + ' Star'),
       createButton('share', getButtonImage(data, 'share') + ' Share'),
       createButton('tagW',  getButtonImage(data, 'tagW') + ' TagW'),
       createButton('edit',  getButtonImage(data, 'edit') + ' Edit/Comment')
-    ]);
+    ])]);
 
     // filter out custom user tags, only original tags remain
     var tags = data.categories.filter(function(tag){
@@ -640,7 +641,7 @@ function ui() {
     }).join(', ');
     
     if (tags.length) {
-      var tagsSpan = DOM('span', {innerHTML: 'Tags: ' + tags});
+      var tagsSpan = DOM('span', {className: 'tags', innerHTML: 'Tags: ' + tags});
       footer.insertBefore(tagsSpan, footer.firstChild);
     }
     
