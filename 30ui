@@ -244,7 +244,7 @@ function ui() {
 
   // update unread count now, every minute and on every window focus
   function initUnreadCount() {
-    updateUnreadCount();
+    updateUnreadCount(true);
     setInterval(updateUnreadCount, 60000);
     window.addEventListener('focus', updateUnreadCount, false);
   }
@@ -274,10 +274,13 @@ function ui() {
           if (feed.id.match(/^feed/)) count += feed.count;
         });
         
-        // if user is not reading now, show new entries
-        // NB: even if already shown 20, because existing continuation won't contain new entries
-        if (currentView == 'unread' && inBackground && !currentItem && count > unreadCount) {
-          actions.reload();
+        // if unread count increased, current continuation isn't complete anymore
+        // thus we get a new one
+        // when force specified, new continuation is already being loaded, ignore
+        if (count > unreadCount && currentView == 'unread' && !force) {
+          // TODO: sometimes this happens right after reading an item
+          // when you get unread count for the moment before you read it
+          getNewUnreadContinuation();
         }
         
         unreadCount = count;
@@ -294,6 +297,46 @@ function ui() {
     }
     document.title = string + 'Google Reader';
     container.previousElementSibling.firstElementChild.nextElementSibling.innerHTML = 'Unread ' + string;
+  }
+  
+  // this replaces active continuation with new, containing all unread items
+  function getNewUnreadContinuation() {
+    // if user hasn't started reading, we simply reload
+    if (inBackground && !currentItem) {
+      actions.reload();
+      
+    // otherwise getting new continuation is a bit more complex
+    } else {
+      // count displayed unread items
+      var displayed = 0;
+      var entry = currentItem;
+      if (!entry && container.firstElementChild) {
+        entry = container.firstElementChild;
+        displayed = 1;
+      }
+      while (entry &&
+             (entry = entry.nextElementSibling) &&
+             (entry.className == 'entry')) ++displayed;
+      
+      // re-request data for already displayed items to get new continuation
+      AjaxRequest(entriesUrl + tags['unread'], {
+        parameters: {n: displayed, xt: tags.read, r: sort.oldestFirst},
+        onSuccess: function(response){
+          var data = response.responseJSON;
+          if (!data) return;
+          
+          continuation = data.continuation;
+          limit = 20 + displayed;
+          noMoreItems = false;
+          checkNeedMoreEntries();
+          
+          if (container.lastChild && container.lastChild.className == 'spacer') {
+            container.removeChild(container.lastChild);
+          }
+        },
+        onFailure: updateToken.curry(getNewUnreadContinuation) // ensure we have active token
+      });
+    }
   }
   
   // call continuation when subscriptions are loaded
