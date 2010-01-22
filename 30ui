@@ -121,6 +121,8 @@ function ui() {
   initUnreadCount();
   // get entries for current view when we have subscriptions data
   ensureSubscriptions(switchToView.curry('unread'));
+  // get token if we don't have any
+  if (!token) updateToken();
   
   // attach listeners for clicks, keypresses and mousewheel
   document.addEventListener('click', clickHandler, false);
@@ -807,7 +809,7 @@ function ui() {
     AjaxRequest('http://www.google.com/reader/api/0/token', {
       onSuccess: function(response) {
         token = response.responseText;
-        oncomplete();
+        oncomplete && oncomplete();
       }
     })
   }

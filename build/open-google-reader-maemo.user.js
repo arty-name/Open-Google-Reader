@@ -166,6 +166,8 @@ function ui() {
   initUnreadCount();
   // get entries for current view when we have subscriptions data
   ensureSubscriptions(switchToView.curry('unread'));
+  // get token if we don't have any
+  if (!token) updateToken();
   
   // attach listeners for clicks, keyupes and mousewheel
   document.addEventListener('click', clickHandler, false);
@@ -319,8 +321,12 @@ function ui() {
         
         // if user is not reading now, show new entries
         // NB: even if already shown 20, because existing continuation won't contain new entries
-        if (currentView == 'unread' && inBackground && !currentItem && count > unreadCount) {
-          actions.reload();
+        if (currentView == 'unread' && count > unreadCount) {
+          if (inBackground && !currentItem) {
+            actions.reload();
+          } else {
+            ;
+          }
         }
         
         unreadCount = count;
@@ -852,7 +858,7 @@ function ui() {
     AjaxRequest('http://www.google.com/reader/api/0/token', {
       onSuccess: function(response) {
         token = response.responseText;
-        oncomplete();
+        oncomplete && oncomplete();
       }
     })
   }
