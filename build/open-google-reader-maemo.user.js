@@ -123,6 +123,8 @@ function ui() {
   var tags = initTags();  
   
   
+  var body = document.body;
+  
   // container of entries
   var container;
   
@@ -205,10 +207,6 @@ function ui() {
     document.body.appendChild(createHeader()); // header contains buttons
     document.body.appendChild(container);
     
-    // fix container height to prevent stretching down
-    document.heightDiff = window.innerHeight - container.clientHeight;
-    container.style.height = window.innerHeight - document.heightDiff + 'px';
-    
     // this one will shadow read portion of entry
     shadow = DOM('div', {className: 'shadow'});
     document.body.appendChild(shadow);
@@ -232,13 +230,14 @@ function ui() {
   // add own css styles
   function addStyles() {
     var css =
-      'html, body { position: absolute; height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; } ' + 
+      'html, body { height: 100%; width: 100%; margin: 0; padding: 0; } ' +
+      'body { margin-top: 2em; }' +
       'body > header { position: fixed; top: 0; left: 0; right: 0; height: 2em; z-index: 100; background-color: window; } ' + 
       'body>header.unread button.unread, body>header.star button.starred, body>header.share button.shared, body>header.tagW button.taggedW { font-weight: bold; } ' + 
       'body > header > a.resetView { position: absolute; right: 0; } ' + 
-      'body > div.container { position: absolute; top: 2em; bottom: 0; left: 0; right: 0; overflow-y: scroll; padding: 0 .5em; } ' + 
-      'div.shadow { position: absolute; top: 2em; left: 0; right: 0; background: black; opacity: .5; } ' + 
-      'section.entry { padding-left: 1.4em; padding-right: .5em; clear: both; display: block; border: 0 solid #bbb; border-bottom-width: 2px; margin-bottom: .2em; float: left; width: 95%; } ' + 
+      'body > div.container { position:relative; padding: 0 .5em; } ' + 
+      'div.shadow {  background: black; opacity: .5; } ' + 
+      'section.entry { padding-left: 1.4em; padding-right: .5em; display: block; border: 0 solid #bbb; border-bottom-width: 2px; margin-bottom: .2em; width: 95%; } ' + 
       'section.entry.active { border-color: #333; } ' + 
       'section.entry > h2 { font-family: sans-serif; margin-top: .1em; margin-bottom: .3em; margin-left: .3em; text-indent: -1.4em; } ' + 
       'section.entry > h2 * { display: inline; } ' + 
@@ -438,7 +437,7 @@ function ui() {
         if (noMoreItems && container.lastChild) {
           var spacer = DOM('div', {className: 'spacer'});
           spacer.style.height = 
-            container.clientHeight - (container.lastChild.clientHeight % container.clientHeight) - 20 + 'px';
+            body.clientHeight - (container.lastChild.clientHeight % body.clientHeight) - 20 + 'px';
           container.appendChild(spacer);
         }
         
@@ -722,12 +721,12 @@ function ui() {
       return;
     }
     var distance2border = Math.min(50, currentItem.clientHeight * .5);
-    if (currentItem.offsetTop + currentItem.clientHeight - distance2border < container.scrollTop) {
+    if (currentItem.offsetTop + currentItem.clientHeight - distance2border < body.scrollTop) {
       if (currentItem.nextElementSibling) {
         makeEntryActive(currentItem.nextElementSibling);
       }
     }
-    if (currentItem.offsetTop + distance2border > container.scrollTop + container.clientHeight) {
+    if (currentItem.offsetTop + distance2border > body.scrollTop + body.clientHeight) {
       if (currentItem.previousElementSibling) {
         makeEntryActive(currentItem.previousElementSibling);
       }
@@ -739,7 +738,7 @@ function ui() {
   function checkNeedMoreEntries() {
     if (dataRequest || noMoreItems) return;
     
-    if (container.scrollTop + 2 * container.clientHeight > container.scrollHeight) {
+    if (body.scrollTop + 2 * body.clientHeight > body.scrollHeight) {
       getViewData(currentView);
     }
   }
@@ -749,7 +748,7 @@ function ui() {
 
     if (!currentItem) return;
     
-    container.scrollTop = currentItem.offsetTop;
+    body.scrollTop = currentItem.offsetTop;
 
     // fixate entry height to fight scroll caused by loading of skipped images
     var article = currentItem.querySelector('article');
@@ -923,7 +922,7 @@ function ui() {
   
     // if this image is in one of previous entries, scroll container and exit
     if (currentItem != entry) {
-      container.scrollTop += diff;
+      body.scrollTop += diff;
       return;
     }
       
@@ -937,10 +936,10 @@ function ui() {
     imageOffset -= entry.offsetTop;
       
     // if image is above .2 of viewport, scroll container
-    var entryVisibleOffset = entry.offsetTop - container.scrollTop;
+    var entryVisibleOffset = entry.offsetTop - body.scrollTop;
     if (entryVisibleOffset < 0 &&
-        entryVisibleOffset + imageOffset < container.clientHeight * .2) {
-      container.scrollTop += diff;
+        entryVisibleOffset + imageOffset < body.clientHeight * .2) {
+      body.scrollTop += diff;
     }
   }
   
@@ -973,7 +972,7 @@ function ui() {
     var currentStep = 0;
 
     // get current window scrolling position
-    var startOffset = container.scrollTop;
+    var startOffset = body.scrollTop;
 
     // calculate scroll distance and maximum scroll speeds
     var deltaY = offset  - startOffset;
@@ -981,7 +980,7 @@ function ui() {
     
     // if both scroll distances are too small, use simple scroll 
     if (deltaY < steps) {
-      container.scrollTop = offset;
+      body.scrollTop = offset;
       return;
     }
     
@@ -1002,7 +1001,7 @@ function ui() {
       var factor = (currentStep < (steps / 2) ? -1 : 1) * centerDist / steps * (steps - centerDist);
       // new scroll coords 
       var y = startOffset  + deltaY / 2 + factor * maxSpeedY;
-      container.scrollTop = parseInt(y);
+      body.scrollTop = parseInt(y);
     }, 10);
   }
   
@@ -1070,7 +1069,7 @@ function ui() {
       } else {
         if (currentItem.nextElementSibling && /\bentry\b/i.test(currentItem.nextElementSibling.className)) { 
           makeEntryActive(currentItem.nextElementSibling);
-          container.scrollTop = currentItem.offsetTop;
+          body.scrollTop = currentItem.offsetTop;
         }
       }
     },
@@ -1079,7 +1078,7 @@ function ui() {
       if (currentItem.previousElementSibling) {
         makeEntryActive(currentItem.previousElementSibling);
       }
-      container.scrollTop = currentItem.offsetTop;
+      body.scrollTop = currentItem.offsetTop;
     },
     
     // smart paging: if current entry is short, show next, but otherwise
@@ -1098,7 +1097,7 @@ function ui() {
       }
       
       // find all images in article
-      var viewHeight = container.clientHeight;
+      var viewHeight = body.clientHeight;
       var images = currentItem.querySelectorAll('article img');
       // find large images (height > half of a viewport height)
       var largeImages = images.map(function(image){
@@ -1109,7 +1108,7 @@ function ui() {
         // try finding large image which *is* on screen, but still needs scrolling
         var foundIndex = undefined;
         var found = largeImages.find(function(image, index){ 
-          var viewportImageTop = image.offsetTop - container.scrollTop;
+          var viewportImageTop = image.offsetTop - body.scrollTop;
           var viewportImageBottom = viewportImageTop + image.height;
           
           if (viewportImageTop < viewHeight * .5 && viewportImageBottom > viewHeight) {
@@ -1119,14 +1118,14 @@ function ui() {
         });
         
         if (found) {
-          var invisibleHeight = found.offsetTop + found.height - container.scrollTop - viewHeight;
+          var invisibleHeight = found.offsetTop + found.height - body.scrollTop - viewHeight;
           
           if (invisibleHeight > viewHeight) {
             // can scroll whole screen
-            container.scrollTop += viewHeight;
+            body.scrollTop += viewHeight;
           } else if (invisibleHeight > viewHeight * .4) {
             // instantly show remaining part
-            container.scrollTop = found.offsetTop + found.height - viewHeight;
+            body.scrollTop = found.offsetTop + found.height - viewHeight;
           } else { 
             // smooth scroll to show remaining part 
             scrollTo(found.offsetTop + found.height - viewHeight);
@@ -1138,7 +1137,7 @@ function ui() {
         // try finding large image which *will be* on screen
         var nextIndex = undefined;
         var next = largeImages.find(function(image, index){ 
-          var viewportImageTop = image.offsetTop - container.scrollTop;
+          var viewportImageTop = image.offsetTop - body.scrollTop;
           var viewportImageBottom = viewportImageTop + image.height;
           
           if (image != found &&
@@ -1152,20 +1151,20 @@ function ui() {
         if (next) {
           if (next.height < viewHeight) {
             // can show whole image on a screen
-            var diff = (next.offsetTop - Math.max(0, viewHeight - next.height) / 4) - container.scrollTop;
+            var diff = (next.offsetTop - Math.max(0, viewHeight - next.height) / 4) - body.scrollTop;
             if (diff < viewHeight * .5) {
-              scrollTo(container.scrollTop + diff);
+              scrollTo(body.scrollTop + diff);
             } else {
-              container.scrollTop += diff;
+              body.scrollTop += diff;
             }
           } else {
-            var viewportImageTop = next.offsetTop - container.scrollTop;
+            var viewportImageTop = next.offsetTop - body.scrollTop;
             if (viewportImageTop < viewHeight * .5) {
               // large part already visible, smooth scroll needed
               scrollTo(next.offsetTop);
             } else {
               // can do instant scroll
-              container.scrollTop = next.offsetTop;
+              body.scrollTop = next.offsetTop;
             }
           }
           return;
@@ -1173,7 +1172,7 @@ function ui() {
       }
       
       var invisibleHeight = (currentItem.offsetTop + currentItem.clientHeight) -
-        (container.scrollTop + container.clientHeight);
+        (body.scrollTop + body.clientHeight);
         
       // if only buttons line is invisible, go to next entry
       if (invisibleHeight < 30) {
@@ -1182,15 +1181,15 @@ function ui() {
       // if there's no full page to show,
       // smooth scroll to show remainder
       // and use shadow to indicate unread part
-      } else if (invisibleHeight < container.clientHeight) {
-        scrollTo(container.scrollTop + invisibleHeight);
-        shadow.style.height = container.clientHeight - invisibleHeight - 40 + 'px';
+      } else if (invisibleHeight < body.clientHeight) {
+        scrollTo(body.scrollTop + invisibleHeight);
+        shadow.style.height = body.clientHeight - invisibleHeight - 40 + 'px';
         setTimeout(hideShadow, 1000);
         
       // otherwise show next page
       // or smaller image that's partially shown
       } else {
-        var targetScroll = container.scrollTop + viewHeight;
+        var targetScroll = body.scrollTop + viewHeight;
         
         // find image that's already partially shown and is less then viewHeight
         images.find(function(image){ 
@@ -1204,7 +1203,7 @@ function ui() {
         });
         
         // show next page, leaving last line of current page on the screen
-        container.scrollTop = targetScroll + 20;
+        body.scrollTop = targetScroll + 20;
       }
     },
     
