@@ -20,11 +20,12 @@ thus feel free to fork the repo and roll your own.
 Features
 --------
 
+ * forced reload of all feeds
+ * filtering of unwanted entries
+ * no more reloading to read entries published just now
  * slick interface
  * customizable hotkeys (on non-us keyboard too)
  * instant load, even on handhelds
- * forced reload of all feeds
- * filtering of unwanted entries
  * links open in background by default
  * hotkey to open first link in entry body
  * single click to assign tag
