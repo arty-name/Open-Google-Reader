@@ -1446,7 +1446,7 @@ function onload() {
   ui();
 }
 
-if (!('readyState' in document)) {
+if (typeof GM_xmlhttpRequest != undefined && !navigator.userAgent.match(/Chrome/)) {
   // GreaseMonkey, fuck you very much! I don't need your overprotection.
   var script = document.createElement('script');
   script.innerHTML =
