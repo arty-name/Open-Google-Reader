@@ -91,7 +91,7 @@ function ui() {
   var actions;
   
   // handle of currently selected item
-  var currentItem;
+  var currentEntry;
   
   // name of current view
   var currentView;
@@ -301,14 +301,14 @@ function ui() {
   // this replaces active continuation with new, containing all unread items
   function getNewUnreadContinuation() {
     // if user hasn't started reading, we simply reload
-    if (inBackground && !currentItem) {
+    if (inBackground && !currentEntry) {
       actions.reload();
       
     // otherwise getting new continuation is a bit more complex
     } else {
       // count displayed unread items
       var displayed = 0;
-      var entry = currentItem;
+      var entry = currentEntry;
       if (!entry && container.firstElementChild) {
         entry = container.firstElementChild;
         displayed = 1;
@@ -611,7 +611,7 @@ function ui() {
     }
     
     target = event.findElement('section.entry');
-    if (target && target != currentItem) {
+    if (target && target != currentEntry) {
       makeEntryActive(target);
     }
     
@@ -653,13 +653,13 @@ function ui() {
       return;
     }
     
-    if (!currentItem) return;
+    if (!currentEntry) return;
     
     matched = true;
     switch (key) {
       case 'K': case 'Л': actions.prev(); break;
-      case 'V': case 'М': currentItem && openTab(currentItem.querySelector('a'), event); break;
-      case 'C': case 'С': currentItem && openTab(currentItem.querySelectorAll('a')[1], event); break;
+      case 'V': case 'М': currentEntry && openTab(currentEntry.querySelector('a'), event); break;
+      case 'C': case 'С': currentEntry && openTab(currentEntry.querySelectorAll('a')[1], event); break;
       //case 'W': case 'Ц': actions.tagW(); break;
       case 'S': case 'Ы': actions[event.shiftKey ? 'share' : 'star'](); break;
       case 'Y': case 'Н': actions.edit(); break;
@@ -671,19 +671,19 @@ function ui() {
   } catch(e) { LOG(e) }}
 
   function scrollHandler(event){
-    if (!currentItem) {
+    if (!currentEntry) {
       makeEntryActive(container.firstElementChild);
       return;
     }
-    var distance2border = Math.min(50, currentItem.clientHeight * .5);
-    if (currentItem.offsetTop + currentItem.clientHeight - distance2border < body.scrollTop) {
-      if (currentItem.nextElementSibling) {
-        makeEntryActive(currentItem.nextElementSibling);
+    var distance2border = Math.min(50, currentEntry.clientHeight * .5);
+    if (currentEntry.offsetTop + currentEntry.clientHeight - distance2border < body.scrollTop) {
+      if (currentEntry.nextElementSibling) {
+        makeEntryActive(currentEntry.nextElementSibling);
       }
     }
-    if (currentItem.offsetTop + distance2border > body.scrollTop + body.clientHeight) {
-      if (currentItem.previousElementSibling) {
-        makeEntryActive(currentItem.previousElementSibling);
+    if (currentEntry.offsetTop + distance2border > body.scrollTop + body.clientHeight) {
+      if (currentEntry.previousElementSibling) {
+        makeEntryActive(currentEntry.previousElementSibling);
       }
     }
     
@@ -701,12 +701,12 @@ function ui() {
   function resizeHandler() {
     container.style.height = window.innerHeight - document.heightDiff + 'px';
 
-    if (!currentItem) return;
+    if (!currentEntry) return;
     
-    body.scrollTop = currentItem.offsetTop;
+    body.scrollTop = currentEntry.offsetTop;
 
     // fixate entry height to fight scroll caused by loading of skipped images
-    var article = currentItem.querySelector('article');
+    var article = currentEntry.querySelector('article');
     if (article.style.height) {
       article.style.height = article.scrollHeight + 'px';
     }
@@ -720,7 +720,7 @@ function ui() {
   }
   
   function resetContainer() {
-    currentItem = undefined;
+    currentEntry = undefined;
     container.innerHTML = 'Loading...';
     body.scrollTop = 0;
   }
@@ -743,18 +743,18 @@ function ui() {
   }
 
   function makeEntryActive(entry) {
-    if (currentItem) {
-      currentItem.removeClassName('active');
+    if (currentEntry) {
+      currentEntry.removeClassName('active');
       actions.edit(undefined, true);
     }
       
-    currentItem = entry;
-    currentItem.addClassName('active');
+    currentEntry = entry;
+    currentEntry.addClassName('active');
     
-    markAsRead(currentItem);
-    currentItem.previousSiblings().forEach(markAsRead); 
+    markAsRead(currentEntry);
+    currentEntry.previousSiblings().forEach(markAsRead); 
     
-    if (currentItem.nextSiblings().length <= 3 && !dataRequest) {
+    if (currentEntry.nextSiblings().length <= 3 && !dataRequest) {
       getViewData(currentView);
     }
     
@@ -811,7 +811,7 @@ function ui() {
       method: 'post',
       parameters: parameters,
       onSuccess: function() {
-        if (entry != currentItem) return;
+        if (entry != currentEntry) return;
         actions.edit(undefined, true);
         
         container.insertBefore(DOM('section', {className: 'entry'}, [
@@ -867,7 +867,7 @@ function ui() {
     this.style.height = this.height;
   
     // ignore images loaded in entries below current
-    if (currentItem.nextSiblings().include(entry)) return;
+    if (currentEntry.nextSiblings().include(entry)) return;
       
     // adjust article height
     var article = entry.querySelector('article');
@@ -877,7 +877,7 @@ function ui() {
     article.style.height = height + diff + 'px';
   
     // if this image is in one of previous entries, scroll container and exit
-    if (currentItem != entry) {
+    if (currentEntry != entry) {
       body.scrollTop += diff;
       return;
     }
@@ -1003,38 +1003,38 @@ function ui() {
     
     // star/share management
     star: function(){
-      toggleEntryTag(currentItem, 'star');
+      toggleEntryTag(currentEntry, 'star');
     },
     share: function(){
-      if (checkIfAltered(currentItem, true)) return;
+      if (checkIfAltered(currentEntry, true)) return;
       
-      toggleEntryTag(currentItem, 'share');
-      toggleEntryTag(currentItem, 'like');
+      toggleEntryTag(currentEntry, 'share');
+      toggleEntryTag(currentEntry, 'like');
     },
     tagW: function(){ // this one adds specific tag
-      if (checkIfAltered(currentItem)) return;
+      if (checkIfAltered(currentEntry)) return;
 
-      toggleEntryTag(currentItem, 'tagW');
-      toggleEntryTag(currentItem, 'like');
+      toggleEntryTag(currentEntry, 'tagW');
+      toggleEntryTag(currentEntry, 'like');
     },
 
     // dumb "show next/previous entry" buttons
     next: function() {
-      if (!currentItem) {
+      if (!currentEntry) {
         makeEntryActive(container.firstElementChild);
       } else {
-        if (currentItem.nextElementSibling && /\bentry\b/i.test(currentItem.nextElementSibling.className)) { 
-          makeEntryActive(currentItem.nextElementSibling);
-          body.scrollTop = currentItem.offsetTop;
+        if (currentEntry.nextElementSibling && /\bentry\b/i.test(currentEntry.nextElementSibling.className)) { 
+          makeEntryActive(currentEntry.nextElementSibling);
+          body.scrollTop = currentEntry.offsetTop;
         }
       }
     },
     prev: function() {
-      if (!currentItem) return;
-      if (currentItem.previousElementSibling) {
-        makeEntryActive(currentItem.previousElementSibling);
+      if (!currentEntry) return;
+      if (currentEntry.previousElementSibling) {
+        makeEntryActive(currentEntry.previousElementSibling);
       }
-      body.scrollTop = currentItem.offsetTop;
+      body.scrollTop = currentEntry.offsetTop;
     },
     
     // smart paging: if current entry is short, show next, but otherwise
@@ -1042,19 +1042,19 @@ function ui() {
     space: function(event) {
       
       // shift+space = previous entry
-      if (event.shiftKey && currentItem) {
+      if (event.shiftKey && currentEntry) {
         actions.prev();
         return;
       }
       // first use focuses first item
-      if (!currentItem) {
+      if (!currentEntry) {
         actions.next();
         return;
       }
       
       // find all images in article
       var viewHeight = body.clientHeight;
-      var images = currentItem.querySelectorAll('article img');
+      var images = currentEntry.querySelectorAll('article img');
       // find large images (height > half of a viewport height)
       var largeImages = images.map(function(image){
         return image.height > viewHeight * .5;
@@ -1127,7 +1127,7 @@ function ui() {
         }
       }
       
-      var invisibleHeight = (currentItem.offsetTop + currentItem.clientHeight) -
+      var invisibleHeight = (currentEntry.offsetTop + currentEntry.clientHeight) -
         (body.scrollTop + body.clientHeight);
         
       // if only buttons line is invisible, go to next entry
@@ -1167,13 +1167,13 @@ function ui() {
     // adding comment is creating new entry too
     // `forceHide` is used to hide inputs i.e. when moving to another entry
     edit: function(event, forceHide) {
-      if (!currentItem || !currentItem.id) return;
+      if (!currentEntry || !currentEntry.id) return;
       
-      var data = storage[currentItem.id];
+      var data = storage[currentEntry.id];
       if (!data.inputs && forceHide) return;
 
-      var title = currentItem.querySelector('a');
-      var body  = currentItem.querySelector('article');
+      var title = currentEntry.querySelector('a');
+      var body  = currentEntry.querySelector('article');
       
       if (!data.inputs) {
         // create inputs if needed and put them to corresponding places
