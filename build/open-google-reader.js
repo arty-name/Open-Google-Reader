@@ -202,7 +202,6 @@ function ui() {
     
     document.body.appendChild(createHeader()); // header contains buttons
     document.body.appendChild(container);
-    //document.body.appendChild(createFooter()); // footer contains up/down buttons
     
     // fix container height to prevent stretching down
     document.heightDiff = window.innerHeight - container.clientHeight;
@@ -234,7 +233,6 @@ function ui() {
       'html, body { position: absolute; height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; } ' + 
       'body > header { position: fixed; top: 0; left: 0; right: 0; height: 2em; z-index: 100; background-color: window; } ' + 
       'body>header.unread button.unread, body>header.star button.starred, body>header.share button.shared, body>header.tagW button.taggedW { font-weight: bold; } ' + 
-      //'body > footer { position: fixed; bottom: 0; left: 0; right: 0; height: 2em; z-index: 100; background-color: window; } ' + 
       'body > header > a.resetView { position: absolute; right: 0; } ' + 
       'body > div.container { position: absolute; top: 2em; bottom: 0; left: 0; right: 0; overflow-y: scroll; padding: 0 .5em; } ' + 
       'div.shadow { position: absolute; top: 2em; left: 0; right: 0; background: black; opacity: .5; } ' + 
@@ -286,13 +284,6 @@ function ui() {
   function createButton(class_, text) {
     return DOM('button', {className: class_, innerHTML: text});
   }
-  
-  /*function createFooter() {
-    return DOM('footer', undefined, [
-      createButton('next', '▽ Next'),
-      createButton('prev', '△ Previous')
-    ]);
-  }*/
 
   // update unread count now, every minute and on every window focus
   function initUnreadCount() {
