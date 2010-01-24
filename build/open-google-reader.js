@@ -374,10 +374,6 @@ function ui() {
           limit = 20 + displayed;
           noMoreItems = false;
           checkNeedMoreEntries();
-          
-          if (container.lastChild && container.lastChild.className == 'spacer') {
-            container.removeChild(container.lastChild);
-          }
         },
         onFailure: updateToken.curry(getNewUnreadContinuation) // ensure we have active token
       });
@@ -429,6 +425,10 @@ function ui() {
         // remove loading indicator
         if (displayedItems.length == 0 && (noMoreItems || data.items.length > 0)) {
             container.innerHTML = '';
+        }
+        // remove spacer if present
+        if (container.lastChild && container.lastChild.className == 'spacer') {
+          container.removeChild(container.lastChild);
         }
 
         // add each entry to container
