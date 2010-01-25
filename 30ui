@@ -472,7 +472,9 @@ function ui() {
     }
 
     // if image is not loaded in 10 seconds, replace it with link
-    var images = container.lastChild.querySelectorAll('article img');
+    var images = container.lastChild.
+      querySelector('article').
+      querySelectorAll('img');
     images.forEach(function(image){
       if (!image.complete) setTimeout(function(){
         if (image.complete) return;
