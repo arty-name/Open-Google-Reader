@@ -131,6 +131,9 @@ function ui() {
   // div to cover read part of entry
   var shadow;
   
+  // div to let body scroll a little more
+  var spacer;
+  
   
   // hash of available actions, defined at the bottom of file
   var actions;
@@ -210,6 +213,9 @@ function ui() {
     // this one will shadow read portion of entry
     shadow = DOM('div', {className: 'shadow'});
     document.body.appendChild(shadow);
+    
+    // this will let body scroll a little more
+    spacer = DOM('div', {className: 'spacer'});
   }
 
   // remove existing body children
@@ -426,17 +432,15 @@ function ui() {
         if (displayedItems.length == 0 && (noMoreItems || data.items.length > 0)) {
             container.innerHTML = '';
         }
-        // remove spacer if present
-        if (container.lastChild && container.lastChild.className == 'spacer') {
-          container.removeChild(container.lastChild);
-        }
 
         // add each entry to container
         data.items.forEach(addEntry);
         
         // append spacer to the end so that even last entry could be shown at top
+        if (spacer.parentNode) {
+          container.removeChild(spacer);
+        }
         if (noMoreItems && container.lastChild) {
-          var spacer = DOM('div', {className: 'spacer'});
           spacer.style.height = 
             body.clientHeight - (container.lastChild.clientHeight % body.clientHeight) - 20 + 'px';
           container.appendChild(spacer);
