@@ -470,6 +470,18 @@ function ui() {
       // fail of one entry shouldn't prevent other from displaying
       LOG(e);
     }
+
+    // if image is not loaded in 10 seconds, replace it with link
+    var images = container.lastChild.querySelectorAll('article img');
+    images.forEach(function(image){
+      if (!image.complete) setTimeout(function(){
+        if (image.complete) return;
+        image.parentNode.replaceChild(
+          DOM('a', {href: image.src, innerHTML: '[unavailable]'}),
+          image
+        );
+      }, 10000);
+    });
   }
   
   function checkEmptyUserId(item, index) {
@@ -865,7 +877,7 @@ function ui() {
   
   function imageHandler(entry, event) {
     // ignore not yet loaded images
-    if (!this.height) return;
+    if (!this.complete) return;
     
     // handler must be successfully called only once
     this.onreadystatechange = undefined;
