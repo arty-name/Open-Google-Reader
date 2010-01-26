@@ -177,7 +177,7 @@ function ui() {
   // attach listeners for clicks, keyupes and mousewheel
   document.addEventListener('click', clickHandler, false);
   document.addEventListener('keyup', keyHandler, false);
-  document.addEventListener('mousewheel', scrollHandler, false);
+  document.addEventListener('scroll', scrollHandler, false);
   
   // attach listeners for window resize, blur and focus
   window.addEventListener('resize', resizeHandler, false);
