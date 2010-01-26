@@ -396,8 +396,9 @@ function ui() {
           container.removeChild(spacer);
         }
         if (noMoreItems && container.lastChild) {
+          var viewHeight = body.clientHeight - body.firstElementChild.clientHeight;
           spacer.style.height = 
-            body.clientHeight - (container.lastChild.clientHeight % body.clientHeight) - 20 + 'px';
+            viewHeight - (container.lastChild.clientHeight % viewHeight) - 20 + 'px';
           container.appendChild(spacer);
         }
         
@@ -1072,7 +1073,7 @@ function ui() {
       }
       
       // find all images in article
-      var viewHeight = body.clientHeight;
+      var viewHeight = body.clientHeight - body.firstElementChild.clientHeight;
       var images = currentEntry.querySelectorAll('article img');
       // find large images (height > half of a viewport height)
       var largeImages = images.map(function(image){
@@ -1147,7 +1148,7 @@ function ui() {
       }
       
       var invisibleHeight = (currentEntry.offsetTop + currentEntry.clientHeight) -
-        (body.scrollTop + body.clientHeight);
+        (body.scrollTop + viewHeight);
         
       // if only buttons line is invisible, go to next entry
       if (invisibleHeight < 30) {
@@ -1156,9 +1157,9 @@ function ui() {
       // if there's no full page to show,
       // smooth scroll to show remainder
       // and use shadow to indicate unread part
-      } else if (invisibleHeight < body.clientHeight) {
+      } else if (invisibleHeight < viewHeight) {
         scrollTo(body.scrollTop + invisibleHeight);
-        shadow.style.height = body.clientHeight - invisibleHeight - 40 + 'px';
+        shadow.style.height = viewHeight - invisibleHeight - 40 + 'px';
         setTimeout(hideShadow, 1000);
         
       // otherwise show next page
@@ -1172,13 +1173,13 @@ function ui() {
             if (image.height > viewHeight && image.offsetTop < targetScroll) {
               return false;
             }
-            targetScroll = image.offsetTop - 20; // +- magic neutralizes effect of scrolling not whole viewHeight
+            targetScroll = image.offsetTop + 20; // +- magic neutralizes effect of scrolling not whole viewHeight
             return true;
           } else return false;
         });
         
         // show next page, leaving last line of current page on the screen
-        body.scrollTop = targetScroll + 20;
+        body.scrollTop = targetScroll - 20;
       }
     },
     
