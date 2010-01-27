@@ -437,10 +437,7 @@ function ui() {
         data.items.forEach(addEntry);
         
         // append spacer to the end so that even last entry could be shown at top
-        if (spacer.parentNode && spacer.nextElementSibling) {
-          container.removeChild(spacer);
-        }
-        if (noMoreItems && container.lastChild) {
+        if (noMoreItems && container.lastChild && spacer.nextElementSibling) {
           var viewHeight = body.clientHeight - body.firstElementChild.clientHeight;
           spacer.style.height = 
             viewHeight - (container.lastChild.clientHeight % viewHeight) - 20 + 'px';
@@ -1470,7 +1467,7 @@ function onload() {
   ui();
 }
 
-if (typeof GM_xmlhttpRequest != undefined && !navigator.userAgent.match(/Chrome/)) {
+if (typeof GM_xmlhttpRequest != "undefined" && !navigator.userAgent.match(/Chrome/)) {
   // GreaseMonkey, fuck you very much! I don't need your overprotection.
   var script = document.createElement('script');
   script.innerHTML =

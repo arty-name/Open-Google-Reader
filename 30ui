@@ -392,10 +392,7 @@ function ui() {
         data.items.forEach(addEntry);
         
         // append spacer to the end so that even last entry could be shown at top
-        if (spacer.parentNode && spacer.nextElementSibling) {
-          container.removeChild(spacer);
-        }
-        if (noMoreItems && container.lastChild) {
+        if (noMoreItems && container.lastChild && spacer.nextElementSibling) {
           var viewHeight = body.clientHeight - body.firstElementChild.clientHeight;
           spacer.style.height = 
             viewHeight - (container.lastChild.clientHeight % viewHeight) - 20 + 'px';
