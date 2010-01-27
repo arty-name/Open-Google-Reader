@@ -437,7 +437,7 @@ function ui() {
         data.items.forEach(addEntry);
         
         // append spacer to the end so that even last entry could be shown at top
-        if (spacer.parentNode) {
+        if (spacer.parentNode && spacer.nextElementSibling) {
           container.removeChild(spacer);
         }
         if (noMoreItems && container.lastChild) {
