@@ -1226,6 +1226,10 @@ function ui() {
       data.inputs.comment.style.display = inputDisplay;
 
       data.inputs.shown = !data.inputs.shown;
+      
+      if (data.inputs.shown) {
+        data.inputs.title.focus();
+      }
     }
   };
 }
