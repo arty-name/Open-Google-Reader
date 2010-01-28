@@ -260,7 +260,7 @@ function ui() {
       'section.entry > footer { clear: both; display: block; margin-left: 0; } ' +
       'section.entry > footer > span.buttons { white-space: nowrap; } ' +
       'section.entry > footer > span.tags { float: right; opacity: .5; } ' +
-      'section.entry + div.spacer { float: left; width: 50%; } ' +
+      'section.entry + div.spacer { width: 90%; } ' +
       'button.star { color: #bfb016; } button.share, button.tagW { color: #dc9765; } button.edit { color: #74d774; } '+
       'button.star, button.share, button.tagW, button.edit { background: none; border: none; } '+
       'button { cursor: pointer; } ' +
