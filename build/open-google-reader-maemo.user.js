@@ -735,7 +735,9 @@ function ui() {
 
   function scrollHandler(event){
     if (!currentEntry) {
-      makeEntryActive(container.firstElementChild);
+      if (container.firstElementChild) {
+        makeEntryActive(container.firstElementChild);
+      }
       return;
     }
     var distance2border = Math.min(50, currentEntry.clientHeight * .5);
