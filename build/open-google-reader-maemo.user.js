@@ -605,7 +605,7 @@ function ui() {
     var author = data.author ? data.author + ' @ ' : '';
     var site = data.origin.title;
     
-    var favicon = 'http://www.google.com/s2/favicons?domain=' + data.domain;
+    var favicon = 'http://favicon.yandex.net/favicon/' + data.domain;
     favicon = '<img src="' + favicon + '">';
     
     // replace feed name with custom feed name, if user renamed it
@@ -847,6 +847,10 @@ function ui() {
       if (unreadCount) {
         unreadCount--;
         updateTitle();
+        
+        if (unreadCount == 0) {
+          updateUnreadCount(true);
+        }
       }
     }
   }
