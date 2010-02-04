@@ -578,7 +578,7 @@ function ui() {
       via = '<br>' + data.via.pluck('title').join('<br>');
     }
     
-    return author + site + favicon + via;
+    return favicon + author + site + via;
   }
   
   // show comments from other users
