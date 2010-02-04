@@ -450,8 +450,8 @@ function ui() {
     // check if entry needs alteration
     entryAlterations.invoke('call', null, item);
     
-    // if entry matches filter, mark it as read and skip it
-    if (matchesFilters(item.title, item.body)) {
+    // if entry marked to ignore or matches filter, mark it as read and skip it
+    if (item.ignore || matchesFilters(item.title, item.body)) {
       item.read = false;
       toggleEntryTag(item, 'read');
       if (unreadCount) {
