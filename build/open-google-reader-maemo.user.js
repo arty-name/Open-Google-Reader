@@ -699,7 +699,7 @@ function ui() {
     }
     
     var matched = true;
-    var key = String.fromCharCode(event.keyCode).toUpperCase();
+    var key = String.fromCharCode(event.which).toUpperCase();
     switch (key) {
       case 'R': case 'К': actions[event.shiftKey ? 'fullReload' : 'reload'](); break;
       case 'W': case 'Ц': 
