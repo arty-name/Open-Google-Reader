@@ -17,7 +17,7 @@
 // To get general idea of how that script works,
 // see OVERVIEW below or in file 30ui
 
-if (!document.location.href.match(/^http:..www.google.com.reader.view.1?$/)) return;
+if (!document.location.href.match(/^https?:..www.google.com.reader.view.1?$/)) return;
 
 defineSettings();
 
