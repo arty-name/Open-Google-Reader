@@ -437,8 +437,10 @@ function ui() {
         data.items.forEach(addEntry);
         
         // append spacer to the end so that even last entry could be shown at top
-        if (noMoreItems && container.lastChild &&
-            (!spacer.parentNode || spacer.nextElementSibling)) {
+        if (spacer.previousSibling && spacer.nextSibling) {
+          container.removeChild(spacer);
+        }
+        if (noMoreItems && container.lastChild) {
           var viewHeight = body.clientHeight - body.firstElementChild.clientHeight;
           spacer.style.height = 
             viewHeight - (container.lastChild.clientHeight % viewHeight) - 20 + 'px';
@@ -847,10 +849,6 @@ function ui() {
       if (unreadCount) {
         unreadCount--;
         updateTitle();
-        
-        if (unreadCount == 0) {
-          updateUnreadCount(true);
-        }
       }
     }
   }
