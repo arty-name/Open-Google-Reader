@@ -1121,7 +1121,7 @@ function ui() {
       
       // find all images in article
       var viewHeight = body.clientHeight - body.firstElementChild.clientHeight;
-      var images = currentEntry.querySelectorAll('article img');
+      var images = currentEntry.querySelector('article').querySelectorAll('img');
       // find large images (height > half of a viewport height)
       var largeImages = images.map(function(image){
         return image.height > viewHeight * .5;
