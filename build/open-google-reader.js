@@ -360,14 +360,13 @@ function ui() {
     } else {
       // count displayed unread items
       var displayed = 0;
-      var entry = currentEntry;
-      if (!entry && container.firstElementChild) {
-        entry = container.firstElementChild;
-        displayed = 1;
+      var entry = container.firstElementChild;
+      while (entry && entry.className == 'entry') {
+        if (!storage[entry.id].read) {
+          ++displayed;
+        }
+        entry = entry.nextElementSibling;
       }
-      while (entry &&
-             (entry = entry.nextElementSibling) &&
-             (entry.className == 'entry')) ++displayed;
       
       // re-request data for already displayed items to get new continuation
       AjaxRequest(entriesUrl + tags['unread'], {
