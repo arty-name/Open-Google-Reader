@@ -306,6 +306,7 @@ function ui() {
     // do not update too often, unless forced
     var time = (new Date()).getTime();
     if (force !== true && time - (updateUnreadCount.time || 0) < 60000) {
+      setTimeout(updateUnreadCount, 60000);
       return;
     }
     updateUnreadCount.time = time;
