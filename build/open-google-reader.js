@@ -1052,17 +1052,20 @@ function ui() {
         if (!subscriptions[index]) return;
         AjaxRequest(entriesUrl + encodeURIComponent(subscriptions[index].id), {
           parameters: {refresh: true, xt: tags.read},
-          onSuccess: function(response) {
-            if (response.responseJSON.items.length > 0) {
-              updateUnreadCount();
-            }
-            index++;
-            reloadFeed(index);
-          },
           onComplete: function(response) {
             if (response.status != 200) {
               LOG(response.statusText);
             }
+            
+            index++;
+            try {
+              if (response.responseJSON.items.length > 0) {
+                updateUnreadCount();
+              }
+              reloadFeed(index);
+            } catch (e) {
+              setTimeout(function(){ reloadFeed(index) }, 10000);
+            };
           }
         });
       }
