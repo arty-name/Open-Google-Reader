@@ -55,16 +55,16 @@ Sorry folks, do these yourself if you need them, it's easy anyway.
 Hotkeys
 -------
 
-j/k - next/previous entry
-s - star entry
-shift+s - share entry
-v/shift+v - open main link of current entry in background/foreground
-c/shift+c - open first link in current entry in background/foreground
-spacebar - go to next entry / next page of same entry / next large image
-r/shift+r - reload/forced reload
-w/e - show unread/starred entries
-u/i - show unread/starred entries
-o - show shared entries
+j/k - next/previous entry  
+s - star entry  
+shift+s - share entry  
+v/shift+v - open main link of current entry in background/foreground  
+c/shift+c - open first link in current entry in background/foreground  
+spacebar - go to next entry / next page of same entry / next large image  
+r/shift+r - reload/forced reload  
+w/e - show unread/starred entries  
+u/i - show unread/starred entries  
+o - show shared entries  
 
 
 Compatibility
@@ -88,26 +88,26 @@ Maemo: http://github.com/arty-name/Open-Google-Reader/raw/master/build/open-goog
 FAQ
 ---
 
-Q: What's "TagW"?
+Q: What's "TagW"?  
 A: That's my shortcut for adding tag "W". Edit it as you need or remove it.
 
-Q: I'm using Opera and links are opened in foreground, how do I fix that?
+Q: I'm using Opera and links are opened in foreground, how do I fix that?  
 A: Activate option opera:config#UserPrefs|Allowscripttolowerwindow.
 
-Q: On which URLs does script work?
+Q: On which URLs does script work?  
 A: By default it works exactly on:
-    * http://www.google.com/reader/view/
-    * http://www.google.com/reader/view/1
-   Adding *any* other character switches script off, thus on
-      http://www.google.com/reader/view/#
-   you will see standard interface of Google Reader. You can get there by
-   clicking "Normal view" link in top right corner of the screen, and get back
-   by clicking Google Reader logo.
+  * <http://www.google.com/reader/view/>
+  * <http://www.google.com/reader/view/1>
+  Adding *any* other character switches script off, thus on  
+   <http://www.google.com/reader/view/#>
+  you will see standard interface of Google Reader. You can get there by
+  clicking "Normal view" link in top right corner of the screen, and get back
+  by clicking Google Reader logo.
 
-Q: Page at http://www.google.com/reader/view/ takes too long to load, how can I
-   speed it up?
+Q: Page at <http://www.google.com/reader/view/> takes too long to load, how can I
+   speed it up?  
 A: That page contains lots of user data, which slows page down. You can use same
-   interface on page http://www.google.com/reader/view/1, which loads in a
+   interface on page <http://www.google.com/reader/view/1>, which loads in a
    blink of eye. The only downside is that you'd have to copy your `userId` from
    popup dialog to userscript.
    
