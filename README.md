@@ -78,11 +78,12 @@ browser, but you might need unicode fonts for button images.
 Installation
 ------------
 
-Opera: http://github.com/arty-name/Open-Google-Reader/raw/master/build/open-google-reader.js
-  (I highly recommend UJS Manager http://unite.opera.com/application/401/ )
+Opera: <http://github.com/arty-name/Open-Google-Reader/raw/master/build/open-google-reader.js>
+  (I highly recommend UJS Manager <http://unite.opera.com/application/401/> )
 
-Chrome & Firefox: http://github.com/arty-name/Open-Google-Reader/raw/master/build/open-google-reader.user.js
-Maemo: http://github.com/arty-name/Open-Google-Reader/raw/master/build/open-google-reader-maemo.user.js
+Chrome & Firefox: <http://github.com/arty-name/Open-Google-Reader/raw/master/build/open-google-reader.user.js>
+
+Maemo: <http://github.com/arty-name/Open-Google-Reader/raw/master/build/open-google-reader-maemo.user.js>
 
 
 FAQ
@@ -92,14 +93,14 @@ Q: What's "TagW"?
 A: That's my shortcut for adding tag "W". Edit it as you need or remove it.
 
 Q: I'm using Opera and links are opened in foreground, how do I fix that?  
-A: Activate option opera:config#UserPrefs|Allowscripttolowerwindow.
+A: Activate option <opera:config#UserPrefs|Allowscripttolowerwindow>.
 
 Q: On which URLs does script work?  
-A: By default it works exactly on:
-  * <http://www.google.com/reader/view/>
-  * <http://www.google.com/reader/view/1>
+A: By default it works exactly on:  
+ * <http://www.google.com/reader/view/>  
+ * <http://www.google.com/reader/view/1>  
   Adding *any* other character switches script off, thus on  
-   <http://www.google.com/reader/view/#>
+   <http://www.google.com/reader/view/#>  
   you will see standard interface of Google Reader. You can get there by
   clicking "Normal view" link in top right corner of the screen, and get back
   by clicking Google Reader logo.
