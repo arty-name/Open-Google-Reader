@@ -8,6 +8,8 @@
 // @license      Simplified BSD License; http://en.wikipedia.org/wiki/Bsd_license#2-clause_license_.28.22Simplified_BSD_License.22_or_.22FreeBSD_License.22.29
 // @include      http://www.google.com/reader/view/
 // @include      http://www.google.com/reader/view/1
+// @include      https://www.google.com/reader/view/
+// @include      https://www.google.com/reader/view/1
 // @run-at       document-start
 // ==/UserScript==
 
@@ -105,13 +107,13 @@ function ui() {
   var token = window._COMMAND_TOKEN;
 
   // prefix of url to get entries from
-  var entriesUrl = 'http://www.google.com/reader/api/0/stream/contents/';
+  var entriesUrl = '/reader/api/0/stream/contents/';
   
   // url to manipulate tags on
-  var editTagUrl = 'http://www.google.com/reader/api/0/edit-tag';
+  var editTagUrl = '/reader/api/0/edit-tag';
   
   // url to post edited entries to
-  var editEntryUrl = 'http://www.google.com/reader/api/0/item/edit';
+  var editEntryUrl = '/reader/api/0/item/edit';
   
   // sort orders
   var sort = {
@@ -312,7 +314,7 @@ function ui() {
     updateUnreadCount.time = time;
     
     // request data
-    AjaxRequest('http://www.google.com/reader/api/0/unread-count', {
+    AjaxRequest('/reader/api/0/unread-count', {
       parameters: {
         allcomments: 'true',
         output: 'json'
@@ -392,7 +394,7 @@ function ui() {
     if (subscriptions) return continuation();
     
     // otherwise load data
-    return AjaxRequest('http://www.google.com/reader/api/0/subscription/list', {
+    return AjaxRequest('/reader/api/0/subscription/list', {
       parameters: {output: 'json'},
       onSuccess: function(response) {
         subscriptions = response.responseJSON.subscriptions;
@@ -916,7 +918,7 @@ function ui() {
   }
   
   function updateToken(oncomplete) {
-    AjaxRequest('http://www.google.com/reader/api/0/token', {
+    AjaxRequest('/reader/api/0/token', {
       onSuccess: function(response) {
         token = response.responseText;
         oncomplete && oncomplete();
