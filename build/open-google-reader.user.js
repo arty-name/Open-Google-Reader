@@ -708,7 +708,8 @@ function ui() {
       case 'R': case 'К': actions[event.shiftKey ? 'fullReload' : 'reload'](); break;
       case 'W': case 'Ц': 
       case 'U': case 'Г': actions.unread(); break;
-      case 'E': case 'У': 
+      case 'Q': case 'Й': actions.removeReadUnstarred(); break;
+      case 'E': case 'У':
       case 'I': case 'Ш': actions.starred(); break;
       case 'O': case 'Щ': actions.shared(); break;
       case 'J': case 'О': actions.next(); break;
@@ -1067,10 +1068,19 @@ function ui() {
               reloadFeed(index);
             } catch (e) {
               setTimeout(function(){ reloadFeed(index) }, 10000);
-            };
+            }
           }
         });
       }
+    },
+
+    removeReadUnstarred: function() {
+      container.querySelectorAll('section').forEach(function(entry){
+        var data = storage[entry.id];
+        if (data.read && !data.star) {
+          container.removeChild(entry);
+        }
+      });
     },
     
     // star/share management

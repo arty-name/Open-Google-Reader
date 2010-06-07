@@ -64,7 +64,8 @@ spacebar - go to next entry / next page of same entry / next large image
 r/shift+r - reload/forced reload  
 w/e - show unread/starred entries  
 u/i - show unread/starred entries  
-o - show shared entries  
+o - show shared entries
+q - remove from view entries which are read but not starred  
 
 
 Compatibility
