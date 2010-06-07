@@ -1081,6 +1081,7 @@ function ui() {
           container.removeChild(entry);
         }
       });
+      body.scrollTop = currentEntry.offsetTop;
     },
     
     // star/share management
