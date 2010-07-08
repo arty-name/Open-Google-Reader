@@ -1081,7 +1081,9 @@ function ui() {
           container.removeChild(entry);
         }
       });
-      if (!currentEntry || !currentEntry.parentNode) makeEntryActive(container.firstElementChild);
+      if (!currentEntry || !currentEntry.parentNode) {
+        if (container.firstElementChild) makeEntryActive(container.firstElementChild);
+      }
       if (currentEntry) body.scrollTop = currentEntry.offsetTop;
     },
     
