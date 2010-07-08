@@ -240,7 +240,7 @@ function ui() {
     var css =
       'html, body { margin: 0; padding: 0; } ' +
       'body { padding-top: 2em; }' +
-      'body > header { position: fixed; top: 0; left: 0; right: 0; height: 2em; z-index: 100; background-color: window; } ' + 
+      'body > header { position: fixed; top: 0; left: 0; right: 0; height: 2em; z-index: 100; } ' + 
       'body>header.unread button.unread, body>header.star button.starred, body>header.share button.shared, body>header.tagW button.taggedW { font-weight: bold; } ' + 
       'body > header > a.resetView { position: absolute; right: 0; } ' + 
       'body > div.container { position:relative; padding: 0 .5em; } ' + 
