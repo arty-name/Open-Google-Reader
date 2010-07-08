@@ -176,12 +176,12 @@ function ui() {
   // get token if we don't have any
   if (!token) updateToken();
   
-  // attach listeners for clicks, keypresses and mousewheel
+  // attach listeners for clicks and keypresses
   document.addEventListener('click', clickHandler, false);
   document.addEventListener('keypress', keyHandler, false);
-  document.addEventListener('scroll', scrollHandler, false);
-  
-  // attach listeners for window resize, blur and focus
+
+  // attach listeners for window scroll, resize, blur and focus
+  window.addEventListener('scroll', scrollHandler, false);
   window.addEventListener('resize', resizeHandler, false);
   window.addEventListener('focus', function(){ inBackground = false; }, false);
   window.addEventListener('blur',  function(){ inBackground = true;  }, false);
