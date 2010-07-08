@@ -1068,7 +1068,8 @@ function ui() {
         }
       });
       if (!currentEntry || !currentEntry.parentNode) {
-        if (container.firstElementChild) makeEntryActive(container.firstElementChild);
+        var firstEntry = container.querySelector('section.entry');
+        if (firstEntry) makeEntryActive(firstEntry);
       }
       if (currentEntry) body.scrollTop = currentEntry.offsetTop;
     },
