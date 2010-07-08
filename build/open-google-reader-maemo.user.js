@@ -1075,6 +1075,8 @@ function ui() {
     },
 
     removeReadUnstarred: function() {
+      if (!currentView.match(/read|star/)) return;
+      
       container.querySelectorAll('section').forEach(function(entry){
         var data = storage[entry.id];
         if (!data || (data.read && !data.star)) {
