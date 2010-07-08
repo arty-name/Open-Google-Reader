@@ -311,34 +311,18 @@ function ui() {
     // if user hasn't started reading, we simply reload
     if (inBackground && !currentEntry) {
       actions.reload();
-      
-    // otherwise getting new continuation is a bit more complex
-    } else {
-      // count displayed unread items
-      var displayed = 0;
-      var entry = container.firstElementChild;
-      while (entry && entry.className == 'entry') {
-        if (!storage[entry.id].read) {
-          ++displayed;
-        }
-        entry = entry.nextElementSibling;
-      }
-      
-      // re-request data for already displayed items to get new continuation
-      AjaxRequest(entriesUrl + tags['unread'], {
-        parameters: {n: displayed, xt: tags.read, r: sort.oldestFirst},
-        onSuccess: function(response){
-          var data = response.responseJSON;
-          if (!data) return;
-          
-          continuation = data.continuation;
-          limit = 20 + displayed;
-          noMoreItems = false;
-          checkNeedMoreEntries();
-        },
-        onFailure: updateToken.curry(getNewUnreadContinuation) // ensure we have active token
-      });
+      return;
     }
+
+    // here was some logic, which is rendered useless by the fact that
+    // sometimes new unread items are to be displayed above current entry,
+    // so now we're just doing some kind of reset instead
+
+    continuation = undefined;
+    limit = 20;
+    noMoreItems = false;
+
+    getViewData(currentView);
   }
   
   // call continuation when subscriptions are loaded
