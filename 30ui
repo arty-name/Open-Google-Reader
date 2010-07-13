@@ -231,6 +231,7 @@ function ui() {
   function createHeader() {
     return DOM('header', undefined, [
       createButton('reload',  '⟳ Reload'),
+      createButton('friends',  '✉'),
       createButton('unread',  'Unread'),
       createButton('starred', '☆ Starred'),
       createButton('shared',  '⚐ Shared'),
@@ -280,6 +281,13 @@ function ui() {
         // summarize all values for feeds (not tags/folders)
         data.unreadcounts.forEach(function(feed){
           if (feed.id.match(/^feed/)) count += feed.count;
+          if (feed.id == tags.friends) {
+            container.
+              previousElementSibling.
+              firstElementChild.
+              nextElementSibling.
+              innerHTML = '✉ ' + feed.count;
+          }
         });
         
         // if unread count increased, current continuation isn't complete anymore
@@ -304,7 +312,12 @@ function ui() {
       string = '(' + unreadCount + ') ';
     }
     document.title = string + 'Google Reader';
-    container.previousElementSibling.firstElementChild.nextElementSibling.innerHTML = 'Unread ' + string;
+    container.
+      previousElementSibling.
+      firstElementChild.
+      nextElementSibling.
+      nextElementSibling.
+      innerHTML = 'Unread ' + string;
   }
   
   // this replaces active continuation with new, containing all unread items
@@ -411,6 +424,9 @@ function ui() {
       parameters.xt = tags.read; // exclude read items
       parameters.r = sort.oldestFirst;
     } else {
+      if (view == 'friends') {
+        parameters.co = true; // items with comments only
+      }
       parameters.r = sort.newestFirst;
     }
     
@@ -978,7 +994,8 @@ function ui() {
     starred: switchToView.curry('star'), 
     shared: switchToView.curry('share'), 
     taggedW: switchToView.curry('tagW'),
-    
+    friends: switchToView.curry('friends'),
+
     reload: function() {
       resetView();
       resetContainer();
