@@ -216,7 +216,7 @@ function ui() {
       'section.entry > cite > img { margin: 6px; vertical-align: middle; }' +
       'section.entry > dl.comments { display: block; margin: .5em; border: 2px dotted grey; border-radius: 10px; padding: .5em .5em 0 .5em; }' +
       'section.entry > dl.comments > dt { font-weight: bold; }' +
-      'section.entry > dl.comments > dt:after { font-style: italic; content: ":" }' +
+      'section.entry > dl.comments > dt:after { content: ":" }' +
       'section.entry > dl.comments > dd { margin-bottom: .5em; }' +
       'section.entry > dl.comments > dd.addcomment.hidden .input { display: none; }' +
       'section.entry > footer { clear: both; display: block; margin-left: 0; } ' +
@@ -556,10 +556,10 @@ function ui() {
   
   function getButtonImage(data, button) {
     switch (button) {
-      case 'star':   return (data.star  ? '★' : '☆'); 
+      case 'star':   return (data.star  ? '★' : '☆');
       case 'share':  return (data.share ? '⚑' : '⚐')
-      case 'tagW':   return (data.tagW  ? '⚑' : '⚐'); 
-      case 'edit':   return '✍'; 
+      case 'tagW':   return (data.tagW  ? '⚑' : '⚐');
+      case 'edit':   return '✍';
     }
     return '';
   }
@@ -601,7 +601,7 @@ function ui() {
         annotations.appendChild(DOM('dd', { innerHTML: data.content || data.htmlContent }));
       });
       annotations.appendChild(DOM('dd', { className: 'addcomment'}, [
-        DOM('button', { className: 'comment', innerHTML: 'Add comment' })
+        DOM('button', { className: 'comment', innerHTML: '✉ Add comment' })
       ]));
     }
     
@@ -614,7 +614,7 @@ function ui() {
       createButton('star',  getButtonImage(data, 'star') + ' Star'),
       createButton('share', getButtonImage(data, 'share') + ' Share'),
       createButton('tagW',  getButtonImage(data, 'tagW') + ' TagW'),
-      createButton('edit',  getButtonImage(data, 'edit') + ' Edit')
+      createButton('edit',  getButtonImage(data, 'edit') + ' Edit/Comment')
     ])]);
 
     // filter out custom user tags, only original tags remain
