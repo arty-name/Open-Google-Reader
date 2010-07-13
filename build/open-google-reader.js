@@ -114,7 +114,10 @@ function ui() {
   
   // url to post edited entries to
   var editEntryUrl = '/reader/api/0/item/edit';
-  
+
+  // url to post edited entries to
+  var ediCommentUrl = '/reader/api/0/comment/edit';
+
   // sort orders
   var sort = {
     oldestFirst: 'o',
@@ -262,12 +265,13 @@ function ui() {
       'section.entry > dl.comments > dt { font-weight: bold; }' +
       'section.entry > dl.comments > dt:after { font-style: italic; content: ":" }' +
       'section.entry > dl.comments > dd { margin-bottom: .5em; }' +
+      'section.entry > dl.comments > dd.addcomment.hidden .input { display: none; }' +
       'section.entry > footer { clear: both; display: block; margin-left: 0; } ' +
       'section.entry > footer > span.buttons { white-space: nowrap; } ' +
       'section.entry > footer > span.tags { float: right; opacity: .5; } ' +
       'section.entry + div.spacer { width: 90%; } ' +
       'button.star { color: #bfb016; } button.share, button.tagW { color: #dc9765; } button.edit, button.comment { color: #74d774; } '+
-      'button.star, button.share, button.tagW, button.edit, button.comment { background: none; border: none; } '+
+      'button.star, button.share, button.tagW, button.edit, button.comment, button.cancel { background: none; border: none; } '+
       'button { cursor: pointer; } ' +
       'textarea { width: 95%; } ' +
       '';
@@ -643,7 +647,10 @@ function ui() {
         annotations.appendChild(DOM('dt', { innerHTML: data.author }));
         annotations.appendChild(DOM('dd', { innerHTML: data.content || data.htmlContent }));
       });
-}
+      annotations.appendChild(DOM('dd', { className: 'addcomment'}, [
+        DOM('button', { className: 'comment', innerHTML: 'Add comment' })
+      ]));
+    }
     
     return annotations;
   }
@@ -654,7 +661,7 @@ function ui() {
       createButton('star',  getButtonImage(data, 'star') + ' Star'),
       createButton('share', getButtonImage(data, 'share') + ' Share'),
       createButton('tagW',  getButtonImage(data, 'tagW') + ' TagW'),
-      createButton('edit',  getButtonImage(data, 'edit') + ' Edit/Comment')
+      createButton('edit',  getButtonImage(data, 'edit') + ' Edit')
     ])]);
 
     // filter out custom user tags, only original tags remain
@@ -685,7 +692,7 @@ function ui() {
     
     target = event.findElement('button');
     if (target && actions[target.className]) {
-      actions[target.className]();
+      actions[target.className](event);
     }
   } catch(e) { LOG(e) }}
 
@@ -1254,8 +1261,53 @@ function ui() {
       }
     },
     
+    // add comment to an entry
+    comment: function(event) {
+      if (!currentEntry || !currentEntry.id) return;
+
+      var button = event.target;
+      var dd = button.parentNode;
+      dd.className = 'addcomment'; // removes possible 'hidden' class to show all inputs
+      
+      var textarea = button.previousElementSibling;
+
+      if (!textarea) {
+        textarea = DOM('textarea', { className: 'input', rows: 4 });
+        dd.insertBefore(textarea, button);
+
+        var cancel = DOM('button', { className: 'cancel input', innerHTML: 'Cancel' });
+        cancel.addEventListener('click', function(){ dd.className += ' hidden'; }, false);
+        dd.appendChild(cancel);
+      }
+
+      // if user haven't yet entered comment, halt
+      if (textarea.value.match(/^\s*$/)) {
+        return;
+      }
+
+      var data = storage[currentEntry.id];
+      var parameters = {
+        T: token,
+        action: 'addcomment',
+        comment: textarea.value,
+        i: currentEntry.id,
+        s: data.origin.streamId,
+        output: 'json'
+      };
+
+      return AjaxRequest(ediCommentUrl, {
+        method: 'post',
+        parameters: parameters,
+        onSuccess: function(response) {
+          dd.className += ' hidden';
+
+          dd.parentNode.insertBefore(DOM('dt', { innerHTML: 'you' }), dd);
+          dd.parentNode.insertBefore(DOM('dd', { innerHTML: response.responseJSON.htmlContent }), dd);
+        }
+      });
+    },
+
     // create new shared entry with altered title/content
-    // adding comment is creating new entry too
     // `forceHide` is used to hide inputs i.e. when moving to another entry
     edit: function(event, forceHide) {
       if (!currentEntry || !currentEntry.id) return;
