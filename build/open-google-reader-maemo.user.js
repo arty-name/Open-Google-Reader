@@ -101,7 +101,7 @@ function ui() {
   
 
   // static user id 
-  userId = userId || window._USER_ID || '-'
+  userId = userId || window._USER_ID || (window.localStorage && localStorage.userId) || '-'
   
   // session token (can be updated)
   var token = window._COMMAND_TOKEN;
@@ -551,7 +551,11 @@ function ui() {
         // if found userId, store it and update global tags values
         userId = match[1];
         tags = initTags();
-        alert('Looks like your user ID is ' + userId + '. Write this value to `userId` in settings.');
+        if (window.localStorage) {
+          localStorage.userId = userId;
+        } else {
+          alert('Looks like your user ID is ' + userId + '. Write this value to `userId` in settings.');
+        }
       }
     }
   }
