@@ -242,7 +242,7 @@ function ui() {
       'body { padding-top: 2em; }' +
       // redefine that white color in settings, if you will
       'body > header { position: fixed; top: 0; left: 0; right: 0; height: 2em; z-index: 100; background-color: white; } ' +
-      'body>header.unread button.unread, body>header.star button.starred, body>header.share button.shared, body>header.tagW button.taggedW { font-weight: bold; } ' + 
+      'body>header.unread button.unread, body>header.star button.starred, body>header.share button.shared, body>header.friends button.friends, body>header.tagW button.taggedW { font-weight: bold; } ' + 
       'body > header > a.resetView { position: absolute; right: 0; } ' + 
       'body > div.container { position:relative; padding: 0 .5em; } ' + 
       'div.shadow { position: absolute; top: 0px; width: 100%; background: black; opacity: .5; } ' + 
@@ -258,14 +258,16 @@ function ui() {
       'section.entry > cite, section.entry > article, section.entry > footer { margin-left: .5em; } ' +
       'section.entry > cite { float: right; text-align: right; }' +
       'section.entry > cite > img { margin: 6px; vertical-align: middle; }' +
-      'section.entry > q { display: block; font-style: italic; margin: .5em; border: 2px dotted grey; padding: 0 .2em; }' +
-      'section.entry > q:before { content: attr(cite) ": «" }  section.entry > q:after { content: "»" }' +
+      'section.entry > dl.comments { display: block; margin: .5em; border: 2px dotted grey; border-radius: 10px; padding: .5em .5em 0 .5em; }' +
+      'section.entry > dl.comments > dt { font-weight: bold; }' +
+      'section.entry > dl.comments > dt:after { font-style: italic; content: ":" }' +
+      'section.entry > dl.comments > dd { margin-bottom: .5em; }' +
       'section.entry > footer { clear: both; display: block; margin-left: 0; } ' +
       'section.entry > footer > span.buttons { white-space: nowrap; } ' +
       'section.entry > footer > span.tags { float: right; opacity: .5; } ' +
       'section.entry + div.spacer { width: 90%; } ' +
-      'button.star { color: #bfb016; } button.share, button.tagW { color: #dc9765; } button.edit { color: #74d774; } '+
-      'button.star, button.share, button.tagW, button.edit { background: none; border: none; } '+
+      'button.star { color: #bfb016; } button.share, button.tagW { color: #dc9765; } button.edit, button.comment { color: #74d774; } '+
+      'button.star, button.share, button.tagW, button.edit, button.comment { background: none; border: none; } '+
       'button { cursor: pointer; } ' +
       'textarea { width: 95%; } ' +
       '';
@@ -278,6 +280,7 @@ function ui() {
   function createHeader() {
     return DOM('header', undefined, [
       createButton('reload',  '⟳ Reload'),
+      createButton('friends',  '✉'),
       createButton('unread',  'Unread'),
       createButton('starred', '☆ Starred'),
       createButton('shared',  '⚐ Shared'),
@@ -327,6 +330,13 @@ function ui() {
         // summarize all values for feeds (not tags/folders)
         data.unreadcounts.forEach(function(feed){
           if (feed.id.match(/^feed/)) count += feed.count;
+          if (feed.id == tags.friends) {
+            container.
+              previousElementSibling.
+              firstElementChild.
+              nextElementSibling.
+              innerHTML = '✉ ' + feed.count;
+          }
         });
         
         // if unread count increased, current continuation isn't complete anymore
@@ -351,7 +361,12 @@ function ui() {
       string = '(' + unreadCount + ') ';
     }
     document.title = string + 'Google Reader';
-    container.previousElementSibling.firstElementChild.nextElementSibling.innerHTML = 'Unread ' + string;
+    container.
+      previousElementSibling.
+      firstElementChild.
+      nextElementSibling.
+      nextElementSibling.
+      innerHTML = 'Unread ' + string;
   }
   
   // this replaces active continuation with new, containing all unread items
@@ -458,6 +473,9 @@ function ui() {
       parameters.xt = tags.read; // exclude read items
       parameters.r = sort.oldestFirst;
     } else {
+      if (view == 'friends') {
+        parameters.co = true; // items with comments only
+      }
       parameters.r = sort.newestFirst;
     }
     
@@ -620,13 +638,12 @@ function ui() {
     var annotations = document.createDocumentFragment();
     
     if (data.annotations.length || data.comments.length) {
+      annotations = DOM('dl', { className: 'comments' });
       data.annotations.concat(data.comments).forEach(function(data){
-        var text = DOM('q', {
-          cite: data.author,
-          innerHTML: data.content || data.htmlContent
-        })
-        annotations.appendChild(text);
+        annotations.appendChild(DOM('dt', { innerHTML: data.author }));
+        annotations.appendChild(DOM('dd', { innerHTML: data.content || data.htmlContent }));
       });
+      annotations.appendChild(DOM('dd', {}, [DOM('button', { className: 'comment', innerHTML: 'Add comment' })]));
     }
     
     return annotations;
@@ -1025,7 +1042,8 @@ function ui() {
     starred: switchToView.curry('star'), 
     shared: switchToView.curry('share'), 
     taggedW: switchToView.curry('tagW'),
-    
+    friends: switchToView.curry('friends'),
+
     reload: function() {
       resetView();
       resetContainer();
