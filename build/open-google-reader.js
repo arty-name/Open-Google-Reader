@@ -643,8 +643,7 @@ function ui() {
         annotations.appendChild(DOM('dt', { innerHTML: data.author }));
         annotations.appendChild(DOM('dd', { innerHTML: data.content || data.htmlContent }));
       });
-      annotations.appendChild(DOM('dd', {}, [DOM('button', { className: 'comment', innerHTML: 'Add comment' })]));
-    }
+}
     
     return annotations;
   }
