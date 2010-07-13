@@ -211,14 +211,16 @@ function ui() {
       'section.entry > cite, section.entry > article, section.entry > footer { margin-left: .5em; } ' +
       'section.entry > cite { float: right; text-align: right; }' +
       'section.entry > cite > img { margin: 6px; vertical-align: middle; }' +
-      'section.entry > q { display: block; font-style: italic; margin: .5em; border: 2px dotted grey; padding: 0 .2em; }' +
-      'section.entry > q:before { content: attr(cite) ": «" }  section.entry > q:after { content: "»" }' +
+      'section.entry > dl.comments { display: block; margin: .5em; border: 2px dotted grey; border-radius: 10px; padding: .5em .5em 0 .5em; }' +
+      'section.entry > dl.comments > dt { font-weight: bold; }' +
+      'section.entry > dl.comments > dt:after { font-style: italic; content: ":" }' +
+      'section.entry > dl.comments > dd { margin-bottom: .5em; }' +
       'section.entry > footer { clear: both; display: block; margin-left: 0; } ' +
       'section.entry > footer > span.buttons { white-space: nowrap; } ' +
       'section.entry > footer > span.tags { float: right; opacity: .5; } ' +
       'section.entry + div.spacer { width: 90%; } ' +
-      'button.star { color: #bfb016; } button.share, button.tagW { color: #dc9765; } button.edit { color: #74d774; } '+
-      'button.star, button.share, button.tagW, button.edit { background: none; border: none; } '+
+      'button.star { color: #bfb016; } button.share, button.tagW { color: #dc9765; } button.edit, button.comment { color: #74d774; } '+
+      'button.star, button.share, button.tagW, button.edit, button.comment { background: none; border: none; } '+
       'button { cursor: pointer; } ' +
       'textarea { width: 95%; } ' +
       '';
@@ -589,14 +591,12 @@ function ui() {
     var annotations = document.createDocumentFragment();
     
     if (data.annotations.length || data.comments.length) {
+      annotations = DOM('dl', { className: 'comments' });
       data.annotations.concat(data.comments).forEach(function(data){
-        var text = DOM('q', {
-          cite: data.author,
-          innerHTML: data.content || data.htmlContent
-        })
-        annotations.appendChild(text);
+        annotations.appendChild(DOM('dt', { innerHTML: data.author }));
+        annotations.appendChild(DOM('dd', { innerHTML: data.content || data.htmlContent }));
       });
-    }
+}
     
     return annotations;
   }
