@@ -69,7 +69,7 @@ function ui() {
   var editEntryUrl = '/reader/api/0/item/edit';
 
   // url to post edited entries to
-  var ediCommentUrl = '/reader/api/0/comment/edit';
+  var editCommentUrl = '/reader/api/0/comment/edit';
 
   // sort orders
   var sort = {
@@ -1242,13 +1242,13 @@ function ui() {
       var parameters = {
         T: token,
         action: 'addcomment',
-        comment: textarea.value,
+        comment: textarea.value.replace(/\r/g, ''),
         i: currentEntry.id,
-        s: data.origin.streamId,
+        s: tags.friends,
         output: 'json'
       };
 
-      return AjaxRequest(ediCommentUrl, {
+      return AjaxRequest(editCommentUrl, {
         method: 'post',
         parameters: parameters,
         onSuccess: function(response) {
