@@ -343,7 +343,7 @@ function ui() {
           previousElementSibling.
           firstElementChild.
           nextElementSibling.
-          innerHTML = '✉ ' + (feed.count ? feed.count : '');
+          innerHTML = '✉ ' + (friends ? friends : '');
 
         // if unread count increased, current continuation isn't complete anymore
         // thus we get a new one
