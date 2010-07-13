@@ -332,17 +332,19 @@ function ui() {
         count = 0;
         
         // summarize all values for feeds (not tags/folders)
+        var friends;
         data.unreadcounts.forEach(function(feed){
           if (feed.id.match(/^feed/)) count += feed.count;
           if (feed.id == tags.friends) {
-            container.
-              previousElementSibling.
-              firstElementChild.
-              nextElementSibling.
-              innerHTML = '✉ ' + feed.count;
+            friends = feed.count;
           }
         });
-        
+        container.
+          previousElementSibling.
+          firstElementChild.
+          nextElementSibling.
+          innerHTML = '✉ ' + (feed.count ? feed.count : '');
+
         // if unread count increased, current continuation isn't complete anymore
         // thus we get a new one
         // when force specified, new continuation is already being loaded, ignore
