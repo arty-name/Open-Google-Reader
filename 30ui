@@ -401,7 +401,7 @@ function ui() {
           APIRequest('preference/set', { method: 'post', parameters: {
             T: token,
             k: 'last-allcomments-view',
-            v: (new Date()).getTime()
+            v: (new Date()).getTime() * 1000 // right - that's microseconds
           }});
         }
         
