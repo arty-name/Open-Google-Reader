@@ -394,6 +394,17 @@ function ui() {
           container.appendChild(spacer);
         }
         
+        // Accessing friends comments view should be followed by setting last access time for that view.
+        // This is ugly, GR team!
+        // Can't think of a better place for that check… : (
+        if (view == 'friends') {
+          APIRequest('preference/set', { method: 'post', parameters: {
+            T: token,
+            k: 'last-allcomments-view',
+            v: (new Date()).getTime()
+          }});
+        }
+        
         // clear current request
         dataRequest = undefined;
         checkNeedMoreEntries(data);
