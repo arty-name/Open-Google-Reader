@@ -101,7 +101,7 @@ function ui() {
   
 
   // static user id 
-  userId = userId || window._USER_ID || (window.localStorage && localStorage.userId) || '-'
+  userId = userId || window._USER_ID || (window.localStorage && localStorage.userId) || '-';
   
   // session token (can be updated)
   var token = window._COMMAND_TOKEN;
@@ -128,7 +128,7 @@ function ui() {
   var tags = initTags();  
   
   
-  var body = document.body;
+  var body = document.compatMode == 'CSS1Compat' ? document.documentElement : document.body;
   
   // container of entries
   var container;
@@ -187,12 +187,12 @@ function ui() {
   window.addEventListener('resize', resizeHandler, false);
   window.addEventListener('focus', function(){ inBackground = false; }, false);
   window.addEventListener('blur',  function(){ inBackground = true;  }, false);
-  
-  
+
+
   function initTags() {
     // prefix of user tags
     var tagPrefix = 'user/' + userId + '/state/com.google/';
-    
+
     // various "tags": some to filter entries, some to assign
     return {
       unread: tagPrefix + 'reading-list',
@@ -204,20 +204,21 @@ function ui() {
       friends: tagPrefix + 'broadcast-friends-comments'
     }
   }
-  
+
   function createLayout() {
     clearDocument(); // remove existing body children
     addStyles(); // add own css styles
-    
+
     container = DOM('div', {className: 'container', innerHTML: 'Loading...'});
-    
-    document.body.appendChild(createHeader()); // header contains buttons
-    document.body.appendChild(container);
-    
+
+    var body = document.body;
+    body.appendChild(createHeader()); // header contains buttons
+    body.appendChild(container);
+
     // this one will shadow read portion of entry
     shadow = DOM('div', {className: 'shadow'});
-    document.body.appendChild(shadow);
-    
+    body.appendChild(shadow);
+
     // this will let body scroll a little more
     spacer = DOM('div', {className: 'spacer'});
   }
@@ -446,7 +447,7 @@ function ui() {
           container.removeChild(spacer);
         }
         if (noMoreItems && container.lastChild) {
-          var viewHeight = body.clientHeight - body.firstElementChild.clientHeight;
+          var viewHeight = body.clientHeight - container.previousElementSibling.clientHeight;
           spacer.style.height = 
             viewHeight - (container.lastChild.clientHeight % viewHeight) - 20 + 'px';
           container.appendChild(spacer);
@@ -1153,7 +1154,7 @@ function ui() {
       }
       
       // find all images in article
-      var viewHeight = body.clientHeight - body.firstElementChild.clientHeight;
+      var viewHeight = body.clientHeight - container.previousElementSibling.clientHeight;
       var images = currentEntry.querySelector('article').querySelectorAll('img');
       // find large images (height > half of a viewport height)
       var largeImages = images.filter(function(image){
