@@ -164,7 +164,6 @@ function ui() {
   
   // 
   var continuation;
-  var limit;
   var displayedItems;
   var noMoreItems;
   var inBackground = false;
@@ -388,7 +387,6 @@ function ui() {
     // so now we're just doing some kind of reset instead
 
     continuation = undefined;
-    limit = 20;
     noMoreItems = false;
 
     getViewData(currentView);
@@ -428,7 +426,6 @@ function ui() {
         var data = response.responseJSON;
         if (!data) return;
         
-        limit += 20;
         // if continuation given, store it, otherwise there's no more entries
         if (data.continuation) {
           continuation = data.continuation;
@@ -470,7 +467,7 @@ function ui() {
   };
   
   function getViewParameters(view) {
-    var parameters = {n: limit};
+    var parameters = {n: 20};
     // add continuation if known
     if (continuation) parameters.c = continuation;
     
@@ -798,7 +795,6 @@ function ui() {
 
   function resetView() {
     continuation = undefined;
-    limit = 20;
     displayedItems = [];
     noMoreItems = false;
   }
