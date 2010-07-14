@@ -106,18 +106,6 @@ function ui() {
   // session token (can be updated)
   var token = window._COMMAND_TOKEN;
 
-  // prefix of url to get entries from
-  var entriesUrl = '/reader/api/0/stream/contents/';
-  
-  // url to manipulate tags on
-  var editTagUrl = '/reader/api/0/edit-tag';
-  
-  // url to post edited entries to
-  var editEntryUrl = '/reader/api/0/item/edit';
-
-  // url to post edited entries to
-  var editCommentUrl = '/reader/api/0/comment/edit';
-
   // sort orders
   var sort = {
     oldestFirst: 'o',
@@ -322,7 +310,7 @@ function ui() {
     updateUnreadCount.time = time;
     
     // request data
-    AjaxRequest('/reader/api/0/unread-count', {
+    APIRequest('unread-count', {
       parameters: {
         allcomments: 'true',
         output: 'json'
@@ -399,7 +387,7 @@ function ui() {
     if (subscriptions) return continuation();
     
     // otherwise load data
-    return AjaxRequest('/reader/api/0/subscription/list', {
+    return APIRequest('subscription/list', {
       parameters: {output: 'json'},
       onSuccess: function(response) {
         subscriptions = response.responseJSON.subscriptions;
@@ -421,7 +409,7 @@ function ui() {
     }
     
     // request data from special url for given view
-    dataRequest = AjaxRequest(entriesUrl + tags[view], {
+    dataRequest = APIRequest('stream/contents/' + tags[view], {
       parameters: getViewParameters(view),
       onSuccess: function(response){
         var data = response.responseJSON;
@@ -889,7 +877,7 @@ function ui() {
       parameters.tags = tags.tagW;
     }
 
-    return AjaxRequest(editEntryUrl, {
+    return APIRequest('item/edit', {
       method: 'post',
       parameters: parameters,
       onSuccess: function() {
@@ -917,7 +905,7 @@ function ui() {
     };
     parameters[state ? 'r' : 'a'] = tags[tag]; 
     
-    AjaxRequest(editTagUrl, {
+    APIRequest('edit-tag', {
       method: 'post',
       parameters: parameters,
       onSuccess: function() {
@@ -931,7 +919,7 @@ function ui() {
   }
   
   function updateToken(oncomplete) {
-    AjaxRequest('/reader/api/0/token', {
+    APIRequest('token', {
       onSuccess: function(response) {
         token = response.responseText;
         oncomplete && oncomplete();
@@ -1065,7 +1053,7 @@ function ui() {
       
       function reloadFeed(index) {
         if (!subscriptions[index]) return;
-        AjaxRequest(entriesUrl + encodeURIComponent(subscriptions[index].id), {
+        APIRequest('stream/contents/' + encodeURIComponent(subscriptions[index].id), {
           parameters: {refresh: true, xt: tags.read},
           onComplete: function(response) {
             if (response.status != 200) {
@@ -1298,7 +1286,7 @@ function ui() {
         output: 'json'
       };
 
-      return AjaxRequest(editCommentUrl, {
+      return APIRequest('comment/edit', {
         method: 'post',
         parameters: parameters,
         onSuccess: function(response) {
@@ -1487,6 +1475,10 @@ function lib() {
   HTMLElement.prototype.nextSiblings = function(class_) {
     var siblings = Array.toArray(this.parentNode.childNodes); // NB: <section> doesn't go to .children :(
     return this.nextElementSibling ? siblings.slice(siblings.indexOf(this) + 1) : [];
+  };
+  
+  window.APIRequest = function (url, options) {
+    return window.AjaxRequest('/reader/api/0/' + url, options);
   };
   
   window.AjaxRequest = function (url, options) {
