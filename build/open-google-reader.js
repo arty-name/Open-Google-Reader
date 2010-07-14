@@ -1001,8 +1001,6 @@ function ui() {
   }
   
   function scrollTo(offset){
-    var steps = 15;
-    
     // interval handler
     var interval;
     // steps indexer
@@ -1013,7 +1011,8 @@ function ui() {
 
     // calculate scroll distance and maximum scroll speeds
     var deltaY = offset  - startOffset;
-    var maxSpeedY = deltaY * 2 / steps;   
+    var steps = Math.round(deltaY / 40);
+    var maxSpeedY = deltaY * 2 / steps;
     
     // if both scroll distances are too small, use simple scroll 
     if (deltaY < steps) {
