@@ -127,6 +127,10 @@ function lib() {
     return this.nextElementSibling ? siblings.slice(siblings.indexOf(this) + 1) : [];
   };
   
+  window.APIRequest = function (url, options) {
+    return window.AjaxRequest('/reader/api/0/' + url, options);
+  };
+  
   window.AjaxRequest = function (url, options) {
     var request = new XMLHttpRequest();
     request.onreadystatechange = function () {
