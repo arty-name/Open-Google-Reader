@@ -174,7 +174,7 @@ function ui() {
   // start regular updating of unread items count 
   initUnreadCount();
   // get entries for current view when we have subscriptions data
-  ensureSubscriptions(switchToView.curry('unread'));
+  ensureSubscriptions(switchToView.curry(window.localStorage && localStorage.currentView || 'unread'));
   // get token if we don't have any
   if (!token) updateToken();
   
@@ -820,6 +820,7 @@ function ui() {
     container.previousElementSibling.addClassName(view);
     
     currentView = view;
+    if (window.localStorage) localStorage.currentView = view;
     getViewData(currentView);
   }
 
