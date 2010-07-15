@@ -801,8 +801,8 @@ function ui() {
   
   function resetContainer() {
     currentEntry = undefined;
-    container.innerHTML = 'Loading...';
     body.scrollTop = 0;
+    container.innerHTML = 'Loading...';
   }
   
   function hideShadow() {
