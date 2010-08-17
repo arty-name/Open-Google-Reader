@@ -137,7 +137,13 @@ function lib() {
       if (request.readyState < 4) return;
       
       try {
-        if (request.status != 200) {
+        if (request.status == 403) {
+          if (confirm('Re-authorization needed. Go to login page?')) {
+            window.location = 
+              'https://www.google.com/accounts/ServiceLogin?service=reader&btmpl=mobile&ltmpl=mobilex&' + 
+              'continue=' + encodeURIComponent(window.location.href);
+          }
+        } else if (request.status != 200) {
           options.onFailure && options.onFailure();
         } else {
           try {
