@@ -29,7 +29,7 @@ Features
  * links open in background by default
  * hotkey to open first link in entry body
  * single click to assign tag
- * smart scolling with spacebar
+ * smart scrolling with spacebar
  * site favicons
  * "sharing" an item also "likes" it
  * as aggressive preloading as you like
