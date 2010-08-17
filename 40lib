@@ -30,7 +30,7 @@ function lib() {
       array.push(list.item(index));
     }
     return array;
-  }
+  };
 
   Array.prototype.invoke = function(method) {
     var args = Array.toArray(arguments); // without this .shift() changes value of `method`
@@ -180,7 +180,7 @@ function lib() {
     request.send(method == 'POST' ? params : null);
     
     return request;
-  }
+  };
 
   window.LOG = function(message) {
     if (window.opera) {

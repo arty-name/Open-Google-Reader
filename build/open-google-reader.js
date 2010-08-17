@@ -89,7 +89,7 @@ function ui() {
   // lowercase words to filter entries out by title
   var titleFilters = settings.titleFilters || [];
 
-  // words to filter entries out by body (hmtl included)
+  // words to filter entries out by body (html included)
   var bodyFilters = settings.bodyFilters || [];
 
   // regular expression to detect links which do not get target=_blank
@@ -140,7 +140,7 @@ function ui() {
   // number of unread items to display in title
   var unreadCount = 0;
   
-  // sibscriptions data
+  // subscriptions data
   var subscriptions = window._STREAM_LIST_SUBSCRIPTIONS && _STREAM_LIST_SUBSCRIPTIONS.subscriptions;
   
   // that's where we keep entries original data
@@ -317,7 +317,7 @@ function ui() {
       },
       onSuccess: function(response) {
         var data = response.responseJSON;
-        count = 0;
+        var count = 0;
         
         // summarize all values for feeds (not tags/folders)
         var friends;
@@ -398,7 +398,7 @@ function ui() {
   
   // load entries for a view
   function getViewData(view) {
-    // if greader reported there's no new entries, stop
+    // if google reader reported there's no new entries, stop
     if (noMoreItems) return;
     
     // abort current request if any
@@ -454,7 +454,7 @@ function ui() {
         
         // clear current request
         dataRequest = undefined;
-        checkNeedMoreEntries(data);
+        checkNeedMoreEntries();
       },
       onComplete: function(request) {
         // clear current request
@@ -464,7 +464,7 @@ function ui() {
       },
       onFailure: updateToken.curry(getViewData.curry(view)) // ensure we have active token
     });
-  };
+  }
   
   function getViewParameters(view) {
     var parameters = {n: 20};
@@ -563,10 +563,9 @@ function ui() {
     if (titleFilters.find(function(term){ return title.include(term) })) {
       return true;
     }
-    if (body && bodyFilters.find(function(term){ return body.include(term) })) {
-      return true;
-    }
-    return false;
+    return body && bodyFilters.find(function(term) {
+      return body.include(term)
+    });
   }
 
   function createEntry(data) {
@@ -607,7 +606,7 @@ function ui() {
   function getButtonImage(data, button) {
     switch (button) {
       case 'star':   return (data.star  ? '★' : '☆');
-      case 'share':  return (data.share ? '⚑' : '⚐')
+      case 'share':  return (data.share ? '⚑' : '⚐');
       case 'tagW':   return (data.tagW  ? '⚑' : '⚐');
       case 'edit':   return '✍';
     }
@@ -749,7 +748,7 @@ function ui() {
     }
   } catch(e) { LOG(e) }}
 
-  function scrollHandler(event){
+  function scrollHandler(){
     if (!currentEntry) {
       if (container.firstElementChild) {
         makeEntryActive(container.firstElementChild);
@@ -780,8 +779,6 @@ function ui() {
   }
 
   function resizeHandler() {
-    container.style.height = window.innerHeight - document.heightDiff + 'px';
-
     if (!currentEntry) return;
     
     body.scrollTop = currentEntry.offsetTop;
@@ -939,7 +936,7 @@ function ui() {
   }
   
   
-  function imageHandler(entry, event) {
+  function imageHandler(entry) {
     // ignore not yet loaded images
     if (!this.complete) return;
     
@@ -996,10 +993,6 @@ function ui() {
     return words.slice(0, N).join(' ') + '…';
   }
   
-  function logException(request, exception) {
-    LOG(exception);
-  }
-  
   function scrollTo(offset){
     // interval handler
     var interval;
@@ -1035,7 +1028,7 @@ function ui() {
       var centerDist = Math.abs(currentStep - steps/2);
       // offset from maximum speed point
       var factor = (currentStep < (steps / 2) ? -1 : 1) * centerDist / steps * (steps - centerDist);
-      // new scroll coords 
+      // new scroll coordinates
       var y = startOffset  + deltaY / 2 + factor * maxSpeedY;
       body.scrollTop = parseInt(y);
     }, 10);
@@ -1112,7 +1105,7 @@ function ui() {
       toggleEntryTag(currentEntry, 'like');
     },
     tagW: function(){ // this one adds specific tag
-      if (checkIfAltered(currentEntry)) return;
+      if (checkIfAltered(currentEntry, false)) return;
 
       toggleEntryTag(currentEntry, 'tagW');
       toggleEntryTag(currentEntry, 'like');
@@ -1174,7 +1167,7 @@ function ui() {
         });
         
         if (found) {
-          var invisibleHeight = found.offsetTop + found.height - body.scrollTop - viewHeight;
+          invisibleHeight = found.offsetTop + found.height - body.scrollTop - viewHeight;
           
           if (invisibleHeight > viewHeight) {
             // can scroll whole screen
@@ -1227,7 +1220,7 @@ function ui() {
         }
       }
       
-      var invisibleHeight = (currentEntry.offsetTop + currentEntry.clientHeight) -
+      invisibleHeight = (currentEntry.offsetTop + currentEntry.clientHeight) -
         (body.scrollTop + viewHeight);
         
       // if only buttons line is invisible, go to next entry
@@ -1287,7 +1280,6 @@ function ui() {
         return;
       }
 
-      var data = storage[currentEntry.id];
       var parameters = {
         T: token,
         action: 'addcomment',
@@ -1391,7 +1383,7 @@ function lib() {
       array.push(list.item(index));
     }
     return array;
-  }
+  };
 
   Array.prototype.invoke = function(method) {
     var args = Array.toArray(arguments); // without this .shift() changes value of `method`
@@ -1541,7 +1533,7 @@ function lib() {
     request.send(method == 'POST' ? params : null);
     
     return request;
-  }
+  };
 
   window.LOG = function(message) {
     if (window.opera) {
