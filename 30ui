@@ -1250,7 +1250,8 @@ function ui() {
 
           dd.parentNode.insertBefore(DOM('dt', { innerHTML: 'you' }), dd);
           dd.parentNode.insertBefore(DOM('dd', { innerHTML: response.responseJSON.htmlContent }), dd);
-        }
+        },
+        onFailure: updateToken.curry(actions.comment.curry(event))
       });
     },
 
