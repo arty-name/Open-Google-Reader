@@ -242,7 +242,7 @@ function ui() {
       'body>header.unread button.unread, body>header.star button.starred, body>header.share button.shared, body>header.friends button.friends { font-weight: bold; } ' + 
       'body > header > a.resetView { position: absolute; right: 0; } ' + 
       'body.mobile > header > a.resetView { display: none; } ' + 
-      'body.mobile > header > button { padding: 2px 0; font-size: 1em; }' +
+      'body.mobile > header > button { padding: 2px 0; font-size: .95em; }' +
       'body > div.container { position:relative; padding: 0 .5em; } ' + 
       'div.shadow { position: absolute; top: 0px; width: 100%; background: black; opacity: .5; } ' + 
       'section.entry { padding-left: 1.4em; padding-right: .5em; display: block; border: 0 solid #bbb; border-bottom-width: 2px; margin-bottom: .2em; width: 95%; } ' + 
