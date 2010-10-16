@@ -53,6 +53,7 @@ settings.css =
 "" +
 "body {" +
 "  padding-top: 2em;" +
+"  font-family: Georgia, serif;" +
 "}" +
 "" +
 "body > header {" +
