@@ -176,6 +176,10 @@ function ui() {
     while (head.firstChild) head.removeChild(head.firstChild);
     head.appendChild(DOM('title'));
     head.appendChild(DOM('link', {href: '/reader/ui/favicon.ico', rel: 'SHORTCUT ICON'}));
+    
+    if (mobile) {
+      head.appendChild(DOM('meta', {name: 'viewport', content: 'width=400, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'}));
+    }
 
     Array.toArray(document.styleSheets).forEach(function(ss){ ss.disabled = true; });
   }
