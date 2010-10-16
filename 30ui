@@ -599,6 +599,7 @@ function ui() {
     
     var favicon = 'http://favicon.yandex.net/favicon/' + data.domain;
     favicon = '<img src="' + favicon + '">';
+    if (mobile) favicon = '';
     
     // replace feed name with custom feed name, if user renamed it
     var feed = subscriptions.find(function(feed){
