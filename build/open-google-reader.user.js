@@ -267,6 +267,7 @@ function ui() {
       'section.entry > footer > span.buttons { white-space: nowrap; } ' +
       'section.entry > footer > span.tags { float: right; opacity: .5; } ' +
       'section.entry + div.spacer { width: 90%; } ' +
+      'body.mobile section.star button.star, body.mobile section.share button.share { font-weight: bold; } '+
       'button.star { color: #bfb016; } button.share { color: #dc9765; } button.edit, button.comment { color: #74d774; } '+
       'button.star, button.share, button.edit, button.comment, button.cancel { background: none; border: none; } '+
       'button { cursor: pointer; } ' +
@@ -596,9 +597,12 @@ function ui() {
   }
 
   function createEntry(data) {
+    var classes = [];
+    
     // simplify tag detection on entry
     ['read', 'star', 'share'].forEach(function(tag){
       data[tag] = data.categories.include(tags[tag]);
+      if (data[tag]) classes.push(tag);
     });
     
     // create entry's main link
@@ -612,7 +616,7 @@ function ui() {
     var headerLink = DOM('a', linkProps);
     data.domain = headerLink.hostname;
 
-    var container = DOM('section', {className: 'entry'}, [
+    var container = DOM('section', {className: 'entry ' + classes.join(' ')}, [
       DOM('cite', {innerHTML: getAuthor(data)}),
       DOM('h2', undefined, [
         createButton('star', getButtonImage(data, 'star')),
