@@ -356,11 +356,13 @@ function ui() {
             friends = feed.count;
           }
         });
+        var html = mobile ? 'Comments ' : '✉ ';
+        if (friends) html += friends;
         container.
           previousElementSibling.
           firstElementChild.
           nextElementSibling.
-          innerHTML = '✉ ' + (friends ? friends : '');
+          innerHTML = html;
 
         // if unread count increased, current continuation isn't complete anymore
         // thus we get a new one
