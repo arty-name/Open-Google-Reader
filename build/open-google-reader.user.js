@@ -277,14 +277,35 @@ function ui() {
 
   // create container with buttons
   function createHeader() {
+    if (mobile) {
+      var titles = {
+        reload: 'Reload',
+        friends: 'Comments',
+        unread: 'Unread',
+        starred: 'Starred',
+        shared: 'Shared',
+        next: 'Next',
+        prev: 'Previous'
+      };
+    } else {
+      titles = {
+        reload: '⟳ Reload',
+        friends: '✉',
+        unread: 'Unread',
+        starred: '☆ Starred',
+        shared: '⚐ Shared',
+        next: '▽ Next',
+        prev: '△ Previous'
+      };
+    }
     return DOM('header', undefined, [
-      createButton('reload',  '⟳ Reload'),
-      createButton('friends',  '✉'),
-      createButton('unread',  'Unread'),
-      createButton('starred', '☆ Starred'),
-      createButton('shared',  '⚐ Shared'),
-      createButton('next',    '▽ Next'),
-      createButton('prev',    '△ Previous'),
+      createButton('reload',  titles.reload),
+      createButton('friends', titles.friends),
+      createButton('unread',  titles.unread),
+      createButton('starred', titles.starred),
+      createButton('shared',  titles.shared),
+      createButton('next',    titles.next),
+      createButton('prev',    titles.prev),
       DOM('a', {
         className: 'resetView',
         href: 'http://google.com/reader/view#',
