@@ -46,10 +46,9 @@ Misfeatures
 Sorry folks, do these yourself if you need them, it's easy anyway.
 
  * sort orders are hardcoded, modify them to fit your habits (1 character to change)
- * same is for initial view: it's "unread entries" now (1 word to change)
  * expanded view only 
  * no subscriptions list
- * mark as read on scrolling past view
+ * mark as read on scrolling past view only
 
 
 Hotkeys
@@ -72,8 +71,8 @@ Compatibility
 -------------
 
 Works nice in Opera. Chrome has some hotkeys issues. Firefox's Greasemonkey
-required lots of patching, but was defeated. Works in Nokia n810 (Maemo)
-browser, but you might need unicode fonts for button images.
+required lots of patching, but was defeated. Works in Opera Mobile 
+on Nokia n810, but you might need unicode fonts for button images.
 
 
 Installation
@@ -83,8 +82,6 @@ Opera: <http://github.com/arty-name/Open-Google-Reader/raw/master/build/open-goo
   (I highly recommend UJS Manager <http://unite.opera.com/application/401/> )
 
 Chrome & Firefox: <http://github.com/arty-name/Open-Google-Reader/raw/master/build/open-google-reader.user.js>
-
-Maemo: <http://github.com/arty-name/Open-Google-Reader/raw/master/build/open-google-reader-maemo.user.js>
 
 
 FAQ
@@ -107,6 +104,5 @@ Q: Page at <http://www.google.com/reader/view/> takes too long to load, how can 
    speed it up?  
 A: That page contains lots of user data, which slows page down. You can use same
    interface on page <http://www.google.com/reader/view/1>, which loads in a
-   blink of eye. The only downside is that you'd have to copy your `userId` from
-   popup dialog to userscript.
+   blink of eye. 
    
