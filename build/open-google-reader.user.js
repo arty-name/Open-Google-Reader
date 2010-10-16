@@ -143,7 +143,7 @@ settings.css =
 "}" +
 "" +
 "body.mobile section.entry > h2 > button {" +
-"  display: none;" +
+"  visibility: hidden;" +
 "}" +
 "" +
 "section.entry > h2 > input {" +
