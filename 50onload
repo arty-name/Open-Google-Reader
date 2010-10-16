@@ -11,6 +11,11 @@ if (typeof GM_xmlhttpRequest != "undefined" && !navigator.userAgent.match(/Chrom
     defineSettings.toString() + lib.toString() + ui.toString() +
     'defineSettings(); lib(); ui();';
   document.body.appendChild(script);
+  setTimeout(function(){
+    var style = document.createElement('style');
+    style.innerHTML = settings.css;
+    document.body.previousElementSibling.appendChild(style);
+  }, 100);
   
 } else if (document.readyState.match(/complete|loaded/)) {
   onload();
