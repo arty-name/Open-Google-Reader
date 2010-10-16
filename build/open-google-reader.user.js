@@ -45,6 +45,199 @@ settings = {
 };
 
 }
+settings.css =
+"html, body {" +
+"  margin: 0;" +
+"  padding: 0;" +
+"}" +
+"" +
+"body {" +
+"  padding-top: 2em;" +
+"}" +
+"" +
+"body > header {" +
+"  position: fixed;" +
+"  top: 0;" +
+"  left: 0;" +
+"  right: 0;" +
+"  height: 2em;" +
+"  z-index: 100;" +
+"  background-color: white;" +
+"}" +
+"" +
+"body>header.unread button.unread, body>header.star button.starred, body>header.share button.shared, body>header.friends button.friends {" +
+"  font-weight: bold;" +
+"}" +
+"" +
+"body > header > a.resetView {" +
+"  position: absolute;" +
+"  right: 0;" +
+"}" +
+"" +
+"body.mobile > header > a.resetView {" +
+"  display: none;" +
+"}" +
+"" +
+"body.mobile > header > button {" +
+"  padding: 2px 0;" +
+"  font-size: .95em;" +
+"}" +
+"" +
+"body > div.container {" +
+"  position: relative;" +
+"  padding: 0 .5em;" +
+"}" +
+"" +
+"div.shadow {" +
+"  position: absolute;" +
+"  top: 0;" +
+"  width: 100%;" +
+"  background: black;" +
+"  opacity: .5;" +
+"}" +
+"" +
+"section.entry {" +
+"  padding-left: 1.4em;" +
+"  padding-right: .5em;" +
+"  display: block;" +
+"  border: 0 solid #bbb;" +
+"  border-bottom-width: 2px;" +
+"  margin-bottom: .2em;" +
+"  width: 95%;" +
+"}" +
+"" +
+"section.entry.active {" +
+"  border-color: #333;" +
+"}" +
+"" +
+"body.mobile section.entry > h2 {" +
+"  font-size: 1.2em;" +
+"}" +
+"" +
+"section.entry > h2 {" +
+"  font-family: sans-serif;" +
+"  margin-top: .1em;" +
+"  margin-bottom: .3em;" +
+"  margin-left: .3em;" +
+"  text-indent: -1.4em;" +
+"}" +
+"" +
+"section.entry > h2 * {" +
+"  display: inline;" +
+"}" +
+"" +
+"section.entry > h2 > a {" +
+"  text-decoration: none;" +
+"  line-height: 1em;" +
+"}" +
+"" +
+"section.entry > h2 > button {" +
+"  font-size: inherit;" +
+"  width: 1em;" +
+"  padding-right: 1.1em;" +
+"}" +
+"" +
+"section.entry > h2 > input {" +
+"  width: 95%;" +
+"  font-size: inherit;" +
+"}" +
+"" +
+"section.entry > article {" +
+"  display: block;" +
+"  overflow-x: auto;" +
+"  clear: both;" +
+"}" +
+"" +
+"section.entry > article > p {" +
+"  line-height: 1.15em;" +
+"}" +
+"" +
+"section.entry > cite, section.entry > article, section.entry > footer {" +
+"  margin-left: .5em;" +
+"}" +
+"" +
+"section.entry > cite {" +
+"  float: right;" +
+"  text-align: right;" +
+"}" +
+"" +
+"section.entry > cite > img {" +
+"  margin: 6px;" +
+"  vertical-align: middle;" +
+"}" +
+"" +
+"section.entry > dl.comments {" +
+"  display: block;" +
+"  margin: .5em;" +
+"  border: 2px dotted gray;" +
+"  border-radius: 10px;" +
+"  padding: .5em .5em 0 .5em;" +
+"}" +
+"" +
+"section.entry > dl.comments > dt {" +
+"  font-weight: bold;" +
+"}" +
+"" +
+"section.entry > dl.comments > dt:after {" +
+"  content: ':';" +
+"}" +
+"" +
+"section.entry > dl.comments > dd {" +
+"  margin-bottom: .5em;" +
+"}" +
+"" +
+"section.entry > dl.comments > dd.addcomment.hidden .input {" +
+"  display: none;" +
+"}" +
+"" +
+"section.entry > footer {" +
+"  clear: both;" +
+"  display: block;" +
+"  margin-left: 0;" +
+"}" +
+"" +
+"section.entry > footer > span.buttons {" +
+"  white-space: nowrap;" +
+"}" +
+"" +
+"section.entry > footer > span.tags {" +
+"  float: right;" +
+"  opacity: .5;" +
+"}" +
+"" +
+"section.entry div.spacer {" +
+"  width: 90%;" +
+"}" +
+"" +
+"body.mobile section.star button.star, body.mobile section.share button.share {" +
+"  font-weight: bold;" +
+"}" +
+"" +
+"button.star {" +
+"  color: #bfb016;" +
+"}" +
+"" +
+"button.share {" +
+"  color: #dc9765;" +
+"}" +
+"" +
+"button.edit, button.comment {" +
+"  color: #74d774;" +
+"}" +
+"" +
+"button.star, button.share, button.edit, button.comment, button.cancel {" +
+"  background: none;" +
+"  border: none;" +
+"}" +
+"" +
+"button {" +
+"  cursor: pointer;" +
+"}" +
+"" +
+"textarea {" +
+"  width: 95%;" +
+"}" +
+"";
 /*
   OVERVIEW
   
@@ -234,47 +427,8 @@ function ui() {
   
   // add own css styles
   function addStyles() {
-    var css =
-      'html, body { margin: 0; padding: 0; } ' +
-      'body { padding-top: 2em; }' +
-      // redefine that white color in settings, if you will
-      'body > header { position: fixed; top: 0; left: 0; right: 0; height: 2em; z-index: 100; background-color: white; } ' +
-      'body>header.unread button.unread, body>header.star button.starred, body>header.share button.shared, body>header.friends button.friends { font-weight: bold; } ' + 
-      'body > header > a.resetView { position: absolute; right: 0; } ' + 
-      'body.mobile > header > a.resetView { display: none; } ' + 
-      'body.mobile > header > button { padding: 2px 0; font-size: .95em; }' +
-      'body > div.container { position:relative; padding: 0 .5em; } ' + 
-      'div.shadow { position: absolute; top: 0px; width: 100%; background: black; opacity: .5; } ' + 
-      'section.entry { padding-left: 1.4em; padding-right: .5em; display: block; border: 0 solid #bbb; border-bottom-width: 2px; margin-bottom: .2em; width: 95%; } ' + 
-      'section.entry.active { border-color: #333; } ' + 
-      'body.mobile section.entry > h2 { font-size: 1.2em; } ' + 
-      'section.entry > h2 { font-family: sans-serif; margin-top: .1em; margin-bottom: .3em; margin-left: .3em; text-indent: -1.4em; } ' + 
-      'section.entry > h2 * { display: inline; } ' + 
-      'section.entry > h2 > a { text-decoration: none; line-height: 1em; } ' + 
-      'section.entry > h2 > button { font-size: inherit; width: 1em; padding-right: 1.1em; } ' + 
-      'section.entry > h2 > input { width: 95%; font-size: inherit; } ' + 
-      'section.entry > article { display: block; overflow-x: auto; clear: both; } ' + 
-      'section.entry > article > p { line-height: 1.15em; } ' + 
-      'section.entry > cite, section.entry > article, section.entry > footer { margin-left: .5em; } ' +
-      'section.entry > cite { float: right; text-align: right; }' +
-      'section.entry > cite > img { margin: 6px; vertical-align: middle; }' +
-      'section.entry > dl.comments { display: block; margin: .5em; border: 2px dotted grey; border-radius: 10px; padding: .5em .5em 0 .5em; }' +
-      'section.entry > dl.comments > dt { font-weight: bold; }' +
-      'section.entry > dl.comments > dt:after { content: ":" }' +
-      'section.entry > dl.comments > dd { margin-bottom: .5em; }' +
-      'section.entry > dl.comments > dd.addcomment.hidden .input { display: none; }' +
-      'section.entry > footer { clear: both; display: block; margin-left: 0; } ' +
-      'section.entry > footer > span.buttons { white-space: nowrap; } ' +
-      'section.entry > footer > span.tags { float: right; opacity: .5; } ' +
-      'section.entry + div.spacer { width: 90%; } ' +
-      'body.mobile section.star button.star, body.mobile section.share button.share { font-weight: bold; } '+
-      'button.star { color: #bfb016; } button.share { color: #dc9765; } button.edit, button.comment { color: #74d774; } '+
-      'button.star, button.share, button.edit, button.comment, button.cancel { background: none; border: none; } '+
-      'button { cursor: pointer; } ' +
-      'textarea { width: 95%; } ' +
-      '';
     document.body.previousElementSibling.appendChild(
-      DOM('style', undefined, [document.createTextNode(css)])
+      DOM('style', undefined, [document.createTextNode(settings.css)])
     );
   }
 
