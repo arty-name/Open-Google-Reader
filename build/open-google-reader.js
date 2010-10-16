@@ -679,7 +679,7 @@ function ui() {
         annotations.appendChild(DOM('dd', { innerHTML: data.content || data.htmlContent }));
       });
       annotations.appendChild(DOM('dd', { className: 'addcomment'}, [
-        DOM('button', { className: 'comment', innerHTML: '✉ Add comment' })
+        DOM('button', { className: 'comment', innerHTML: (mobile ? '' : '✉ ') + 'Add comment' })
       ]));
     }
     
