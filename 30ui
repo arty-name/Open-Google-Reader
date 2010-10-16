@@ -171,6 +171,7 @@ function ui() {
     body.innerHTML = '';
     body.removeAttribute('text');
     body.removeAttribute('bgcolor');
+    body.className = mobile ? 'mobile' : '';
 
     var head = body.previousElementSibling;
     while (head.firstChild) head.removeChild(head.firstChild);
