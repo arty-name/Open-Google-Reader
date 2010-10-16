@@ -188,7 +188,6 @@ function ui() {
       like: tagPrefix + 'like',
       star: tagPrefix + 'starred',
       share: tagPrefix + 'broadcast',
-      tagW: 'user/' + userId + '/label/w', // my specific tag "W"
       friends: tagPrefix + 'broadcast-friends-comments'
     }
   }
@@ -233,7 +232,7 @@ function ui() {
       'body { padding-top: 2em; }' +
       // redefine that white color in settings, if you will
       'body > header { position: fixed; top: 0; left: 0; right: 0; height: 2em; z-index: 100; background-color: white; } ' +
-      'body>header.unread button.unread, body>header.star button.starred, body>header.share button.shared, body>header.friends button.friends, body>header.tagW button.taggedW { font-weight: bold; } ' + 
+      'body>header.unread button.unread, body>header.star button.starred, body>header.share button.shared, body>header.friends button.friends { font-weight: bold; } ' + 
       'body > header > a.resetView { position: absolute; right: 0; } ' + 
       'body > div.container { position:relative; padding: 0 .5em; } ' + 
       'div.shadow { position: absolute; top: 0px; width: 100%; background: black; opacity: .5; } ' + 
@@ -258,8 +257,8 @@ function ui() {
       'section.entry > footer > span.buttons { white-space: nowrap; } ' +
       'section.entry > footer > span.tags { float: right; opacity: .5; } ' +
       'section.entry + div.spacer { width: 90%; } ' +
-      'button.star { color: #bfb016; } button.share, button.tagW { color: #dc9765; } button.edit, button.comment { color: #74d774; } '+
-      'button.star, button.share, button.tagW, button.edit, button.comment, button.cancel { background: none; border: none; } '+
+      'button.star { color: #bfb016; } button.share { color: #dc9765; } button.edit, button.comment { color: #74d774; } '+
+      'button.star, button.share, button.edit, button.comment, button.cancel { background: none; border: none; } '+
       'button { cursor: pointer; } ' +
       'textarea { width: 95%; } ' +
       '';
@@ -276,7 +275,6 @@ function ui() {
       createButton('unread',  'Unread'),
       createButton('starred', '☆ Starred'),
       createButton('shared',  '⚐ Shared'),
-      createButton('taggedW', '⚐ TaggedW'),
       createButton('next',    '▽ Next'),
       createButton('prev',    '△ Previous'),
       DOM('a', {
@@ -566,7 +564,7 @@ function ui() {
 
   function createEntry(data) {
     // simplify tag detection on entry
-    ['read', 'star', 'share', 'tagW'].forEach(function(tag){
+    ['read', 'star', 'share'].forEach(function(tag){
       data[tag] = data.categories.include(tags[tag]);
     });
     
@@ -603,7 +601,6 @@ function ui() {
     switch (button) {
       case 'star':   return (data.star  ? '★' : '☆');
       case 'share':  return (data.share ? '⚑' : '⚐');
-      case 'tagW':   return (data.tagW  ? '⚑' : '⚐');
       case 'edit':   return '✍';
     }
     return '';
@@ -658,7 +655,6 @@ function ui() {
     var footer = DOM('footer', undefined, [DOM('span', {className: 'buttons'}, [
       createButton('star',  getButtonImage(data, 'star') + ' Star'),
       createButton('share', getButtonImage(data, 'share') + ' Share'),
-      createButton('tagW',  getButtonImage(data, 'tagW') + ' TagW'),
       createButton('edit',  getButtonImage(data, 'edit') + ' Edit/Comment')
     ])]);
 
@@ -734,7 +730,6 @@ function ui() {
       case 'K': case 'Л': actions.prev(); break;
       case 'V': case 'М': currentEntry && openTab(currentEntry.querySelector('a'), event); break;
       case 'C': case 'С': currentEntry && openTab(currentEntry.querySelectorAll('a')[1], event); break;
-      //case 'W': case 'Ц': actions.tagW(); break;
       case 'S': case 'Ы': actions[event.shiftKey ? 'share' : 'star'](); break;
       case 'Y': case 'Н': actions.edit(); break;
       default: matched = false;
@@ -885,9 +880,6 @@ function ui() {
       srcTitle: (data.feed || data.origin).title,
       srcUrl: data.origin.htmlUrl
     };
-    if (!share) {
-      parameters.tags = tags.tagW;
-    }
 
     return APIRequest('item/edit', {
       method: 'post',
@@ -1046,7 +1038,6 @@ function ui() {
     unread: switchToView.curry('unread'), 
     starred: switchToView.curry('star'), 
     shared: switchToView.curry('share'), 
-    taggedW: switchToView.curry('tagW'),
     friends: switchToView.curry('friends'),
 
     reload: function() {
@@ -1106,12 +1097,6 @@ function ui() {
       if (checkIfAltered(currentEntry, true)) return;
       
       toggleEntryTag(currentEntry, 'share');
-      toggleEntryTag(currentEntry, 'like');
-    },
-    tagW: function(){ // this one adds specific tag
-      if (checkIfAltered(currentEntry, false)) return;
-
-      toggleEntryTag(currentEntry, 'tagW');
       toggleEntryTag(currentEntry, 'like');
     },
 

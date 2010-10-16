@@ -90,9 +90,6 @@ Maemo: <http://github.com/arty-name/Open-Google-Reader/raw/master/build/open-goo
 FAQ
 ---
 
-Q: What's "TagW"?  
-A: That's my shortcut for adding tag "W". Edit it as you need or remove it.
-
 Q: I'm using Opera and links are opened in foreground, how do I fix that?  
 A: Activate option <opera:config#UserPrefs|Allowscripttolowerwindow>.
 
