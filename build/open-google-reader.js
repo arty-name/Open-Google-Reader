@@ -142,6 +142,10 @@ settings.css =
 "  padding-right: 1.1em;" +
 "}" +
 "" +
+"body.mobile section.entry > h2 > button {" +
+"  display: none;" +
+"}" +
+"" +
 "section.entry > h2 > input {" +
 "  width: 95%;" +
 "  font-size: inherit;" +
