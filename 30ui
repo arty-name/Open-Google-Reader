@@ -580,6 +580,8 @@ function ui() {
   }
   
   function getButtonImage(data, button) {
+    if (mobile) return '';
+    
     switch (button) {
       case 'star':   return (data.star  ? '★' : '☆');
       case 'share':  return (data.share ? '⚑' : '⚐');
