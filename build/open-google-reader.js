@@ -106,6 +106,11 @@ settings.css =
 "  width: 95%;" +
 "}" +
 "" +
+"body.mobile section.entry {" +
+"  padding: 0;" +
+"  width: auto;" +
+"}" +
+"" +
 "section.entry.active {" +
 "  border-color: #333;" +
 "}" +
