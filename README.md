@@ -106,3 +106,7 @@ A: That page contains lots of user data, which slows page down. You can use same
    interface on page <http://www.google.com/reader/view/1>, which loads in a
    blink of eye. 
    
+Q: How to install user javascript in Opera Mobile on Nokia Maemo?
+A: Copy the script to /home/user/.opera/ and add following line 
+   to [User Prefs] section of /home/user/.opera/opera.ini:    
+   User JavaScript File=/home/user/.opera/open-google-reader.js
