@@ -58,6 +58,8 @@ function ui() {
   
   // session token (can be updated)
   var token = window._COMMAND_TOKEN;
+  
+  var mobile = !!/mobi/i.test(window.navigator.userAgent);
 
   // sort orders
   var sort = {
