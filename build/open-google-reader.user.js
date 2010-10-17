@@ -85,11 +85,8 @@ settings.css =
 "  font-size: .95em;" +
 "}" +
 "" +
-"body.mobile img { " +
-"  transform: scale(0.5); " +
-"  -o-transform: scale(0.5); " +
-"  -moz-transform: scale(0.5); " +
-"  -webkit-transform: scale(0.5); " +
+"body.mobile article img {" +
+"  max-width: 100%;" +
 "}" +
 "" +
 "body > div.container {" +
