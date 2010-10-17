@@ -188,6 +188,7 @@ settings.css =
 "  margin: .5em;" +
 "  border: 2px dotted gray;" +
 "  border-radius: 10px;" +
+"  -moz-border-radius: 10px;" +
 "  padding: .5em .5em 0 .5em;" +
 "}" +
 "" +
