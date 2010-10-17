@@ -52,7 +52,7 @@ settings.css =
 "}" +
 "" +
 "body {" +
-"  padding-top: 2em;" +
+"  padding-top: 25px;" +
 "  font-family: Georgia, serif;" +
 "}" +
 "" +
