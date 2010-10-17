@@ -71,6 +71,7 @@ settings.css =
 "body > header > button.starred, " +
 "body > header > button.shared, " +
 "body > header > button.friends {" +
+"  margin: 0;" +
 "  border-radius: 5px 5px 0 0;" +
 "  -moz-border-radius: 5px 5px 0 0;" +
 "  border: 1px solid gray;" +
