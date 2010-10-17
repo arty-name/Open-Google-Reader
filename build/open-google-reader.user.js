@@ -65,7 +65,6 @@ settings.css =
 "  height: 25px;" +
 "  z-index: 100;" +
 "  background-color: gray;" +
-"  /*border-bottom: 1px solid gray;*/" +
 "}" +
 "" +
 "body > header > button.unread, " +
