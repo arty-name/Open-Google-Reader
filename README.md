@@ -17,6 +17,14 @@ javascript. I do not want to make this bloated victim of creeping featuristis,
 thus feel free to fork the repo and roll your own.
 
 
+Screenshot
+----------
+
+You can easily change looks using css.
+
+![Screenshot of Open Google Reader in action](http://github.com/arty-name/Open-Google-Reader/raw/master/screenshot.png)
+
+
 Features
 --------
 
