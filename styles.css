@@ -23,6 +23,7 @@ body>header.unread button.unread, body>header.star button.starred, body>header.s
 }
 
 body > header > a.resetView {
+  font-family: sans-serif;
   position: absolute;
   right: 0;
 }

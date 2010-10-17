@@ -71,6 +71,7 @@ settings.css =
 "}" +
 "" +
 "body > header > a.resetView {" +
+"  font-family: sans-serif;" +
 "  position: absolute;" +
 "  right: 0;" +
 "}" +
