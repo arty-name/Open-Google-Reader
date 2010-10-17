@@ -57,23 +57,47 @@ settings.css =
 "}" +
 "" +
 "body > header {" +
+"  display: block;" +
 "  position: fixed;" +
 "  top: 0;" +
 "  left: 0;" +
 "  right: 0;" +
-"  height: 2em;" +
+"  height: 25px;" +
 "  z-index: 100;" +
-"  background-color: white;" +
+"  background-color: gray;" +
+"  /*border-bottom: 1px solid gray;*/" +
+"}" +
+"" +
+"body > header > button.unread, " +
+"body > header > button.starred, " +
+"body > header > button.shared, " +
+"body > header > button.friends {" +
+"  border-radius: 5px 5px 0 0;" +
+"  -moz-border-radius: 5px 5px 0 0;" +
+"  border: 1px solid gray;" +
+"  height: 26px;" +
+"  background-color: #eee;" +
+"}" +
+"" +
+"body > header > button.friends {" +
+"  margin-left: .5em;" +
+"}" +
+"" +
+"body > header > button.shared {" +
+"  margin-right: .5em;" +
 "}" +
 "" +
 "body>header.unread button.unread, body>header.star button.starred, body>header.share button.shared, body>header.friends button.friends {" +
 "  font-weight: bold;" +
+"  background-color: white;" +
+"  border-bottom-color: white;" +
 "}" +
 "" +
 "body > header > a.resetView {" +
 "  font-family: sans-serif;" +
 "  position: absolute;" +
 "  right: 0;" +
+"  color: white;" +
 "}" +
 "" +
 "body.mobile > header > a.resetView {" +
