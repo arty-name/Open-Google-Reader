@@ -462,7 +462,7 @@ function ui() {
       head.appendChild(DOM('meta', {name: 'viewport', content: 'width=400, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'}));
     }
 
-    Array.toArray(document.styleSheets).forEach(function(ss){ ss.disabled = true; });
+    Array.prototype.slice.call(document.styleSheets, 0).forEach(function(ss){ ss.disabled = true; });
   }
   
   // add own css styles
@@ -1595,16 +1595,12 @@ function lib() {
     return node;
   };
   
-  Array.toArray = function(list) {
-    var array = [];
-    for (var index = 0; index < list.length; ++index) {
-      array.push(list[index]);
-    }
-    return array;
+  function cloneArray(array) {
+    return Array.prototype.slice.call(array, 0);
   };
 
   Array.prototype.invoke = function(method) {
-    var args = Array.toArray(arguments); // without this .shift() changes value of `method`
+    var args = cloneArray(arguments); // without this .shift() changes value of `method`
     args.shift();
     
     return this.map(function(element){
@@ -1654,9 +1650,9 @@ function lib() {
   
   Function.prototype.curry = function() {
     var fun = this;
-    var args = Array.toArray(arguments); // only Opera supports .concat for arguments
+    var args = cloneArray(arguments); // only Opera supports .concat for arguments
     return function() {
-      return fun.apply(null, args.concat(Array.toArray(arguments)));
+      return fun.apply(null, args.concat(cloneArray(arguments)));
     }
   };
   
@@ -1689,12 +1685,12 @@ function lib() {
   };
   
   HTMLElement.prototype.previousSiblings = function(class_) {
-    var siblings = Array.toArray(this.parentNode.childNodes);// NB: <section> doesn't go to .children :(
+    var siblings = cloneArray(this.parentNode.childNodes);// NB: <section> doesn't go to .children :(
     return siblings.slice(0, siblings.indexOf(this));
   };
   
   HTMLElement.prototype.nextSiblings = function(class_) {
-    var siblings = Array.toArray(this.parentNode.childNodes); // NB: <section> doesn't go to .children :(
+    var siblings = cloneArray(this.parentNode.childNodes); // NB: <section> doesn't go to .children :(
     return this.nextElementSibling ? siblings.slice(siblings.indexOf(this) + 1) : [];
   };
   
