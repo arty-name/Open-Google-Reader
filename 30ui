@@ -182,7 +182,7 @@ function ui() {
       head.appendChild(DOM('meta', {name: 'viewport', content: 'width=400, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'}));
     }
 
-    Array.toArray(document.styleSheets).forEach(function(ss){ ss.disabled = true; });
+    Array.prototype.slice.call(document.styleSheets, 0).forEach(function(ss){ ss.disabled = true; });
   }
   
   // add own css styles
