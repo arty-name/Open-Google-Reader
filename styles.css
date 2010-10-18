@@ -57,7 +57,7 @@ body.mobile > header > a.resetView {
 }
 
 body.mobile > header > button {
-  padding: 2px 0;
+  padding: 2px 1px;
   font-size: .95em;
 }
 
