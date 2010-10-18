@@ -1602,14 +1602,6 @@ function lib() {
     }
     return array;
   };
-  
-  Array.NodeListToArray = function(list) {
-    var array = [];
-    for (var index = 0; index < list.length; ++index) {
-      array.push(list.item(index));
-    }
-    return array;
-  };
 
   Array.prototype.invoke = function(method) {
     var args = Array.toArray(arguments); // without this .shift() changes value of `method`
@@ -1648,7 +1640,7 @@ function lib() {
   // but allows to bring Array methods to NodeList
   'invoke pluck find include filter forEach map'.split(' ').forEach(function(method){
     NodeList.prototype[method] = function(what) {
-      return Array.NodeListToArray(this)[method](what);
+      return Array.prototype[method].call(this, what);
     }
   });
   
@@ -1683,7 +1675,7 @@ function lib() {
     var qsa = HTMLElement.prototype.querySelectorAll;
     if (qsa && qsa.toString().match(/native|source/)) { // ignore maemo
       HTMLElement.prototype.querySelectorAll = function() {
-        return Array.NodeListToArray(qsa.apply(this, arguments));
+        return Array.prototype.slice.call(qsa.apply(this, arguments), 0);
       };
     }
   })();
