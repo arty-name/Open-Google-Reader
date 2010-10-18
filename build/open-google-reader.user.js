@@ -64,7 +64,7 @@ settings.css =
 "  right: 0;" +
 "  height: 25px;" +
 "  z-index: 100;" +
-"  background-color: gray;" +
+"  background-color: #c2cff1;" +
 "}" +
 "" +
 "body > header > button.unread, " +
@@ -74,9 +74,9 @@ settings.css =
 "  margin: 0;" +
 "  border-radius: 5px 5px 0 0;" +
 "  -moz-border-radius: 5px 5px 0 0;" +
-"  border: 1px solid gray;" +
+"  border: 1px solid #c2cff1;" +
 "  height: 26px;" +
-"  background-color: #eee;" +
+"  background-color: #ebeff9;" +
 "}" +
 "" +
 "body > header > button.friends {" +
@@ -130,7 +130,7 @@ settings.css =
 "  padding-left: 1.4em;" +
 "  padding-right: .5em;" +
 "  display: block;" +
-"  border: 0 solid #bbb;" +
+"  border: 0 solid #c2cff1;" +
 "  border-bottom-width: 2px;" +
 "  margin-bottom: .2em;" +
 "  width: 95%;" +
@@ -142,7 +142,7 @@ settings.css =
 "}" +
 "" +
 "section.entry.active {" +
-"  border-color: #333;" +
+"  border-color: #70778c;" +
 "}" +
 "" +
 "body.mobile section.entry > h2 {" +
@@ -208,7 +208,7 @@ settings.css =
 "section.entry > dl.comments {" +
 "  display: block;" +
 "  margin: .5em;" +
-"  border: 2px dotted gray;" +
+"  border: 2px dotted #70778c;" +
 "  border-radius: 10px;" +
 "  -moz-border-radius: 10px;" +
 "  padding: .5em .5em 0 .5em;" +
@@ -254,15 +254,15 @@ settings.css =
 "}" +
 "" +
 "button.star {" +
-"  color: #bfb016;" +
+"  color: #8c8211;" +
 "}" +
 "" +
 "button.share {" +
-"  color: #dc9765;" +
+"  color: #8c6041;" +
 "}" +
 "" +
 "button.edit, button.comment {" +
-"  color: #74d774;" +
+"  color: #4c8c4c;" +
 "}" +
 "" +
 "button.star, button.share, button.edit, button.comment, button.cancel {" +
