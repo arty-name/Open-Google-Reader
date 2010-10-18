@@ -868,6 +868,7 @@ function ui() {
       parameters: parameters,
       onSuccess: function() {
         data[tag] = !state;
+        entry[state ? 'removeClassName' : 'addClassName'](tag);
         entry.querySelectorAll && entry.querySelectorAll('button.' + tag).forEach(function(button){
           button.innerHTML = button.innerHTML.replace(/^./, getButtonImage(data, tag));
         });
