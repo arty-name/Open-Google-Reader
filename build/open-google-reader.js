@@ -105,7 +105,7 @@ settings.css =
 "}" +
 "" +
 "body.mobile > header > button {" +
-"  padding: 2px 0;" +
+"  padding: 2px 1px;" +
 "  font-size: .95em;" +
 "}" +
 "" +
@@ -1148,6 +1148,7 @@ function ui() {
       parameters: parameters,
       onSuccess: function() {
         data[tag] = !state;
+        entry[state ? 'removeClassName' : 'addClassName'](tag);
         entry.querySelectorAll && entry.querySelectorAll('button.' + tag).forEach(function(button){
           button.innerHTML = button.innerHTML.replace(/^./, getButtonImage(data, tag));
         });
