@@ -1664,17 +1664,15 @@ function lib() {
     }
     return target;
   };
-  
-  (function(){
-    // in Opera querySelectorAll returns StaticNodeList, which is unavailable for
-    // monkey-patching, thus we patch querySelectorAll itself
-    var qsa = HTMLElement.prototype.querySelectorAll;
-    if (qsa && qsa.toString().match(/native|source/)) { // ignore maemo
-      HTMLElement.prototype.querySelectorAll = function() {
-        return Array.prototype.slice.call(qsa.apply(this, arguments), 0);
-      };
-    }
-  })();
+
+  // in Opera querySelectorAll returns StaticNodeList, which is unavailable for
+  // monkey-patching, thus we patch querySelectorAll itself
+  var qsa = HTMLElement.prototype.querySelectorAll;
+  if (qsa && qsa.toString().match(/native|source/)) { // ignore maemo
+    HTMLElement.prototype.querySelectorAll = function() {
+      return Array.prototype.slice.call(qsa.apply(this, arguments), 0);
+    };
+  }
   
   HTMLElement.prototype.addClassName = function(class_) {
     this.className += ' ' + class_;
