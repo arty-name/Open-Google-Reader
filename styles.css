@@ -229,3 +229,19 @@ button {
 textarea {
   width: 95%;
 }
+
+button meter:empty:before {
+  content: '';
+}
+
+button meter:empty:after {
+  content: '';
+}
+
+button meter:before {
+  content: ' (';
+}
+
+button meter:after {
+  content: ')';
+}
