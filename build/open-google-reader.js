@@ -277,6 +277,22 @@ settings.css =
 "textarea {" +
 "  width: 95%;" +
 "}" +
+"" +
+"button meter:empty:before {" +
+"  content: '';" +
+"}" +
+"" +
+"button meter:empty:after {" +
+"  content: '';" +
+"}" +
+"" +
+"button meter:before {" +
+"  content: ' (';" +
+"}" +
+"" +
+"button meter:after {" +
+"  content: ')';" +
+"}" +
 "";
 /*
   OVERVIEW
@@ -497,8 +513,8 @@ function ui() {
     }
     return DOM('header', undefined, [
       createButton('reload',  titles.reload),
-      createButton('friends', titles.friends),
-      createButton('unread',  titles.unread),
+      createButton('friends', titles.friends, DOM('meter')),
+      createButton('unread',  titles.unread,  DOM('meter')),
       createButton('starred', titles.starred),
       createButton('shared',  titles.shared),
       createButton('next',    titles.next),
@@ -511,8 +527,8 @@ function ui() {
     ]);
   }
 
-  function createButton(class_, text) {
-    return DOM('button', {className: class_, innerHTML: text});
+  function createButton(class_, text, child) {
+    return DOM('button', {className: class_, innerHTML: text}, child ? [child] : undefined);
   }
 
   // update unread count now, every minute and on every window focus
@@ -551,13 +567,7 @@ function ui() {
             friends = feed.count;
           }
         });
-        var html = mobile ? 'Comments ' : '✉ ';
-        if (friends) html += friends;
-        container.
-          previousElementSibling.
-          firstElementChild.
-          nextElementSibling.
-          innerHTML = html;
+        document.querySelector('body > header > button.friends > meter').innerHTML = friends || '';
 
         // if unread count increased, current continuation isn't complete anymore
         // thus we get a new one
@@ -581,12 +591,8 @@ function ui() {
       string = '(' + unreadCount + ') ';
     }
     document.title = string + 'Google Reader';
-    container.
-      previousElementSibling.
-      firstElementChild.
-      nextElementSibling.
-      nextElementSibling.
-      innerHTML = 'Unread ' + string;
+
+    document.querySelector('body > header > button.unread > meter').innerHTML = unreadCount || '';
   }
   
   // this replaces active continuation with new, containing all unread items
