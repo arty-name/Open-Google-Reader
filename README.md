@@ -22,7 +22,7 @@ Screenshot
 
 You can easily change looks using css.
 
-![Screenshot of Open Google Reader in action](http://github.com/arty-name/Open-Google-Reader/raw/master/screenshot.png)
+![Screenshot of Open Google Reader in action](https://github.com/arty-name/Open-Google-Reader/raw/0c84631a1014e1fd52c48f24bed0f7c4d63d277b/screenshot.png)
 
 
 Features
