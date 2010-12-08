@@ -278,19 +278,23 @@ settings.css =
 "  width: 95%;" +
 "}" +
 "" +
-"button meter:empty:before {" +
+"button var {" +
+"  font-style: normal;" +
+"}" +
+"" +
+"button var:empty:before {" +
 "  content: '';" +
 "}" +
 "" +
-"button meter:empty:after {" +
+"button var:empty:after {" +
 "  content: '';" +
 "}" +
 "" +
-"button meter:before {" +
+"button var:before {" +
 "  content: ' (';" +
 "}" +
 "" +
-"button meter:after {" +
+"button var:after {" +
 "  content: ')';" +
 "}" +
 "";
@@ -513,8 +517,8 @@ function ui() {
     }
     return DOM('header', undefined, [
       createButton('reload',  titles.reload),
-      createButton('friends', titles.friends, DOM('meter')),
-      createButton('unread',  titles.unread,  DOM('meter')),
+      createButton('friends', titles.friends, DOM('var')),
+      createButton('unread',  titles.unread,  DOM('var')),
       createButton('starred', titles.starred),
       createButton('shared',  titles.shared),
       createButton('next',    titles.next),
@@ -567,7 +571,7 @@ function ui() {
             friends = feed.count;
           }
         });
-        document.querySelector('body > header > button.friends > meter').innerHTML = friends || '';
+        document.querySelector('body > header > button.friends > var').innerHTML = friends || '';
 
         // if unread count increased, current continuation isn't complete anymore
         // thus we get a new one
@@ -592,7 +596,7 @@ function ui() {
     }
     document.title = string + 'Google Reader';
 
-    document.querySelector('body > header > button.unread > meter').innerHTML = unreadCount || '';
+    document.querySelector('body > header > button.unread > var').innerHTML = unreadCount || '';
   }
   
   // this replaces active continuation with new, containing all unread items

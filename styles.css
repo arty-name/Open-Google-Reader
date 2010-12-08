@@ -230,18 +230,22 @@ textarea {
   width: 95%;
 }
 
-button meter:empty:before {
+button var {
+  font-style: normal;
+}
+
+button var:empty:before {
   content: '';
 }
 
-button meter:empty:after {
+button var:empty:after {
   content: '';
 }
 
-button meter:before {
+button var:before {
   content: ' (';
 }
 
-button meter:after {
+button var:after {
   content: ')';
 }
