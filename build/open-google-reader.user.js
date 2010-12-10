@@ -1009,11 +1009,11 @@ function ui() {
     }
   }
 
-  function updateAllCommentsViewTime() {
+  function updateAllCommentsViewTime(opt_time) {
     APIRequest('preference/set', { method: 'post', parameters: {
       T: token,
       k: 'last-allcomments-view',
-      v: (new Date()).getTime() * 1000 // right - that's microseconds
+      v: opt_time || ((new Date()).getTime() * 1000) // right - that's microseconds
     }});
   }
 
@@ -1527,7 +1527,10 @@ function ui() {
 
           dd.parentNode.insertBefore(DOM('dt', { innerHTML: 'you' }), dd);
           dd.parentNode.insertBefore(DOM('dd', { innerHTML: response.responseJSON.htmlContent }), dd);
-          updateAllCommentsViewTime();
+          
+          var id = response.responseJSON.commentId;
+          var time = id.split(/#/)[1];
+          updateAllCommentsViewTime(time);
         },
         onFailure: updateToken.curry(actions.comment.curry(event))
       });
