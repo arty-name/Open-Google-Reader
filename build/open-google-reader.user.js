@@ -282,11 +282,7 @@ settings.css =
 "  font-style: normal;" +
 "}" +
 "" +
-"button var:empty:before {" +
-"  content: '';" +
-"}" +
-"" +
-"button var:empty:after {" +
+"button var:empty:before, button var:empty:after {" +
 "  content: '';" +
 "}" +
 "" +
