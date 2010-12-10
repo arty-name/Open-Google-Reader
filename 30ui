@@ -1233,7 +1233,7 @@ function ui() {
           dd.parentNode.insertBefore(DOM('dd', { innerHTML: response.responseJSON.htmlContent }), dd);
           
           var id = response.responseJSON.commentId;
-          var time = id.split(/#/)[1];
+          var time = parseInt(id.split(/#/)[1]) + 1000;
           updateAllCommentsViewTime(time);
         },
         onFailure: updateToken.curry(actions.comment.curry(event))
