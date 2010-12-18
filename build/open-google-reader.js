@@ -469,7 +469,7 @@ function ui() {
     body.removeAttribute('bgcolor');
     body.className = mobile ? 'mobile' : '';
 
-    var head = body.previousElementSibling;
+    var head = document.head || document.body.previousElementSibling;
     while (head.firstChild) head.removeChild(head.firstChild);
     head.appendChild(DOM('title'));
     head.appendChild(DOM('link', {href: '/reader/ui/favicon.ico', rel: 'SHORTCUT ICON'}));
