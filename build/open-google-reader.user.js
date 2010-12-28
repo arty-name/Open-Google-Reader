@@ -1523,6 +1523,7 @@ function ui() {
         method: 'post',
         parameters: parameters,
         onSuccess: function(response) {
+          textarea.value = '';
           dd.className += ' hidden';
 
           dd.parentNode.insertBefore(DOM('dt', { innerHTML: 'you' }), dd);
