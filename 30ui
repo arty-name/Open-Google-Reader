@@ -638,7 +638,7 @@ function ui() {
     var target = event.target;
     
     if (event.ctrlKey || event.altKey) return;
-    if (target && (target.nodeName.match(/input|textarea/i))) return;
+    if (target && (target.nodeName.match(/input|textarea|button/i))) return;
     if (!event.ctrlKey && event.keyCode == 32) event.preventDefault(); // space
     
     hideShadow();
