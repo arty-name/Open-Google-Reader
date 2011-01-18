@@ -927,6 +927,7 @@ function ui() {
     target = event.findElement('button');
     if (target && actions[target.className]) {
       actions[target.className](event);
+      target.blur();
     }
   } catch(e) { LOG(e) }}
 
