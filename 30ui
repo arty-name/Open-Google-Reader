@@ -434,6 +434,11 @@ function ui() {
     item.originalTitle = item.title;
     item.title = item.title || trimToNWords(item.body.stripTags(), 8) || '»';
     
+    ['read', 'star', 'share'].forEach(function(tag){
+      item[tag] = item.categories.include(tags[tag]);
+    });
+    item.hooks = { read: undefined, star: undefined, share: undefined };
+
     // check if entry needs alteration
     entryAlterations.invoke('call', null, item);
     
@@ -501,14 +506,6 @@ function ui() {
   }
 
   function createEntry(data) {
-    var classes = [];
-    
-    // simplify tag detection on entry
-    ['read', 'star', 'share'].forEach(function(tag){
-      data[tag] = data.categories.include(tags[tag]);
-      if (data[tag]) classes.push(tag);
-    });
-    
     // create entry's main link
     var linkProps = {innerHTML: data.title};
     if (data.alternate) {
@@ -520,6 +517,11 @@ function ui() {
     var headerLink = DOM('a', linkProps);
     data.domain = headerLink.hostname;
 
+    var classes = [
+      data.read ? 'read' : '',
+      data.star ? 'star' : '',
+      data.share ? 'share' : ''
+    ];
     var container = DOM('section', {className: 'entry ' + classes.join(' ')}, [
       DOM('cite', {innerHTML: getAuthor(data)}),
       DOM('h2', undefined, [
@@ -846,6 +848,8 @@ function ui() {
     if (!entry.id) return;
     var data = storage[entry.id] || entry;
     var state = data[tag];
+    
+    if (state && data.hooks[tag]) data.hooks[tag].call();
     
     var parameters = {
       T: token,
