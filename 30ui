@@ -849,7 +849,7 @@ function ui() {
     var data = storage[entry.id] || entry;
     var state = data[tag];
     
-    if (state && data.hooks[tag]) data.hooks[tag].call();
+    if (!state && data.hooks[tag]) data.hooks[tag].call();
     
     var parameters = {
       T: token,
