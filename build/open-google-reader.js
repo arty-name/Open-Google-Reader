@@ -52,8 +52,13 @@ settings.css =
 "}" +
 "" +
 "body {" +
-"  padding-top: 25px;" +
+"  padding-top: 26px;" +
 "  font-family: Georgia, serif;" +
+"}" +
+"" +
+"body.mobile {" +
+"  padding-top: 40px;" +
+"  font-size: 30px;" +
 "}" +
 "" +
 "body > header {" +
@@ -65,6 +70,14 @@ settings.css =
 "  height: 26px;" +
 "  z-index: 100;" +
 "  background-color: #c2cff1;" +
+"}" +
+"" +
+"body.mobile > header {" +
+"  height: 40px;" +
+"}" +
+"" +
+"body.mobile > header > button {" +
+"  font-size: 23px;" +
 "}" +
 "" +
 "body > header > button.unread, " +
@@ -79,6 +92,14 @@ settings.css =
 "  background-color: #ebeff9;" +
 "}" +
 "" +
+"body.mobile > header > button.unread, " +
+"body.mobile > header > button.starred, " +
+"body.mobile > header > button.shared, " +
+"body.mobile > header > button.friends {" +
+"  height: 40px;" +
+"  border-width: 4px;" +
+"}" +
+"" +
 "body > header > button.friends {" +
 "  margin-left: .5em;" +
 "}" +
@@ -91,6 +112,13 @@ settings.css =
 "  font-weight: bold;" +
 "  background-color: white;" +
 "  border-bottom-color: white;" +
+"}" +
+"" +
+"body.mobile>header.unread button.unread, " +
+"body.mobile>header.star button.starred, " +
+"body.mobile>header.share button.shared, " +
+"body.mobile>header.friends button.friends {" +
+"  font-weight: bold;" +
 "}" +
 "" +
 "body > header > a.resetView {" +
@@ -111,6 +139,7 @@ settings.css =
 "" +
 "body.mobile article img {" +
 "  max-width: 100%;" +
+"  -o-object-fit: contain;" +
 "}" +
 "" +
 "body > div.container {" +
@@ -146,7 +175,8 @@ settings.css =
 "}" +
 "" +
 "body.mobile section.entry > h2 {" +
-"  font-size: 1.2em;" +
+"  font-size: 1em;" +
+"  font-weight: normal;" +
 "}" +
 "" +
 "section.entry > h2 {" +
@@ -421,12 +451,22 @@ function ui() {
   document.addEventListener('click', clickHandler, false);
   document.addEventListener('keypress', keyHandler, false);
 
-  // attach listeners for window scroll, resize, blur and focus
-  window.addEventListener('scroll', scrollHandler, false);
+  // attach listeners for window resize, blur and focus
   window.addEventListener('resize', resizeHandler, false);
   window.addEventListener('focus', function(){ inBackground = false; }, false);
   window.addEventListener('blur',  function(){ inBackground = true;  }, false);
 
+  // window scroll requires special handling on mobile
+  if (!mobile) {
+    window.addEventListener('scroll', scrollHandler, false);
+  } else {
+    document.addEventListener('touchmove', function(){
+      document.addEventListener('touchend', function touch(){
+        document.removeEventListener('touchend', touch, false);
+        scrollHandler();
+      }, false);
+    }, false);
+  }
 
   function initTags() {
     // prefix of user tags

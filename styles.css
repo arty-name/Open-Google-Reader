@@ -4,8 +4,13 @@ html, body {
 }
 
 body {
-  padding-top: 25px;
+  padding-top: 26px;
   font-family: Georgia, serif;
+}
+
+body.mobile {
+  padding-top: 40px;
+  font-size: 30px;
 }
 
 body > header {
@@ -17,6 +22,14 @@ body > header {
   height: 26px;
   z-index: 100;
   background-color: #c2cff1;
+}
+
+body.mobile > header {
+  height: 40px;
+}
+
+body.mobile > header > button {
+  font-size: 23px;
 }
 
 body > header > button.unread, 
@@ -31,6 +44,14 @@ body > header > button.friends {
   background-color: #ebeff9;
 }
 
+body.mobile > header > button.unread, 
+body.mobile > header > button.starred, 
+body.mobile > header > button.shared, 
+body.mobile > header > button.friends {
+  height: 40px;
+  border-width: 4px;
+}
+
 body > header > button.friends {
   margin-left: .5em;
 }
@@ -43,6 +64,13 @@ body>header.unread button.unread, body>header.star button.starred, body>header.s
   font-weight: bold;
   background-color: white;
   border-bottom-color: white;
+}
+
+body.mobile>header.unread button.unread, 
+body.mobile>header.star button.starred, 
+body.mobile>header.share button.shared, 
+body.mobile>header.friends button.friends {
+  font-weight: bold;
 }
 
 body > header > a.resetView {
@@ -63,6 +91,7 @@ body.mobile > header > button {
 
 body.mobile article img {
   max-width: 100%;
+  -o-object-fit: contain;
 }
 
 body > div.container {
@@ -98,7 +127,8 @@ section.entry.active {
 }
 
 body.mobile section.entry > h2 {
-  font-size: 1.2em;
+  font-size: 1em;
+  font-weight: normal;
 }
 
 section.entry > h2 {
