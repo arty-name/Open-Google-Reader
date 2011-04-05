@@ -27,7 +27,7 @@ function lib() {
   
   function cloneArray(array) {
     return Array.prototype.slice.call(array, 0);
-  };
+  }
 
   Array.prototype.invoke = function(method) {
     var args = cloneArray(arguments); // without this .shift() changes value of `method`
@@ -74,7 +74,7 @@ function lib() {
     return this.indexOf(what) > -1;
   };
   
-  String.prototype.stripTags = function(what) {
+  String.prototype.stripTags = function() {
     return this.replace(/<\/?[^>]+>/gi, '');
   };
   
@@ -115,12 +115,12 @@ function lib() {
     return classList;
   });
   
-  HTMLElement.prototype.previousSiblings = function(class_) {
+  HTMLElement.prototype.previousSiblings = function() {
     var siblings = cloneArray(this.parentNode.childNodes);// NB: <section> doesn't go to .children :(
     return siblings.slice(0, siblings.indexOf(this));
   };
   
-  HTMLElement.prototype.nextSiblings = function(class_) {
+  HTMLElement.prototype.nextSiblings = function() {
     var siblings = cloneArray(this.parentNode.childNodes); // NB: <section> doesn't go to .children :(
     return this.nextElementSibling ? siblings.slice(siblings.indexOf(this) + 1) : [];
   };
@@ -178,7 +178,7 @@ function lib() {
     request.send(method == 'POST' ? params : null);
     
     return request;
-  };
+  }
 
   window.LOG = function(message) {
     if (window.opera) {
