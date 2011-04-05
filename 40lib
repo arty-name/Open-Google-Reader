@@ -2,6 +2,15 @@ function lib() {
   // Following code is Prototype.js replacement for stupid Firefox's GreaseMonkey 
 
   window.DOM = function(name, attributes, children) {
+    attributes = attributes || {};
+    
+    var parts = name.split('.');
+    name = parts[0];
+    
+    if (parts.length > 1) {
+      attributes.className = parts[1];
+    }
+    
     var node = document.createElement(name);
     if (attributes) {
       for (name in attributes) {

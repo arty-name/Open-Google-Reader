@@ -447,18 +447,18 @@ function ui() {
     clearDocument(); // remove existing body children
     addStyles(); // add own css styles
 
-    container = DOM('div', {className: 'container', innerHTML: 'Loading...'});
+    container = DOM('div.container', {innerHTML: 'Loading...'});
 
     var body = document.body;
     body.appendChild(createHeader()); // header contains buttons
     body.appendChild(container);
 
     // this one will shadow read portion of entry
-    shadow = DOM('div', {className: 'shadow'});
+    shadow = DOM('div.shadow');
     body.appendChild(shadow);
 
     // this will let body scroll a little more
-    spacer = DOM('div', {className: 'spacer'});
+    spacer = DOM('div.spacer');
   }
 
   // remove existing body children
@@ -519,8 +519,7 @@ function ui() {
       createButton('shared',  titles.shared),
       createButton('next',    titles.next),
       createButton('prev',    titles.prev),
-      DOM('a', {
-        className: 'resetView',
+      DOM('a.resetView', {
         href: 'http://google.com/reader/view#',
         innerHTML: 'Normal View'
       })
@@ -818,7 +817,7 @@ function ui() {
       data.star ? 'star' : '',
       data.share ? 'share' : ''
     ];
-    var container = DOM('section', {className: 'entry ' + classes.join(' ')}, [
+    var container = DOM('section.entry ' + classes.join(' '), {}, [
       DOM('cite', {innerHTML: getAuthor(data)}),
       DOM('h2', undefined, [
         createButton('star', getButtonImage(data, 'star')),
@@ -879,13 +878,13 @@ function ui() {
     var annotations = document.createDocumentFragment();
     
     if (data.annotations.length || data.comments.length) {
-      annotations = DOM('dl', { className: 'comments' });
+      annotations = DOM('dl.comments');
       data.annotations.concat(data.comments).forEach(function(data){
         annotations.appendChild(DOM('dt', { innerHTML: data.author }));
         annotations.appendChild(DOM('dd', { innerHTML: data.content || data.htmlContent }));
       });
-      annotations.appendChild(DOM('dd', { className: 'addcomment'}, [
-        DOM('button', { className: 'comment', innerHTML: (mobile ? '' : '✉ ') + 'Add comment' })
+      annotations.appendChild(DOM('dd.addcomment', {}, [
+        DOM('button.comment', { innerHTML: (mobile ? '' : '✉ ') + 'Add comment' })
       ]));
     }
     
@@ -894,7 +893,7 @@ function ui() {
 
   // entry footer contains buttons and tags
   function createEntryFooter(data) {
-    var footer = DOM('footer', undefined, [DOM('span', {className: 'buttons'}, [
+    var footer = DOM('footer', undefined, [DOM('span.buttons', {}, [
       createButton('star',  getButtonImage(data, 'star') + ' Star'),
       createButton('share', getButtonImage(data, 'share') + ' Share'),
       createButton('edit',  getButtonImage(data, 'edit') + ' Edit/Comment')
@@ -906,7 +905,7 @@ function ui() {
     }).join(', ');
     
     if (tags.length) {
-      var tagsSpan = DOM('span', {className: 'tags', innerHTML: 'Tags: ' + tags});
+      var tagsSpan = DOM('span.tags', {innerHTML: 'Tags: ' + tags});
       footer.insertBefore(tagsSpan, footer.firstChild);
     }
     
@@ -1131,7 +1130,7 @@ function ui() {
         if (entry != currentEntry) return;
         actions.edit(undefined, true);
         
-        container.insertBefore(DOM('section', {className: 'entry'}, [
+        container.insertBefore(DOM('section.entry', {}, [
           DOM('h2', undefined, [DOM('a', {href: parameters.url, innerHTML: parameters.title})]),
           DOM('article', {innerHTML: parameters.snippet})
         ]), entry.nextElementSibling);
@@ -1502,10 +1501,10 @@ function ui() {
       var textarea = button.previousElementSibling;
 
       if (!textarea) {
-        textarea = DOM('textarea', { className: 'input', rows: 4 });
+        textarea = DOM('textarea.input', { rows: 4 });
         dd.insertBefore(textarea, button);
 
-        var cancel = DOM('button', { className: 'cancel input', innerHTML: 'Cancel' });
+        var cancel = DOM('button.cancel input', { innerHTML: 'Cancel' });
         cancel.addEventListener('click', function(){ dd.className += ' hidden'; }, false);
         dd.appendChild(cancel);
       }
@@ -1596,6 +1595,15 @@ function lib() {
   // Following code is Prototype.js replacement for stupid Firefox's GreaseMonkey 
 
   window.DOM = function(name, attributes, children) {
+    attributes = attributes || {};
+    
+    var parts = name.split('.');
+    name = parts[0];
+    
+    if (parts.length > 1) {
+      attributes.className = parts[1];
+    }
+    
     var node = document.createElement(name);
     if (attributes) {
       for (name in attributes) {
