@@ -125,12 +125,22 @@ function ui() {
   document.addEventListener('click', clickHandler, false);
   document.addEventListener('keypress', keyHandler, false);
 
-  // attach listeners for window scroll, resize, blur and focus
-  window.addEventListener('scroll', scrollHandler, false);
+  // attach listeners for window resize, blur and focus
   window.addEventListener('resize', resizeHandler, false);
   window.addEventListener('focus', function(){ inBackground = false; }, false);
   window.addEventListener('blur',  function(){ inBackground = true;  }, false);
 
+  // window scroll requires special handling on mobile
+  if (!mobile) {
+    window.addEventListener('scroll', scrollHandler, false);
+  } else {
+    document.addEventListener('touchmove', function(){
+      document.addEventListener('touchend', function touch(){
+        document.removeEventListener('touchend', touch, false);
+        scrollHandler();
+      }, false);
+    }, false);
+  }
 
   function initTags() {
     // prefix of user tags
