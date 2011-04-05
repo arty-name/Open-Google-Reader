@@ -527,7 +527,7 @@ function ui() {
   }
 
   function createButton(class_, text, child) {
-    return DOM('button', {className: class_, innerHTML: text}, child ? [child] : undefined);
+    return DOM('button.' + class_, {innerHTML: text}, child ? [child] : undefined);
   }
 
   // update unread count now, every minute and on every window focus
@@ -1053,8 +1053,7 @@ function ui() {
     resetView();
     resetContainer();
 
-    container.previousElementSibling.removeClassName(currentView);
-    container.previousElementSibling.addClassName(view);
+    container.previousElementSibling.classList.remove(currentView).add(view);
     
     currentView = view;
     if (window.localStorage) localStorage.currentView = view;
@@ -1063,12 +1062,12 @@ function ui() {
 
   function makeEntryActive(entry) {
     if (currentEntry) {
-      currentEntry.removeClassName('active');
+      currentEntry.classList.remove('active');
       actions.edit(undefined, true);
     }
       
     currentEntry = entry;
-    currentEntry.addClassName('active');
+    currentEntry.classList.add('active');
     
     markAsRead(currentEntry);
     currentEntry.previousSiblings().forEach(markAsRead); 
@@ -1158,7 +1157,7 @@ function ui() {
       parameters: parameters,
       onSuccess: function() {
         data[tag] = !state;
-        entry[state ? 'removeClassName' : 'addClassName'](tag);
+        entry.classList[state ? 'remove' : 'add'](tag);
         entry.querySelectorAll && entry.querySelectorAll('button.' + tag).forEach(function(button){
           button.innerHTML = button.innerHTML.replace(/^./, getButtonImage(data, tag));
         });
@@ -1350,7 +1349,7 @@ function ui() {
       if (!currentEntry) {
         makeEntryActive(container.firstElementChild);
       } else {
-        if (currentEntry.nextElementSibling && /\bentry\b/i.test(currentEntry.nextElementSibling.className)) { 
+        if (currentEntry.nextElementSibling && currentEntry.nextElementSibling.classList.has('entry')) { 
           makeEntryActive(currentEntry.nextElementSibling);
           body.scrollTop = currentEntry.offsetTop;
         }
@@ -1496,7 +1495,7 @@ function ui() {
 
       var button = event.target;
       var dd = button.parentNode;
-      dd.className = 'addcomment'; // removes possible 'hidden' class to show all inputs
+      dd.classList.remove('hidden'); // show all inputs
       
       var textarea = button.previousElementSibling;
 
@@ -1505,7 +1504,7 @@ function ui() {
         dd.insertBefore(textarea, button);
 
         var cancel = DOM('button.cancel input', { innerHTML: 'Cancel' });
-        cancel.addEventListener('click', function(){ dd.className += ' hidden'; }, false);
+        cancel.addEventListener('click', function(){ dd.classList.add('hidden'); }, false);
         dd.appendChild(cancel);
       }
 
@@ -1528,7 +1527,7 @@ function ui() {
         parameters: parameters,
         onSuccess: function(response) {
           textarea.value = '';
-          dd.className += ' hidden';
+          dd.classList.add('hidden');
 
           dd.parentNode.insertBefore(DOM('dt', { innerHTML: 'you' }), dd);
           dd.parentNode.insertBefore(DOM('dd', { innerHTML: response.responseJSON.htmlContent }), dd);
@@ -1697,13 +1696,16 @@ function lib() {
     };
   }
   
-  HTMLElement.prototype.addClassName = function(class_) {
-    this.className += ' ' + class_;
-  };
-  
-  HTMLElement.prototype.removeClassName = function(class_) {
-    this.className = this.className.replace(new RegExp('\\b' + class_ + '\\b', 'g'), '');
-  };
+  if (!document.body.classList) HTMLElement.prototype.__defineGetter__('classList', function() {
+    var element = this;
+    var classList = {
+      has:    function(name) { return element.className.include(name); },
+      add:    function(name) { element.className += ' ' + name; return classList; },
+      remove: function(name) { element.className = element.className.replace(new RegExp('\\b' + name + '\\b', 'g'), ''); return classList; },
+      toggle: function(name) { if (classList.has(name)) classList.remove(name); else classList.add(name); }
+    };
+    return classList;
+  });
   
   HTMLElement.prototype.previousSiblings = function(class_) {
     var siblings = cloneArray(this.parentNode.childNodes);// NB: <section> doesn't go to .children :(
