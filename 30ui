@@ -45,9 +45,6 @@ function ui() {
   // words to filter entries out by body (html included)
   var bodyFilters = settings.bodyFilters || [];
 
-  // regular expression to detect links which do not get target=_blank
-  var torrentRE = settings.torrentRE || /b41b964aeda4a6d58bb22fcbc345248a/;
-  
   // filters to manipulate on entry content
   // NB: set data.altered = true if you want these changes to be shared when you click "share"
   var entryAlterations = settings.entryAlterations || [];
@@ -641,14 +638,7 @@ function ui() {
   }
   
   function clickHandler(event){ try{
-    var target;
-    target = event.findElement('section.entry a');
-    if (target && !torrentRE.test(target.href)) {
-      target.target = '_blank';
-      target.blur();
-    }
-    
-    target = event.findElement('section.entry');
+    var target = event.findElement('section.entry');
     if (target && target != currentEntry) {
       makeEntryActive(target);
     }
