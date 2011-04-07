@@ -33,7 +33,7 @@ settings = {
   // lowercase words to filter entries out by title
   titleFilters: [],
   
-  // words to filter entries out by body (hmtl included)
+  // words to filter entries out by body (html included)
   bodyFilters: [],
   
   // filters to manipulate on entry content
