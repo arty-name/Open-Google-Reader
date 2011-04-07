@@ -366,6 +366,9 @@ function ui() {
   // session token (can be updated)
   var token = window._COMMAND_TOKEN;
   
+  // subscriptions data
+  var subscriptions = window._STREAM_LIST_SUBSCRIPTIONS && _STREAM_LIST_SUBSCRIPTIONS.subscriptions;
+  
   // sort orders
   var sort = {
     oldestFirst: 'o',
@@ -401,9 +404,6 @@ function ui() {
   
   // number of unread items to display in title
   var unreadCount = 0;
-  
-  // subscriptions data
-  var subscriptions = window._STREAM_LIST_SUBSCRIPTIONS && _STREAM_LIST_SUBSCRIPTIONS.subscriptions;
   
   // that's where we keep entries original data
   var storage = {};
