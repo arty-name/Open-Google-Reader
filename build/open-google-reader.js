@@ -36,9 +36,6 @@ settings = {
   // words to filter entries out by body (hmtl included)
   bodyFilters: [],
   
-  // regular expression to detect links which do not get target=_blank
-  torrentRE: /\.torrent$/,
-  
   // filters to manipulate on entry content
   entryAlterations: []
   
