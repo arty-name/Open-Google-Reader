@@ -964,7 +964,13 @@ function ui() {
   }
   
   function clickHandler(event){ try{
-    var target = event.findElement('section.entry');
+    var target = event.findElement('section.entry a');
+    if (target) {
+      target.target = '_blank';
+      target.blur();
+    }
+    
+    target = event.findElement('section.entry');
     if (target && target != currentEntry) {
       makeEntryActive(target);
     }
