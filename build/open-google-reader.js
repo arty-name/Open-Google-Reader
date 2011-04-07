@@ -38,7 +38,8 @@ settings = {
   
   // filters to manipulate on entry content
   // NB: set data.altered = true if you want these changes to be shared when you click "share"
-  entryAlterations: []
+  entryHtmlAlterations: [],
+  entryDomAlterations: []
   
 };
 
@@ -745,7 +746,7 @@ function ui() {
     item = transformEntry(item);
     
     // check if entry needs alteration
-    settings.entryAlterations.invoke('call', null, item);
+    settings.entryHtmlAlterations.invoke('call', null, item);
     
     // if entry marked to ignore or matches filter, mark it as read and skip it
     if (item.ignore || matchesFilters(item.title, item.body)) {
@@ -760,7 +761,12 @@ function ui() {
     
     // create entry and add it to shown entries and to container
     try {
-      container.appendChild(createEntry(item));
+      var entry = createEntry(item);
+      
+      // check if entry needs alteration
+      settings.entryDomAlterations.invoke('call', null, entry);
+      
+      container.appendChild(entry);
       displayedItems.push(item.id);
     } catch (e) {
       // fail of one entry shouldn't prevent other from displaying
