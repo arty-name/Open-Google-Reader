@@ -366,8 +366,6 @@ function ui() {
   // session token (can be updated)
   var token = window._COMMAND_TOKEN;
   
-  var mobile = !!/mobi/i.test(window.navigator.userAgent);
-
   // sort orders
   var sort = {
     oldestFirst: 'o',
@@ -378,6 +376,8 @@ function ui() {
   var tags = initTags();  
   
   
+  var mobile = !!/mobi/i.test(window.navigator.userAgent);
+
   var body = document.compatMode == 'CSS1Compat' ? document.documentElement : document.body;
   
   // container of entries
