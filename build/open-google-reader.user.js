@@ -799,7 +799,8 @@ function ui() {
     feed = {
       title: feed && feed.title || item.origin.title || '',
       url: item.origin.htmlUrl,
-      id: item.origin.streamId
+      id: item.origin.streamId,
+      categories: feed && feed.categories || []
     };
 
     item = {
