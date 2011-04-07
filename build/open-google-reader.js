@@ -761,19 +761,8 @@ function ui() {
       return;
     }
     
-    // make useful shortcuts for title and content
-    item.body =
-      item.content && item.content.content ||
-      item.summary && item.summary.content || '';
-      
-    item.originalTitle = item.title;
-    item.title = item.title || trimToNWords(item.body.stripTags(), 8) || '»';
+    item = transformEntry(item);
     
-    ['read', 'star', 'share'].forEach(function(tag){
-      item[tag] = item.categories.include(tags[tag]);
-    });
-    item.hooks = { read: undefined, star: undefined, share: undefined };
-
     // check if entry needs alteration
     entryAlterations.invoke('call', null, item);
     
@@ -812,6 +801,52 @@ function ui() {
     });
   }
   
+  function transformEntry(item) {
+    var body =
+      item.content && item.content.content ||
+        item.summary && item.summary.content || '';
+
+    var feed = subscriptions.find(function(feed){
+      return feed.id == item.origin.streamId;
+    });
+    feed = {
+      title: feed && feed.title || item.origin.title || '',
+      url: item.origin.htmlUrl,
+      id: item.origin.id
+    };
+
+    item = {
+      id: item.id,
+      original: item,
+
+      title: item.title || trimToNWords(body.stripTags(), 8) || '»',
+      body: body,
+      url: item.alternate && item.alternate[0] && item.alternate[0].href || '',
+
+      author: item.author,
+      feed: feed,
+      tags: item.categories,
+      comments: [].concat(item.comments).concat(item.annotations),
+      via: item.via,
+
+      hooks: {
+        read: undefined,
+        star: undefined,
+        share: undefined
+      }
+    };
+
+    ['read', 'star', 'share'].forEach(function(tag){
+      item[tag] = item.tags.include(tags[tag]);
+    });
+    
+    item.comments.forEach(function(comment){
+      comment.content = comment.content || comment.htmlContent;
+    });
+
+    return item;
+  }
+
   function checkEmptyUserId(item, index) {
     // if userId is not yet known, try to detect it by entry tags
     if (userId == '-' && index == 0 && currentView == 'unread' && item.categories) {
@@ -836,20 +871,12 @@ function ui() {
       return true;
     }
     return body && bodyFilters.find(function(term) {
-      return body.include(term)
+      return body.include(term);
     });
   }
 
   function createEntry(data) {
-    // create entry's main link
-    var linkProps = {innerHTML: data.title};
-    if (data.alternate) {
-      linkProps.href = data.alternate[0].href;
-      if (!linkProps.href.match(torrentRE)) {
-        linkProps.target = '_blank';
-      }
-    }
-    var headerLink = DOM('a', linkProps);
+    var headerLink = DOM('a', {href: data.url, innerHTML: data.title});
     data.domain = headerLink.hostname;
 
     var classes = [
@@ -863,7 +890,7 @@ function ui() {
         createButton('star', getButtonImage(data, 'star')),
         headerLink
       ]),
-      createAnnotations(data),
+      createComments(data),
       DOM('article', {innerHTML: data.body}),
       createEntryFooter(data)
     ]);
@@ -888,47 +915,34 @@ function ui() {
   
   // show entry's origin, favicon, and users who shared it
   function getAuthor(data) {
-    var author = data.author ? data.author + ' @ ' : '';
-    var site = data.origin.title;
-    
-    var favicon = 'http://favicon.yandex.net/favicon/' + data.domain;
-    favicon = '<img src="' + favicon + '">';
-    if (mobile) favicon = '';
-    
-    // replace feed name with custom feed name, if user renamed it
-    var feed = subscriptions.find(function(feed){
-      return feed.id == data.origin.streamId;
-    });
-    if (feed) {
-      data.feed = feed;
-      site = feed.title;
-    }
-    
-    // users who shared entry
-    var via = '';
-    if (data.via) {
-      via = '<br>' + data.via.pluck('title').join('<br>');
-    }
-    
-    return favicon + author + site + via;
+    return (
+      // favicon
+      (mobile ? '' : '<img src="http://favicon.yandex.net/favicon/' + data.domain + '">') +
+      // author
+      (data.author ? data.author + ' @ ' : '') +
+      // site
+      data.feed.title +
+      // via
+      (data.via ? '<br>' + data.via.pluck('title').join('<br>') : '')
+    );
   }
   
   // show comments from other users
-  function createAnnotations(data) {
-    var annotations = document.createDocumentFragment();
+  function createComments(data) {
+    var comments = document.createDocumentFragment();
     
-    if (data.annotations.length || data.comments.length) {
-      annotations = DOM('dl.comments');
-      data.annotations.concat(data.comments).forEach(function(data){
-        annotations.appendChild(DOM('dt', { innerHTML: data.author }));
-        annotations.appendChild(DOM('dd', { innerHTML: data.content || data.htmlContent }));
+    if (data.comments.length) {
+      comments = DOM('dl.comments');
+      data.comments.forEach(function(comment){
+        comments.appendChild(DOM('dt', { innerHTML: comment.author }));
+        comments.appendChild(DOM('dd', { innerHTML: comment.content }));
       });
-      annotations.appendChild(DOM('dd.addcomment', {}, [
+      comments.appendChild(DOM('dd.addcomment', {}, [
         DOM('button.comment', { innerHTML: (mobile ? '' : '✉ ') + 'Add comment' })
       ]));
     }
     
-    return annotations;
+    return comments;
   }
 
   // entry footer contains buttons and tags
@@ -940,7 +954,7 @@ function ui() {
     ])]);
 
     // filter out custom user tags, only original tags remain
-    var tags = data.categories.filter(function(tag){
+    var tags = data.tags.filter(function(tag){
       return !tag.match(/^user\//);
     }).join(', ');
     
@@ -1158,8 +1172,8 @@ function ui() {
       annotation: edited ? data.inputs.comment.value : '',
       linkify: false,
       share: !!share,
-      srcTitle: (data.feed || data.origin).title,
-      srcUrl: data.origin.htmlUrl
+      srcTitle: data.feed.title,
+      srcUrl: data.feed.url
     };
 
     return APIRequest('item/edit', {
@@ -1188,7 +1202,7 @@ function ui() {
     var parameters = {
       T: token,
       i: data.id,
-      s: data.origin.streamId
+      s: data.feed.id
     };
     parameters[state ? 'r' : 'a'] = tags[tag]; 
     
