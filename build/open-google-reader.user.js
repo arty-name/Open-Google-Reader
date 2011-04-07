@@ -37,6 +37,7 @@ settings = {
   bodyFilters: [],
   
   // filters to manipulate on entry content
+  // NB: set data.altered = true if you want these changes to be shared when you click "share"
   entryAlterations: []
   
 };
@@ -359,22 +360,8 @@ settings.css =
 
 function ui() {
 
-  // only required to be loaded on 404 url, i.e. http://www.google.com/reader/view/1
-  var userId = settings.userId || '';
-  
-  // lowercase words to filter entries out by title
-  var titleFilters = settings.titleFilters || [];
-
-  // words to filter entries out by body (html included)
-  var bodyFilters = settings.bodyFilters || [];
-
-  // filters to manipulate on entry content
-  // NB: set data.altered = true if you want these changes to be shared when you click "share"
-  var entryAlterations = settings.entryAlterations || [];
-  
-
   // static user id 
-  userId = userId || window._USER_ID || (window.localStorage && localStorage.userId) || '-';
+  var userId = settings.userId || window._USER_ID || (window.localStorage && localStorage.userId) || '-';
   
   // session token (can be updated)
   var token = window._COMMAND_TOKEN;
@@ -758,7 +745,7 @@ function ui() {
     item = transformEntry(item);
     
     // check if entry needs alteration
-    entryAlterations.invoke('call', null, item);
+    settings.entryAlterations.invoke('call', null, item);
     
     // if entry marked to ignore or matches filter, mark it as read and skip it
     if (item.ignore || matchesFilters(item.title, item.body)) {
@@ -861,10 +848,10 @@ function ui() {
   // check entry's title and body against filters
   function matchesFilters(title, body) {
     title = title.toLowerCase();
-    if (titleFilters.find(function(term){ return title.include(term) })) {
+    if (settings.titleFilters.find(function(term){ return title.include(term) })) {
       return true;
     }
-    return body && bodyFilters.find(function(term) {
+    return body && settings.bodyFilters.find(function(term) {
       return body.include(term);
     });
   }

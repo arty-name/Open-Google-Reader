@@ -14,6 +14,7 @@ settings = {
   bodyFilters: [],
   
   // filters to manipulate on entry content
+  // NB: set data.altered = true if you want these changes to be shared when you click "share"
   entryAlterations: []
   
 };
