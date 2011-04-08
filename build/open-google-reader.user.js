@@ -867,7 +867,7 @@ function ui() {
 
   function createEntry(data) {
     var headerLink = DOM('a', {href: data.url, innerHTML: data.title, target: '_blank'});
-    data.domain = headerLink.hostname;
+    data.domain = DOM('a', {href: data.feed.url}).hostname;
 
     var classes = [
       data.read ? 'read' : '',
