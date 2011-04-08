@@ -439,7 +439,7 @@ function ui() {
       var entry = createEntry(item);
       
       // check if entry needs alteration
-      settings.entryDomAlterations.invoke('call', null, entry);
+      settings.entryDomAlterations.invoke('call', null, item, entry);
       
       container.appendChild(entry);
       displayedItems.push(item.id);
