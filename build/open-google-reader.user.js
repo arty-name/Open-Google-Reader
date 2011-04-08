@@ -1200,7 +1200,7 @@ function ui() {
       parameters: parameters,
       onSuccess: function() {
         data[tag] = !state;
-        entry.classList[state ? 'remove' : 'add'](tag);
+        if (entry.classList) entry.classList[state ? 'remove' : 'add'](tag); // sometimes entry is just data object
         entry.querySelectorAll && entry.querySelectorAll('button.' + tag).forEach(function(button){
           button.innerHTML = button.innerHTML.replace(/^./, getButtonImage(data, tag));
         });
