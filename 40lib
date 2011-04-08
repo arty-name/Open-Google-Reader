@@ -144,7 +144,7 @@ function lib() {
         } else if (request.status != 200) {
           options.onFailure && options.onFailure();
         } else {
-          if (!request.responseText.match(/^\/\//)) request.responseJSON = JSON.parse(request.responseText);
+          if (request.responseText[0] == '{') request.responseJSON = JSON.parse(request.responseText);
           options.onSuccess && options.onSuccess(request);
         }
         options.onComplete && options.onComplete(request);
