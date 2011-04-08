@@ -475,7 +475,8 @@ function ui() {
       title: feed && feed.title || item.origin.title || '',
       url: item.origin.htmlUrl,
       id: item.origin.streamId,
-      categories: feed && feed.categories || []
+      categories: feed && feed.categories || [],
+      category: feed && feed.categories && feed.categories[0] || ''
     };
 
     item = {
@@ -488,9 +489,10 @@ function ui() {
 
       author: item.author,
       feed: feed,
+      via: item.via,
       tags: item.categories,
       comments: [].concat(item.comments).concat(item.annotations),
-      via: item.via,
+      enclosure: item.related && item.related[0] && item.related[0].href,
 
       hooks: {
         read: undefined,
