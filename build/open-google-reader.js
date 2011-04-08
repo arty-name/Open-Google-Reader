@@ -1779,9 +1779,7 @@ function lib() {
         } else if (request.status != 200) {
           options.onFailure && options.onFailure();
         } else {
-          try {
-            request.responseJSON = eval('(' + request.responseText + ')');
-          } catch (e) {}
+          if (!request.responseText.match(/^\/\//)) request.responseJSON = JSON.parse(request.responseText);
           options.onSuccess && options.onSuccess(request);
         }
         options.onComplete && options.onComplete(request);
