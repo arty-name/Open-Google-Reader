@@ -492,7 +492,7 @@ function ui() {
       via: item.via,
       tags: item.categories,
       comments: [].concat(item.comments).concat(item.annotations),
-      enclosure: item.related && item.related[0] && item.related[0].href,
+      enclosure: item.related && item.related[0].href || item.enclosure && item.enclosure[0].href || '',
 
       hooks: {
         read: undefined,
