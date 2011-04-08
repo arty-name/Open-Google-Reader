@@ -476,7 +476,7 @@ function ui() {
       url: item.origin.htmlUrl,
       id: item.origin.streamId,
       categories: feed && feed.categories || [],
-      category: feed && feed.categories && feed.categories[0] || ''
+      category: feed && feed.categories && feed.categories[0] && feed.categories[0].label || ''
     };
 
     item = {
