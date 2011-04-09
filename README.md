@@ -55,7 +55,9 @@ Sorry folks, do these yourself if you need them, it's easy anyway.
 
  * sort orders are hardcoded, modify them to fit your habits (1 character to change)
  * expanded view only 
- * no subscriptions list
+ * subscriptions list is available only in 
+ [ unsupported "subscriptsions" branch](https://github.com/arty-name/Open-Google-Reader/tree/subscriptions) 
+ by [vasya1](https://github.com/vasya1)
  * mark as read on scrolling past view only
 
 
