@@ -1,6 +1,5 @@
 // ==UserScript==
 // @name         Open Google Reader
-// @version      1.0
 // @date         2009-12-07
 // @author       Artemy Tregubenko <me@arty.name>
 // @description  Replaces native Google Reader's interface with fully customizable one.
