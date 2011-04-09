@@ -229,3 +229,7 @@ button {
 textarea {
   width: 95%;
 }
+
+select {
+  width: 180px;
+}

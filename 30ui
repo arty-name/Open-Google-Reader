@@ -94,6 +94,13 @@ function ui() {
   
   // number of unread items to display in title
   var unreadCount = 0;
+
+  // tags/folders will be here
+  var tagList;
+  
+  // will hold current Tag/Folder
+  var currentLabel;
+  
   
   // subscriptions data
   var subscriptions = window._STREAM_LIST_SUBSCRIPTIONS && _STREAM_LIST_SUBSCRIPTIONS.subscriptions;
@@ -110,6 +117,41 @@ function ui() {
   var displayedItems;
   var noMoreItems;
   var inBackground = false;
+
+
+// load tags/folders
+loadTags();
+
+function updateTags()
+{
+tSelector = document.getElementById('tagSelector');
+
+
+while (tSelector.firstChild) {
+ tSelector.removeChild(tSelector.firstChild);
+}
+
+tList = [];
+
+for (cTag in tagList)
+{
+//tList[tList.length] = DOM('option', {value: 'test', innerHTML: 'test' });
+tagId = tagList[cTag]['id'];
+tagName = tagList[cTag]['id'];
+tagName = tagName.replace(/user\/.*\/label\//,"");
+if (tagId.match(/\/label\//)) 
+tSelector.appendChild(DOM('option', {value: tagId, innerHTML: tagName }));
+}
+
+}
+
+function tagSelectorChanged(event)
+{
+currentLabel = event.target.value;
+tags = initTags();
+actions.reload();
+//alert('selector changed ' + currentLabel);
+}
 
 
   // replace google's dom with own layout
@@ -136,9 +178,15 @@ function ui() {
     // prefix of user tags
     var tagPrefix = 'user/' + userId + '/state/com.google/';
 
+if (currentLabel) unreadValue = currentLabel;
+else unreadValue = tagPrefix + 'reading-list';
+
     // various "tags": some to filter entries, some to assign
     return {
-      unread: tagPrefix + 'reading-list',
+//     unread: tagPrefix + 'reading-list',
+// put labelname here like /label/TG
+//     unread: 'user/' + userId + '/label/TG',
+unread: unreadValue,
       read: tagPrefix + 'read',
       like: tagPrefix + 'like',
       star: tagPrefix + 'starred',
@@ -223,6 +271,7 @@ function ui() {
       createButton('shared',  titles.shared),
       createButton('next',    titles.next),
       createButton('prev',    titles.prev),
+    createTagDropDown(),
       DOM('a', {
         className: 'resetView',
         href: 'http://google.com/reader/view#',
@@ -230,6 +279,18 @@ function ui() {
       })
     ]);
   }
+
+function createTagDropDown()
+{
+
+//tList = [DOM('option', {value: 'loading', innerHTML: 'loading' })];
+tList = [];
+
+dropDown =  DOM('select',{id: 'tagSelector'}, tList );
+dropDown.addEventListener('change', tagSelectorChanged, false);
+//onChange: tagSelectorChanged()
+return dropDown;
+}
 
   function createButton(class_, text) {
     return DOM('button', {className: class_, innerHTML: text});
@@ -266,7 +327,33 @@ function ui() {
         // summarize all values for feeds (not tags/folders)
         var friends;
         data.unreadcounts.forEach(function(feed){
-          if (feed.id.match(/^feed/)) count += feed.count;
+//         if (feed.id.match(/^feed/)) count += feed.count;
+// put label name here like /\/label\/labelname/
+//  if (feed.id.match(/\/label\/T/)) count += feed.count;
+if (currentLabel) 
+{
+if (feed.id == currentLabel) count += feed.count;
+}
+else
+{
+ if (feed.id.match(/^feed/)) count += feed.count;
+
+ if (feed.id.match(/label/)) {
+// put folder counts
+tSelector = document.getElementById('tagSelector');
+
+ var children = tSelector.childNodes;
+
+     // Loop through the children
+     for(var c=0; c < children.length; c++) {
+
+if (children[c].value == feed.id) children[c].innerHTML = children[c].innerHTML + ' (' + feed.count +')';
+     }
+
+
+}
+
+}
           if (feed.id == tags.friends) {
             friends = feed.count;
           }
@@ -326,6 +413,23 @@ function ui() {
 
     getViewData(currentView);
   }
+
+// will load Tags/folders here
+function loadTags()
+{
+
+  return APIRequest('tag/list', {
+      parameters: {output: 'json'},
+      onSuccess: function(response) {
+       tagList = response.responseJSON.tags;
+//for (tag in tagList[0])
+//{
+//alert ("tag0 field " + cfield + " is " + tagList[0][cfield]);
+//}
+updateTags();
+        }
+    });
+}
   
   // call continuation when subscriptions are loaded
   function ensureSubscriptions(continuation) {
@@ -668,7 +772,7 @@ function ui() {
       case 'E': case 'У':
       case 'I': case 'Ш': actions.starred(); break;
       case 'O': case 'Щ': actions.shared(); break;
-      case 'J': case 'О': actions.next(); break;
+      case 'C': case 'С': actions.next(); break;
       case ' ':           actions.space(event);  break;
       default: matched = false;
     }
@@ -681,10 +785,10 @@ function ui() {
     
     matched = true;
     switch (key) {
-      case 'K': case 'Л': actions.prev(); break;
+      case 'Z': case 'Я': actions.prev(); break;
       case 'V': case 'М': currentEntry && openTab(currentEntry.querySelector('a'), event); break;
-      case 'C': case 'С': currentEntry && openTab(currentEntry.querySelectorAll('a')[1], event); break;
-      case 'S': case 'Ы': actions[event.shiftKey ? 'share' : 'star'](); break;
+      case 'J': case 'О': currentEntry && openTab(currentEntry.querySelectorAll('a')[1], event); break;
+      case 'X': case 'Ч': actions[event.shiftKey ? 'share' : 'star'](); break;
       case 'Y': case 'Н': actions.edit(); break;
       default: matched = false;
     }
@@ -1004,22 +1108,25 @@ function ui() {
     
     fullReload: function() {
       reloadFeed(0);
-      
+     
       function reloadFeed(index) {
+
         if (!subscriptions[index]) return;
-        APIRequest('stream/contents/' + encodeURIComponent(subscriptions[index].id), {
+            APIRequest('stream/contents/' + encodeURIComponent(subscriptions[index].id), {
           parameters: {refresh: true, xt: tags.read},
           onComplete: function(response) {
             if (response.status != 200) {
               LOG(response.statusText);
             }
-            
+
             index++;
+
             try {
               if (response.responseJSON.items.length > 0) {
                 updateUnreadCount();
               }
-              reloadFeed(index);
+
+             reloadFeed(index);
             } catch (e) {
               setTimeout(function(){ reloadFeed(index) }, 10000);
             }
