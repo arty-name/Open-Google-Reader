@@ -164,7 +164,7 @@ function ui() {
     body.innerHTML = '';
     body.removeAttribute('text');
     body.removeAttribute('bgcolor');
-    body.className = mobile ? 'mobile' : '';
+    body.className = mobile ? 'mobile' : 'desktop';
 
     var head = document.head || document.body.previousElementSibling;
     while (head.firstChild) head.removeChild(head.firstChild);
