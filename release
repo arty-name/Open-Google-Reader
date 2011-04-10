@@ -13,14 +13,14 @@ cat 27styles.tmp >> 27styles
 cat 28styles.tmp >> 27styles
 echo '"";' >> 27styles
 
-cat 10meta > build/open-google-reader.js
+cat 10meta.js > build/open-google-reader.js
 cat 20prefix >> build/open-google-reader.js
-cat 25settings >> build/open-google-reader.js
+cat 25settings.js >> build/open-google-reader.js
 cat 27styles >> build/open-google-reader.js
-cat 30ui >> build/open-google-reader.js
-cat 40lib >> build/open-google-reader.js
+cat 30ui.js >> build/open-google-reader.js
+cat 40lib.js >> build/open-google-reader.js
 cat 50onload >> build/open-google-reader.js
-cat 60killDefault >> build/open-google-reader.js
+cat 60killDefault.js >> build/open-google-reader.js
 cat 70postfix >> build/open-google-reader.js
 
 cp build/open-google-reader.js build/open-google-reader.user.js
