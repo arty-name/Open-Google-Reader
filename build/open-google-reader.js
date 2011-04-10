@@ -75,8 +75,10 @@ settings.css =
 "}" +
 "" +
 "body.mobile > header > button {" +
-"  font-size: 23px;" +
+"  padding: 2px 1px;" +
+"  font-size: .95em;" +
 "}" +
+"" +
 "" +
 "body > header > button.unread, " +
 "body > header > button.starred, " +
@@ -111,13 +113,6 @@ settings.css =
 "  border-bottom-color: white;" +
 "}" +
 "" +
-"body.mobile>header.unread button.unread, " +
-"body.mobile>header.star button.starred, " +
-"body.mobile>header.share button.shared, " +
-"body.mobile>header.friends button.friends {" +
-"  font-weight: bold;" +
-"}" +
-"" +
 "body > header > a.resetView {" +
 "  font-family: sans-serif;" +
 "  position: absolute;" +
@@ -129,11 +124,6 @@ settings.css =
 "  display: none;" +
 "}" +
 "" +
-"body.mobile > header > button {" +
-"  padding: 2px 1px;" +
-"  font-size: .95em;" +
-"}" +
-"" +
 "body.mobile article img {" +
 "  max-width: 100%;" +
 "  -o-object-fit: contain;" +
@@ -141,6 +131,9 @@ settings.css =
 "" +
 "body > div.container {" +
 "  position: relative;" +
+"}" +
+"" +
+"body.desktop > div.container {" +
 "  padding: 0 .5em;" +
 "}" +
 "" +
@@ -153,18 +146,16 @@ settings.css =
 "}" +
 "" +
 "section.entry {" +
-"  padding-left: 1.4em;" +
-"  padding-right: .5em;" +
 "  display: block;" +
 "  border: 0 solid #c2cff1;" +
 "  border-bottom-width: 2px;" +
 "  margin-bottom: .2em;" +
-"  width: 95%;" +
 "}" +
 "" +
-"body.mobile section.entry {" +
-"  padding: 0;" +
-"  width: auto;" +
+"body.desktop section.entry {" +
+"  padding-left: 1.4em;" +
+"  padding-right: .5em;" +
+"  width: 95%;" +
 "}" +
 "" +
 "section.entry.active {" +
@@ -178,6 +169,9 @@ settings.css =
 "" +
 "section.entry > h2 {" +
 "  font-family: sans-serif;" +
+"}" +
+"" +
+"body.desktop section.entry > h2 {" +
 "  margin-top: .1em;" +
 "  margin-bottom: .3em;" +
 "  margin-left: .3em;" +
@@ -193,14 +187,14 @@ settings.css =
 "  line-height: 1em;" +
 "}" +
 "" +
-"section.entry > h2 > button {" +
+"body.desktop section.entry > h2 > button {" +
 "  font-size: inherit;" +
 "  width: 1em;" +
 "  padding-right: 1.1em;" +
 "}" +
 "" +
 "body.mobile section.entry > h2 > button {" +
-"  visibility: hidden;" +
+"  display: none;" +
 "}" +
 "" +
 "section.entry > h2 > input {" +
@@ -218,7 +212,9 @@ settings.css =
 "  line-height: 1.15em;" +
 "}" +
 "" +
-"section.entry > cite, section.entry > article, section.entry > footer {" +
+"body.desktop section.entry > cite, " +
+"body.desktop section.entry > article, " +
+"body.desktop section.entry > footer {" +
 "  margin-left: .5em;" +
 "}" +
 "" +
@@ -227,7 +223,7 @@ settings.css =
 "  text-align: right;" +
 "}" +
 "" +
-"section.entry > cite > img {" +
+"body.desktop section.entry > cite > img {" +
 "  margin: 6px;" +
 "  vertical-align: middle;" +
 "}" +
@@ -546,7 +542,9 @@ function ui() {
   }
 
   function createButton(class_, text, child) {
-    return DOM('button.' + class_, {innerHTML: text}, child ? [child] : undefined);
+    var button = DOM('button.' + class_, {innerHTML: text});
+    if (child) button.insertBefore(child, button.firstChild);
+    return button;
   }
 
   // update unread count now, every minute and on every window focus

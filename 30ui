@@ -224,7 +224,9 @@ function ui() {
   }
 
   function createButton(class_, text, child) {
-    return DOM('button.' + class_, {innerHTML: text}, child ? [child] : undefined);
+    var button = DOM('button.' + class_, {innerHTML: text});
+    if (child) button.insertBefore(child, button.firstChild);
+    return button;
   }
 
   // update unread count now, every minute and on every window focus
