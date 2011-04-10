@@ -137,6 +137,10 @@ settings.css =
 "  padding: 0 .5em;" +
 "}" +
 "" +
+"body.mobile > div.container {" +
+"  padding-left: .2em;" +
+"}" +
+"" +
 "div.shadow {" +
 "  position: absolute;" +
 "  top: 0;" +
@@ -176,6 +180,10 @@ settings.css =
 "  margin-bottom: .3em;" +
 "  margin-left: .3em;" +
 "  text-indent: -1.4em;" +
+"}" +
+"" +
+"body.mobile section.entry > h2 {" +
+"  margin-bottom: .3em;" +
 "}" +
 "" +
 "section.entry > h2 * {" +
@@ -221,6 +229,10 @@ settings.css =
 "section.entry > cite {" +
 "  float: right;" +
 "  text-align: right;" +
+"}" +
+"" +
+"body.mobile section.entry > cite {" +
+"  font-size: .5em;" +
 "}" +
 "" +
 "body.desktop section.entry > cite > img {" +
