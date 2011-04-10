@@ -84,7 +84,6 @@ settings.css =
 "body > header > button.friends {" +
 "  margin: 0;" +
 "  border-radius: 5px 5px 0 0;" +
-"  -moz-border-radius: 5px 5px 0 0;" +
 "  border: 1px solid #c2cff1;" +
 "  height: 26px;" +
 "  background-color: #ebeff9;" +
@@ -238,7 +237,6 @@ settings.css =
 "  margin: .5em;" +
 "  border: 2px dotted #70778c;" +
 "  border-radius: 10px;" +
-"  -moz-border-radius: 10px;" +
 "  padding: .5em .5em 0 .5em;" +
 "}" +
 "" +
@@ -488,7 +486,7 @@ function ui() {
     body.innerHTML = '';
     body.removeAttribute('text');
     body.removeAttribute('bgcolor');
-    body.className = mobile ? 'mobile' : '';
+    body.className = mobile ? 'mobile' : 'desktop';
 
     var head = document.head || document.body.previousElementSibling;
     while (head.firstChild) head.removeChild(head.firstChild);
