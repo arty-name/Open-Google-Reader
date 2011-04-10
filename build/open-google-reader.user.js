@@ -308,12 +308,8 @@ settings.css =
 "  content: '';" +
 "}" +
 "" +
-"button var:before {" +
-"  content: ' (';" +
-"}" +
-"" +
 "button var:after {" +
-"  content: ')';" +
+"  content: ' ';" +
 "}" +
 "";
 /*
