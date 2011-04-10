@@ -117,12 +117,7 @@ function ui() {
   if (!mobile) {
     window.addEventListener('scroll', scrollHandler, false);
   } else {
-    document.addEventListener('touchmove', function(){
-      document.addEventListener('touchend', function touch(){
-        document.removeEventListener('touchend', touch, false);
-        scrollHandler();
-      }, false);
-    }, false);
+    window.addEventListener('touchend', scrollHandler, false);
   }
 
   function initTags() {
