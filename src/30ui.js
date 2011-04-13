@@ -488,7 +488,7 @@ function ui() {
       feed: feed,
       via: item.via,
       tags: item.categories,
-      comments: [].concat(item.comments).concat(item.annotations),
+      comments: [].concat(item.annotations).concat(item.comments),
       enclosure: item.related && item.related[0].href || item.enclosure && item.enclosure[0].href || '',
 
       hooks: {
