@@ -4,13 +4,11 @@ html, body {
 }
 
 body {
-  padding-top: 26px;
+  padding-top: 1.7em;
   font-family: Georgia, serif;
 }
 
 body.mobile {
-  padding-top: 40px;
-  font-size: 30px;
 }
 
 body > header {
@@ -19,29 +17,30 @@ body > header {
   top: 0;
   left: 0;
   right: 0;
-  height: 26px;
+  height: 1.7em;
   z-index: 100;
   background-color: #c2cff1;
 }
 
 body.mobile > header {
-  height: 40px;
 }
 
 body.mobile > header > button {
-  padding: 2px 1px;
-  font-size: .95em;
+  padding: 0.2em 0.1em;
 }
 
+body > header > button {
+  font-size: inherit;
+}
 
 body > header > button.unread, 
 body > header > button.starred, 
 body > header > button.shared, 
 body > header > button.friends {
   margin: 0;
-  border-radius: 5px 5px 0 0;
-  border: 1px solid #c2cff1;
-  height: 26px;
+  border-radius: 0.4em 0.4em 0 0;
+  border: 0.1em solid #c2cff1;
+  height: 1.6em;
   background-color: #ebeff9;
 }
 
@@ -49,8 +48,7 @@ body.mobile > header > button.unread,
 body.mobile > header > button.starred, 
 body.mobile > header > button.shared, 
 body.mobile > header > button.friends {
-  height: 40px;
-  border-width: 4px;
+  border-width: 0.1em;
 }
 
 body > header > button.friends {
@@ -198,7 +196,7 @@ section.entry > dl.comments {
   display: block;
   margin: .5em;
   border: 2px dotted #70778c;
-  border-radius: 10px;
+  border-radius: .5em;
   padding: .5em .5em 0 .5em;
 }
 

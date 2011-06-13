@@ -71,18 +71,21 @@ settings.css =
 "}" +
 "" +
 "body.mobile > header > button {" +
-"  padding: 2px 1px;" +
+"  padding: 0.2em 0.1em;" +
 "}" +
 "" +
+"body > header > button {" +
+"  font-size: inherit;" +
+"}" +
 "" +
 "body > header > button.unread, " +
 "body > header > button.starred, " +
 "body > header > button.shared, " +
 "body > header > button.friends {" +
 "  margin: 0;" +
-"  border-radius: 5px 5px 0 0;" +
-"  border: 1px solid #c2cff1;" +
-"  height: 1.7em;" +
+"  border-radius: 0.4em 0.4em 0 0;" +
+"  border: 0.1em solid #c2cff1;" +
+"  height: 1.6em;" +
 "  background-color: #ebeff9;" +
 "}" +
 "" +
@@ -90,7 +93,7 @@ settings.css =
 "body.mobile > header > button.starred, " +
 "body.mobile > header > button.shared, " +
 "body.mobile > header > button.friends {" +
-"  border-width: 2px;" +
+"  border-width: 0.1em;" +
 "}" +
 "" +
 "body > header > button.friends {" +
