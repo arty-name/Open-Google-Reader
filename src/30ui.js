@@ -768,7 +768,8 @@ function ui() {
     resetView();
     resetContainer();
 
-    container.previousElementSibling.classList.remove(currentView).add(view);
+    container.previousElementSibling.classList.remove(currentView);
+    container.previousElementSibling.classList.add(view);
     
     currentView = view;
     if (window.localStorage) localStorage.currentView = view;
@@ -1064,7 +1065,7 @@ function ui() {
       if (!currentEntry) {
         makeEntryActive(container.firstElementChild);
       } else {
-        if (currentEntry.nextElementSibling && currentEntry.nextElementSibling.classList.has('entry')) { 
+        if (currentEntry.nextElementSibling && currentEntry.nextElementSibling.classList.contains('entry')) { 
           makeEntryActive(currentEntry.nextElementSibling);
           body.scrollTop = currentEntry.offsetTop;
         }

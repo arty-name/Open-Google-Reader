@@ -107,10 +107,10 @@ function lib() {
   if (!document.body.classList) HTMLElement.prototype.__defineGetter__('classList', function() {
     var element = this;
     var classList = {
-      has:    function(name) { return element.className.include(name); },
-      add:    function(name) { element.className += ' ' + name; return classList; },
-      remove: function(name) { element.className = element.className.replace(new RegExp('\\b' + name + '\\b', 'g'), ''); return classList; },
-      toggle: function(name) { if (classList.has(name)) classList.remove(name); else classList.add(name); }
+      contains: function(name) { return element.className.include(name); },
+      add:      function(name) { element.className += ' ' + name; },
+      remove:   function(name) { element.className = element.className.replace(new RegExp('\\b' + name + '\\b', 'g'), ''); },
+      toggle:   function(name) { if (classList.has(name)) classList.remove(name); else classList.add(name); }
     };
     return classList;
   });

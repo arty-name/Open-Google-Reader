@@ -49,13 +49,11 @@ settings.css =
 "}" +
 "" +
 "body {" +
-"  padding-top: 26px;" +
+"  padding-top: 1.7em;" +
 "  font-family: Georgia, serif;" +
 "}" +
 "" +
 "body.mobile {" +
-"  padding-top: 40px;" +
-"  font-size: 30px;" +
 "}" +
 "" +
 "body > header {" +
@@ -64,18 +62,16 @@ settings.css =
 "  top: 0;" +
 "  left: 0;" +
 "  right: 0;" +
-"  height: 26px;" +
+"  height: 1.7em;" +
 "  z-index: 100;" +
 "  background-color: #c2cff1;" +
 "}" +
 "" +
 "body.mobile > header {" +
-"  height: 40px;" +
 "}" +
 "" +
 "body.mobile > header > button {" +
 "  padding: 2px 1px;" +
-"  font-size: .95em;" +
 "}" +
 "" +
 "" +
@@ -86,7 +82,7 @@ settings.css =
 "  margin: 0;" +
 "  border-radius: 5px 5px 0 0;" +
 "  border: 1px solid #c2cff1;" +
-"  height: 26px;" +
+"  height: 1.7em;" +
 "  background-color: #ebeff9;" +
 "}" +
 "" +
@@ -94,8 +90,7 @@ settings.css =
 "body.mobile > header > button.starred, " +
 "body.mobile > header > button.shared, " +
 "body.mobile > header > button.friends {" +
-"  height: 40px;" +
-"  border-width: 4px;" +
+"  border-width: 2px;" +
 "}" +
 "" +
 "body > header > button.friends {" +
@@ -243,7 +238,7 @@ settings.css =
 "  display: block;" +
 "  margin: .5em;" +
 "  border: 2px dotted #70778c;" +
-"  border-radius: 10px;" +
+"  border-radius: .5em;" +
 "  padding: .5em .5em 0 .5em;" +
 "}" +
 "" +
@@ -1093,7 +1088,8 @@ function ui() {
     resetView();
     resetContainer();
 
-    container.previousElementSibling.classList.remove(currentView).add(view);
+    container.previousElementSibling.classList.remove(currentView);
+    container.previousElementSibling.classList.add(view);
     
     currentView = view;
     if (window.localStorage) localStorage.currentView = view;
@@ -1389,7 +1385,7 @@ function ui() {
       if (!currentEntry) {
         makeEntryActive(container.firstElementChild);
       } else {
-        if (currentEntry.nextElementSibling && currentEntry.nextElementSibling.classList.has('entry')) { 
+        if (currentEntry.nextElementSibling && currentEntry.nextElementSibling.classList.contains('entry')) { 
           makeEntryActive(currentEntry.nextElementSibling);
           body.scrollTop = currentEntry.offsetTop;
         }
@@ -1739,10 +1735,10 @@ function lib() {
   if (!document.body.classList) HTMLElement.prototype.__defineGetter__('classList', function() {
     var element = this;
     var classList = {
-      has:    function(name) { return element.className.include(name); },
-      add:    function(name) { element.className += ' ' + name; return classList; },
-      remove: function(name) { element.className = element.className.replace(new RegExp('\\b' + name + '\\b', 'g'), ''); return classList; },
-      toggle: function(name) { if (classList.has(name)) classList.remove(name); else classList.add(name); }
+      contains: function(name) { return element.className.include(name); },
+      add:      function(name) { element.className += ' ' + name; },
+      remove:   function(name) { element.className = element.className.replace(new RegExp('\\b' + name + '\\b', 'g'), ''); },
+      toggle:   function(name) { if (classList.has(name)) classList.remove(name); else classList.add(name); }
     };
     return classList;
   });
