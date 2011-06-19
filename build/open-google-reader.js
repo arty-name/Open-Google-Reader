@@ -1399,7 +1399,10 @@ function ui() {
       } else {
         if (currentEntry.nextElementSibling && currentEntry.nextElementSibling.classList.contains('entry')) { 
           makeEntryActive(currentEntry.nextElementSibling);
-          body.scrollTop = currentEntry.offsetTop;
+          body.scrollTop = currentEntry.offsetTop - (mobile ? 20 : 0);
+
+          // TODO: remove this hacky optimization
+          if (mobile) setTimeout(scrollHandler, 10);
         }
       }
     },
