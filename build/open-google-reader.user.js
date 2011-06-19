@@ -34,6 +34,9 @@ settings = {
   // words to filter entries out by body (html included)
   bodyFilters: [],
   
+  // your device screen's horizontal resolution
+  mobileViewPortWidth: 400,
+  
   // filters to manipulate on entry content
   // NB: set data.altered = true if you want these changes to be shared when you click "share"
   entryHtmlAlterations: [],
@@ -490,7 +493,14 @@ function ui() {
     head.appendChild(DOM('link', {href: '/reader/ui/favicon.ico', rel: 'SHORTCUT ICON'}));
     
     if (mobile) {
-      head.appendChild(DOM('meta', {name: 'viewport', content: 'width=400, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'}));
+      var properties = [
+        'width=' + settings.mobileViewPortWidth, 
+        'initial-scale=1.0',
+        'maximum-scale=1.0',
+        'user-scalable=0',
+        'target-densitydpi=device-dpi'
+      ];
+      head.appendChild(DOM('meta', {name: 'viewport', content: properties.join(', ')}));
     }
 
     Array.prototype.slice.call(document.styleSheets, 0).forEach(function(ss){ ss.disabled = true; });

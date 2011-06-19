@@ -13,6 +13,9 @@ settings = {
   // words to filter entries out by body (html included)
   bodyFilters: [],
   
+  // your device screen's horizontal resolution
+  mobileViewPortWidth: 400,
+  
   // filters to manipulate on entry content
   // NB: set data.altered = true if you want these changes to be shared when you click "share"
   entryHtmlAlterations: [],
