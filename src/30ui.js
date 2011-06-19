@@ -441,22 +441,21 @@ function ui() {
     // create entry and add it to shown entries and to container
     try {
       var entry = createEntry(item);
+      var article = entry.querySelector('article');
       
       // check if entry needs alteration
-      settings.entryDomAlterations.invoke('call', null, item, entry.querySelector('article'), entry);
+      settings.entryDomAlterations.invoke('call', null, item, article, entry);
       
       container.appendChild(entry);
       displayedItems.push(item.id);
     } catch (e) {
       // fail of one entry shouldn't prevent other from displaying
       LOG(e);
+      return;
     }
 
     // if image is not loaded in 10 seconds, replace it with link
-    var images = container.lastChild.
-      querySelector('article').
-      querySelectorAll('img');
-    images.forEach(function(image){
+    article.querySelectorAll('img').forEach(function(image){
       if (!image.complete) setTimeout(function(){
         if (image.complete) return;
         image.parentNode.replaceChild(
