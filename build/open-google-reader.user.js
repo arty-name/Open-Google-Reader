@@ -35,7 +35,7 @@ settings = {
   bodyFilters: [],
   
   // your device screen's horizontal resolution
-  mobileViewPortWidth: 400,
+  mobileViewPort: '800x480',
   
   // filters to manipulate on entry content
   // NB: set data.altered = true if you want these changes to be shared when you click "share"
@@ -43,6 +43,12 @@ settings = {
   entryDomAlterations: []
   
 };
+
+  var parts = settings.mobileViewPort.split('x');
+  settings.mobileViewPort = {
+    max: Math.max(parts[0], parts[1]),
+    min: Math.min(parts[0], parts[1])
+  };
 
 }
 settings.css =
@@ -493,17 +499,27 @@ function ui() {
     head.appendChild(DOM('link', {href: '/reader/ui/favicon.ico', rel: 'SHORTCUT ICON'}));
     
     if (mobile) {
-      var properties = [
-        'width=' + settings.mobileViewPortWidth, 
-        'initial-scale=1.0',
-        'maximum-scale=1.0',
-        'user-scalable=0',
-        'target-densitydpi=device-dpi'
-      ];
-      head.appendChild(DOM('meta', {name: 'viewport', content: properties.join(', ')}));
+      // on first load I must use smaller dimension, 
+      // otherwise opera will not resize to smaller one later 
+      head.appendChild(DOM('meta', {name: 'viewport', content: getMetaViewPortContent(true)}));
     }
 
     Array.prototype.slice.call(document.styleSheets, 0).forEach(function(ss){ ss.disabled = true; });
+  }
+  
+  function getMetaViewPortContent(forceMin) {
+    var viewPortWidth = 
+      (!forceMin && screen.width > screen.height) ? 
+        settings.mobileViewPort.max : 
+        settings.mobileViewPort.min;  
+    
+    return [
+      'width=' + viewPortWidth, 
+      'initial-scale=1.0',
+      'maximum-scale=1.0',
+      'user-scalable=0',
+      'target-densitydpi=device-dpi'
+    ].join(', ');
   }
   
   // add own css styles
@@ -1067,6 +1083,11 @@ function ui() {
   }
 
   function resizeHandler() {
+    if (mobile) {
+      document.querySelector('head>meta[name="viewport"]').setAttribute('content', getMetaViewPortContent());
+      return;
+    }
+    
     if (!currentEntry) return;
     
     body.scrollTop = currentEntry.offsetTop;

@@ -14,7 +14,7 @@ settings = {
   bodyFilters: [],
   
   // your device screen's horizontal resolution
-  mobileViewPortWidth: 400,
+  mobileViewPort: '800x480',
   
   // filters to manipulate on entry content
   // NB: set data.altered = true if you want these changes to be shared when you click "share"
@@ -22,5 +22,11 @@ settings = {
   entryDomAlterations: []
   
 };
+
+  var parts = settings.mobileViewPort.split('x');
+  settings.mobileViewPort = {
+    max: Math.max(parts[0], parts[1]),
+    min: Math.min(parts[0], parts[1])
+  };
 
 }

@@ -167,17 +167,27 @@ function ui() {
     head.appendChild(DOM('link', {href: '/reader/ui/favicon.ico', rel: 'SHORTCUT ICON'}));
     
     if (mobile) {
-      var properties = [
-        'width=' + settings.mobileViewPortWidth, 
-        'initial-scale=1.0',
-        'maximum-scale=1.0',
-        'user-scalable=0',
-        'target-densitydpi=device-dpi'
-      ];
-      head.appendChild(DOM('meta', {name: 'viewport', content: properties.join(', ')}));
+      // on first load I must use smaller dimension, 
+      // otherwise opera will not resize to smaller one later 
+      head.appendChild(DOM('meta', {name: 'viewport', content: getMetaViewPortContent(true)}));
     }
 
     Array.prototype.slice.call(document.styleSheets, 0).forEach(function(ss){ ss.disabled = true; });
+  }
+  
+  function getMetaViewPortContent(forceMin) {
+    var viewPortWidth = 
+      (!forceMin && screen.width > screen.height) ? 
+        settings.mobileViewPort.max : 
+        settings.mobileViewPort.min;  
+    
+    return [
+      'width=' + viewPortWidth, 
+      'initial-scale=1.0',
+      'maximum-scale=1.0',
+      'user-scalable=0',
+      'target-densitydpi=device-dpi'
+    ].join(', ');
   }
   
   // add own css styles
@@ -741,6 +751,11 @@ function ui() {
   }
 
   function resizeHandler() {
+    if (mobile) {
+      document.querySelector('head>meta[name="viewport"]').setAttribute('content', getMetaViewPortContent());
+      return;
+    }
+    
     if (!currentEntry) return;
     
     body.scrollTop = currentEntry.offsetTop;
