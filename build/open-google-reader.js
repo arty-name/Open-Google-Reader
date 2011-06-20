@@ -65,7 +65,7 @@ settings.css =
 "  top: 0;" +
 "  left: 0;" +
 "  right: 0;" +
-"  height: 1.7em;" +
+"  height: 1.6em;" +
 "  z-index: 100;" +
 "  background-color: #c2cff1;" +
 "}" +
