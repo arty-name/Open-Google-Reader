@@ -792,7 +792,7 @@ function ui() {
       displayedItems.push(item.id);
     } catch (e) {
       // fail of one entry shouldn't prevent other from displaying
-      LOG(e);
+      console.error(e);
       return;
     }
 
@@ -993,7 +993,7 @@ function ui() {
       actions[target.className](event);
       target.blur();
     }
-  } catch(e) { LOG(e) }}
+  } catch(e) { console.error(e) }}
 
   function keyHandler(event){ try{
     var target = event.target;
@@ -1042,7 +1042,7 @@ function ui() {
     if (matched) {
       event.preventDefault();
     }
-  } catch(e) { LOG(e) }}
+  } catch(e) { console.error(e) }}
 
   function scrollHandler(){
     if (!currentEntry) {
@@ -1369,7 +1369,7 @@ function ui() {
           parameters: {refresh: true, xt: tags.read},
           onComplete: function(response) {
             if (response.status != 200) {
-              LOG(response.statusText);
+              console.warn(response.statusText);
             }
             
             index++;
@@ -1814,7 +1814,7 @@ function lib() {
         options.onComplete && options.onComplete(request);
   
       } catch (e) {
-        LOG(e);
+        console.error(e);
       }
     };
     
@@ -1840,14 +1840,6 @@ function lib() {
     request.send(method == 'POST' ? params : null);
     
     return request;
-  }
-
-  window.LOG = function(message) {
-    if (window.console) {
-      console.log(message);
-    } else {
-      alert(message);
-    }
   }
 
 }

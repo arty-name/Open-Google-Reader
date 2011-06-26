@@ -150,7 +150,7 @@ function lib() {
         options.onComplete && options.onComplete(request);
   
       } catch (e) {
-        LOG(e);
+        console.error(e);
       }
     };
     
@@ -176,14 +176,6 @@ function lib() {
     request.send(method == 'POST' ? params : null);
     
     return request;
-  }
-
-  window.LOG = function(message) {
-    if (window.console) {
-      console.log(message);
-    } else {
-      alert(message);
-    }
   }
 
 }
