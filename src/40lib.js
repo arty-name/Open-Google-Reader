@@ -179,9 +179,7 @@ function lib() {
   }
 
   window.LOG = function(message) {
-    if (window.opera) {
-      opera.postError(message);
-    } else if (window.console) {
+    if (window.console) {
       console.log(message);
     } else {
       alert(message);
