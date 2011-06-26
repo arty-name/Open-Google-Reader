@@ -428,7 +428,7 @@ function ui() {
     checkEmptyUserId(item, index);
     
     // skip entries which are already shown
-    if (displayedItems.include(item.id)) {
+    if (displayedItems.contains(item.id)) {
       return;
     }
     
@@ -515,7 +515,7 @@ function ui() {
     };
 
     ['read', 'star', 'share'].forEach(function(tag){
-      item[tag] = item.tags.include(tags[tag]);
+      item[tag] = item.tags.contains(tags[tag]);
     });
     
     item.comments.forEach(function(comment){
@@ -545,11 +545,11 @@ function ui() {
   // check entry's title and body against filters
   function matchesFilters(title, body) {
     title = title.toLowerCase();
-    if (settings.titleFilters.find(function(term){ return title.include(term) })) {
+    if (settings.titleFilters.find(function(term){ return title.contains(term) })) {
       return true;
     }
     return body && settings.bodyFilters.find(function(term) {
-      return body.include(term);
+      return body.contains(term);
     });
   }
 
@@ -922,7 +922,7 @@ function ui() {
     this.style.height = this.height;
   
     // ignore images loaded in entries below current
-    if (currentEntry.nextSiblings().include(entry)) return;
+    if (currentEntry.nextSiblings().contains(entry)) return;
       
     // adjust article height
     var article = entry.querySelector('article');

@@ -760,7 +760,7 @@ function ui() {
     checkEmptyUserId(item, index);
     
     // skip entries which are already shown
-    if (displayedItems.include(item.id)) {
+    if (displayedItems.contains(item.id)) {
       return;
     }
     
@@ -847,7 +847,7 @@ function ui() {
     };
 
     ['read', 'star', 'share'].forEach(function(tag){
-      item[tag] = item.tags.include(tags[tag]);
+      item[tag] = item.tags.contains(tags[tag]);
     });
     
     item.comments.forEach(function(comment){
@@ -877,11 +877,11 @@ function ui() {
   // check entry's title and body against filters
   function matchesFilters(title, body) {
     title = title.toLowerCase();
-    if (settings.titleFilters.find(function(term){ return title.include(term) })) {
+    if (settings.titleFilters.find(function(term){ return title.contains(term) })) {
       return true;
     }
     return body && settings.bodyFilters.find(function(term) {
-      return body.include(term);
+      return body.contains(term);
     });
   }
 
@@ -1254,7 +1254,7 @@ function ui() {
     this.style.height = this.height;
   
     // ignore images loaded in entries below current
-    if (currentEntry.nextSiblings().include(entry)) return;
+    if (currentEntry.nextSiblings().contains(entry)) return;
       
     // adjust article height
     var article = entry.querySelector('article');
@@ -1717,7 +1717,7 @@ function lib() {
     return undefined;
   };
   
-  Array.prototype.include = function(what) {
+  Array.prototype.contains = function(what) {
     for (var index = 0; index < this.length; ++index) {
       if (this[index] === what) {
         return true;
@@ -1728,13 +1728,13 @@ function lib() {
 
   // gecko doesn't allow patching of querySelectorAll,
   // but allows to bring Array methods to NodeList
-  'invoke pluck find include filter forEach map'.split(' ').forEach(function(method){
+  'invoke pluck find contains filter forEach map'.split(' ').forEach(function(method){
     NodeList.prototype[method] = function(what) {
       return Array.prototype[method].call(this, what);
     }
   });
   
-  String.prototype.include = function(what) {
+  String.prototype.contains = function(what) {
     return this.indexOf(what) > -1;
   };
   
@@ -1753,7 +1753,7 @@ function lib() {
   Event.prototype.findElement = function(selector) {
     var matches = document.body.querySelectorAll(selector);
     var target = this.target;
-    while (target && !matches.include(target)) {
+    while (target && !matches.contains(target)) {
       target = target.parentNode;
     }
     return target;
@@ -1771,7 +1771,7 @@ function lib() {
   if (!document.body.classList) HTMLElement.prototype.__defineGetter__('classList', function() {
     var element = this;
     var classList = {
-      contains: function(name) { return element.className.include(name); },
+      contains: function(name) { return element.className.contains(name); },
       add:      function(name) { element.className += ' ' + name; },
       remove:   function(name) { element.className = element.className.replace(new RegExp('\\b' + name + '\\b', 'g'), ''); },
       toggle:   function(name) { if (classList.contains(name)) classList.remove(name); else classList.add(name); }
