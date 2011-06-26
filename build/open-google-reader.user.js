@@ -1764,7 +1764,7 @@ function lib() {
   var qsa = HTMLElement.prototype.querySelectorAll;
   if (qsa && qsa.toString().match(/native|source/)) { // ignore maemo
     HTMLElement.prototype.querySelectorAll = function() {
-      return Array.prototype.slice.call(qsa.apply(this, arguments), 0);
+      return cloneArray(qsa.apply(this, arguments));
     };
   }
   
