@@ -110,7 +110,7 @@ function lib() {
       contains: function(name) { return element.className.include(name); },
       add:      function(name) { element.className += ' ' + name; },
       remove:   function(name) { element.className = element.className.replace(new RegExp('\\b' + name + '\\b', 'g'), ''); },
-      toggle:   function(name) { if (classList.has(name)) classList.remove(name); else classList.add(name); }
+      toggle:   function(name) { if (classList.contains(name)) classList.remove(name); else classList.add(name); }
     };
     return classList;
   });
