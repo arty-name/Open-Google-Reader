@@ -511,6 +511,12 @@ function ui() {
         read: undefined,
         star: undefined,
         share: undefined
+      },
+      
+      processing: {
+        read: false,
+        star: false,
+        share: false
       }
     };
 
@@ -832,7 +838,7 @@ function ui() {
   function markAsRead(entry) {
     if (!entry.id) return;
     var data = storage[entry.id];
-    if (!data.read) {
+    if (!data.read && !data.processing.read) {
       toggleEntryTag(entry, 'read');
       if (unreadCount) {
         unreadCount--;
@@ -880,6 +886,9 @@ function ui() {
     var data = storage[entry.id] || entry;
     var state = data[tag];
     
+    if (data.processing[tag]) return;
+    data.processing[tag] = true;
+    
     if (!state && data.hooks[tag]) data.hooks[tag].call();
     
     var parameters = {
@@ -899,7 +908,8 @@ function ui() {
           button.innerHTML = button.innerHTML.replace(/^./, getButtonImage(data, tag));
         });
       },
-      onFailure: updateToken.curry(toggleEntryTag.curry(entry, tag))
+      onFailure: updateToken.curry(toggleEntryTag.curry(entry, tag)),
+      onComplete: function() { data.processing[tag] = false; }
     });
   }
   
