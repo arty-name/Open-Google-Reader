@@ -59,6 +59,9 @@ function ui() {
 
   var body = document.compatMode == 'CSS1Compat' ? document.documentElement : document.body;
   
+  // container of buttons
+  var header;
+  
   // container of entries
   var container;
   
@@ -142,7 +145,8 @@ function ui() {
     container = DOM('div.container', {innerHTML: 'Loading...'});
 
     var body = document.body;
-    body.appendChild(createHeader()); // header contains buttons
+    header = createHeader();
+    body.appendChild(header); // header contains buttons
     body.appendChild(container);
 
     // this one will shadow read portion of entry
@@ -277,7 +281,7 @@ function ui() {
             friends = feed.count;
           }
         });
-        document.querySelector('body > header > button.friends > var').innerHTML = friends || '';
+        header.querySelector('button.friends > var').innerHTML = friends || '';
 
         // if unread count increased, current continuation isn't complete anymore
         // thus we get a new one
@@ -302,7 +306,7 @@ function ui() {
     }
     document.title = string + 'Google Reader';
 
-    document.querySelector('body > header > button.unread > var').innerHTML = unreadCount || '';
+    header.querySelector('button.unread > var').innerHTML = unreadCount || '';
   }
   
   // this replaces active continuation with new, containing all unread items
@@ -377,7 +381,7 @@ function ui() {
           container.removeChild(spacer);
         }
         if (noMoreItems && container.lastChild) {
-          var viewHeight = body.clientHeight - container.previousElementSibling.clientHeight;
+          var viewHeight = body.clientHeight - header.clientHeight;
           spacer.style.height = 
             viewHeight - (container.lastChild.clientHeight % viewHeight) - 20 + 'px';
           container.appendChild(spacer);
@@ -795,8 +799,8 @@ function ui() {
     resetView();
     resetContainer();
 
-    container.previousElementSibling.classList.remove(currentView);
-    container.previousElementSibling.classList.add(view);
+    header.classList.remove(currentView);
+    header.classList.add(view);
     
     currentView = view;
     if (window.localStorage) localStorage.currentView = view;
@@ -1129,7 +1133,7 @@ function ui() {
       }
       
       // find all images in article
-      var viewHeight = body.clientHeight - container.previousElementSibling.clientHeight;
+      var viewHeight = body.clientHeight - header.clientHeight;
       var images = currentEntry.querySelector('article').querySelectorAll('img');
       // find large images (height > half of a viewport height)
       var largeImages = images.filter(function(image){
