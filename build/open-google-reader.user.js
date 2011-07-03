@@ -59,7 +59,6 @@ settings.css =
 "" +
 "body {" +
 "  padding-top: 1.7em;" +
-"  font-family: Georgia, serif;" +
 "}" +
 "" +
 "body.mobile {" +
