@@ -1409,6 +1409,7 @@ function ui() {
         }
       });
       if (!currentEntry || !currentEntry.parentNode) {
+        currentEntry = undefined;
         var firstEntry = container.querySelector('section.entry');
         if (firstEntry) makeEntryActive(firstEntry);
       }
