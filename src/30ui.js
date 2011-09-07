@@ -808,6 +808,8 @@ function ui() {
   }
 
   function makeEntryActive(entry) {
+    if (!entry || !entry.classList.contains('entry')) return;
+    
     if (currentEntry) {
       currentEntry.classList.remove('active');
       actions.edit(undefined, true);
@@ -1099,7 +1101,9 @@ function ui() {
     // dumb "show next/previous entry" buttons
     next: function() {
       if (!currentEntry) {
-        makeEntryActive(container.firstElementChild);
+        if (container.firstElementChild) {
+          makeEntryActive(container.firstElementChild);
+        }
       } else {
         if (currentEntry.nextElementSibling && currentEntry.nextElementSibling.classList.contains('entry')) { 
           makeEntryActive(currentEntry.nextElementSibling);
