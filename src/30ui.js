@@ -605,7 +605,7 @@ function ui() {
   function getAuthor(data) {
     return (
       // favicon
-      (mobile ? '' : '<img src="http://www.google.com/s2/favicons?domain=' + data.domain + '">') +
+      (mobile ? '' : '<img src="/s2/favicons?domain=' + data.domain + '">') +
       // author
       (data.author ? data.author + ' @ ' : '') +
       // site
