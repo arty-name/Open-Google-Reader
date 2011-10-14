@@ -174,6 +174,7 @@ function ui() {
       // on first load I must use smaller dimension, 
       // otherwise opera will not resize to smaller one later 
       head.appendChild(DOM('meta', {name: 'viewport', content: getMetaViewPortContent(true)}));
+      detectOrientation();
     }
 
     Array.prototype.slice.call(document.styleSheets, 0).forEach(function(ss){ ss.disabled = true; });
@@ -192,6 +193,16 @@ function ui() {
       'user-scalable=0',
       'target-densitydpi=device-dpi'
     ].join(', ');
+  }
+  
+  function detectOrientation() {
+    if (screen.width > screen.height) {
+      document.body.classList.add('landscape');
+      document.body.classList.remove('portrait');
+    } else {
+      document.body.classList.add('portrait');
+      document.body.classList.remove('landscape');
+    }
   }
   
   // add own css styles
@@ -763,6 +774,7 @@ function ui() {
   function resizeHandler() {
     if (mobile) {
       document.querySelector('head>meta[name="viewport"]').setAttribute('content', getMetaViewPortContent());
+      detectOrientation();
       return;
     }
     
