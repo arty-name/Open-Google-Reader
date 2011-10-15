@@ -1,3 +1,334 @@
+// ==UserScript==
+// @name         Open Google Reader
+// @author       Artemy Tregubenko <me@arty.name>
+// @description  Replaces native Google Reader's interface with fully customizable one.
+// @homepage     http://github.com/arty-name/Open-Google-Reader
+// @license      Simplified BSD License; http://en.wikipedia.org/wiki/Bsd_license#2-clause_license_.28.22Simplified_BSD_License.22_or_.22FreeBSD_License.22.29
+// @include      http://www.google.com/reader/view/
+// @include      http://www.google.com/reader/view/1
+// @include      https://www.google.com/reader/view/
+// @include      https://www.google.com/reader/view/1
+// @run-at       document-start
+// ==/UserScript==
+
+(function(){
+
+// OVERVIEW
+// To get general idea of how that script works,
+// see OVERVIEW below or in file 30ui.js
+
+if (!document.location.href.match(/^https?:..www.google.com.reader.view.1?$/)) return;
+
+defineSettings();
+
+function defineSettings() {
+
+settings = {
+
+  // only required to be loaded on 404 url, i.e. http://www.google.com/reader/view/1
+  userId: '',
+  
+  // lowercase words to filter entries out by title
+  titleFilters: [],
+  
+  // words to filter entries out by body (html included)
+  bodyFilters: [],
+  
+  // your device screen's horizontal resolution
+  mobileViewPort: '800x480',
+  
+  // filters to manipulate on entry content
+  // NB: set data.altered = true if you want these changes to be shared when you click "share"
+  entryHtmlAlterations: [],
+  entryDomAlterations: []
+  
+};
+
+  var parts = settings.mobileViewPort.split('x');
+  settings.mobileViewPort = {
+    max: Math.max(parts[0], parts[1]),
+    min: Math.min(parts[0], parts[1])
+  };
+
+}
+settings.css =
+"html, body {" +
+"  margin: 0;" +
+"  padding: 0;" +
+"}" +
+"" +
+"body {" +
+"  padding-top: 1.7em;" +
+"}" +
+"" +
+"body.mobile {" +
+"}" +
+"" +
+"body > header {" +
+"  display: block;" +
+"  position: fixed;" +
+"  top: 0;" +
+"  left: 0;" +
+"  right: 0;" +
+"  height: 1.6em;" +
+"  z-index: 100;" +
+"  background-color: #c2cff1;" +
+"}" +
+"" +
+"body.mobile > header {" +
+"}" +
+"" +
+"body.mobile > header > button {" +
+"  padding: 0.2em 0.1em;" +
+"}" +
+"" +
+"body > header > button {" +
+"  font-size: inherit;" +
+"}" +
+"" +
+"body > header > button.unread, " +
+"body > header > button.starred, " +
+"body > header > button.shared, " +
+"body > header > button.friends {" +
+"  margin: 0;" +
+"  border-radius: 0.4em 0.4em 0 0;" +
+"  border: 0.1em solid #c2cff1;" +
+"  height: 1.6em;" +
+"  background-color: #ebeff9;" +
+"}" +
+"" +
+"body.mobile > header > button.unread, " +
+"body.mobile > header > button.starred, " +
+"body.mobile > header > button.shared, " +
+"body.mobile > header > button.friends {" +
+"  border-width: 0.1em;" +
+"}" +
+"" +
+"body > header > button.friends {" +
+"  margin-left: .5em;" +
+"}" +
+"" +
+"body > header > button.shared {" +
+"  margin-right: .5em;" +
+"}" +
+"" +
+"body>header.unread button.unread, body>header.star button.starred, body>header.share button.shared, body>header.friends button.friends {" +
+"  font-weight: bold;" +
+"  background-color: white;" +
+"  border-bottom-color: white;" +
+"}" +
+"" +
+"body > header > a.resetView {" +
+"  font-family: sans-serif;" +
+"  position: absolute;" +
+"  right: 0;" +
+"  color: white;" +
+"}" +
+"" +
+"body.mobile > header > a.resetView {" +
+"  display: none;" +
+"}" +
+"" +
+"body.mobile article img {" +
+"  max-width: 100%;" +
+"  -o-object-fit: contain;" +
+"}" +
+"" +
+"body > div.container {" +
+"  position: relative;" +
+"}" +
+"" +
+"body.desktop > div.container {" +
+"  padding: 0 .5em;" +
+"}" +
+"" +
+"body.mobile > div.container {" +
+"  padding-left: .2em;" +
+"}" +
+"" +
+"div.shadow {" +
+"  position: absolute;" +
+"  top: 0;" +
+"  width: 100%;" +
+"  background: black;" +
+"  opacity: .5;" +
+"}" +
+"" +
+"section.entry {" +
+"  display: block;" +
+"  border: 0 solid #c2cff1;" +
+"  border-bottom-width: 2px;" +
+"  margin-bottom: .2em;" +
+"}" +
+"" +
+"body.desktop section.entry {" +
+"  padding-left: 1.4em;" +
+"  padding-right: .5em;" +
+"  width: 95%;" +
+"}" +
+"" +
+"section.entry.active {" +
+"  border-color: #70778c;" +
+"}" +
+"" +
+"body.mobile section.entry > h2 {" +
+"  font-size: 1em;" +
+"  font-weight: normal;" +
+"}" +
+"" +
+"section.entry > h2 {" +
+"  font-family: sans-serif;" +
+"}" +
+"" +
+"body.desktop section.entry > h2 {" +
+"  margin-top: .1em;" +
+"  margin-bottom: .3em;" +
+"  margin-left: .3em;" +
+"  text-indent: -1.4em;" +
+"}" +
+"" +
+"body.mobile section.entry > h2 {" +
+"  margin-bottom: .3em;" +
+"}" +
+"" +
+"section.entry > h2 * {" +
+"  display: inline;" +
+"}" +
+"" +
+"section.entry > h2 > a {" +
+"  text-decoration: none;" +
+"  line-height: 1em;" +
+"}" +
+"" +
+"body.desktop section.entry > h2 > button {" +
+"  font-size: inherit;" +
+"  width: 1em;" +
+"  padding-right: 1.1em;" +
+"}" +
+"" +
+"body.mobile section.entry > h2 > button {" +
+"  display: none;" +
+"}" +
+"" +
+"section.entry > h2 > input {" +
+"  width: 95%;" +
+"  font-size: inherit;" +
+"}" +
+"" +
+"section.entry > article {" +
+"  display: block;" +
+"  overflow-x: auto;" +
+"  clear: both;" +
+"}" +
+"" +
+"section.entry > article > p {" +
+"  line-height: 1.15em;" +
+"}" +
+"" +
+"body.desktop section.entry > cite, " +
+"body.desktop section.entry > article, " +
+"body.desktop section.entry > footer {" +
+"  margin-left: .5em;" +
+"}" +
+"" +
+"section.entry > cite {" +
+"  float: right;" +
+"  text-align: right;" +
+"}" +
+"" +
+"body.mobile section.entry > cite {" +
+"  font-size: .5em;" +
+"}" +
+"" +
+"body.desktop section.entry > cite > img {" +
+"  margin: 6px;" +
+"  vertical-align: middle;" +
+"}" +
+"" +
+"section.entry > dl.comments {" +
+"  display: block;" +
+"  margin: .5em;" +
+"  border: 2px dotted #70778c;" +
+"  border-radius: .5em;" +
+"  padding: .5em .5em 0 .5em;" +
+"}" +
+"" +
+"section.entry > dl.comments > dt {" +
+"  font-weight: bold;" +
+"}" +
+"" +
+"section.entry > dl.comments > dt:after {" +
+"  content: ':';" +
+"}" +
+"" +
+"section.entry > dl.comments > dd {" +
+"  margin-bottom: .5em;" +
+"}" +
+"" +
+"section.entry > dl.comments > dd.addcomment.hidden .input {" +
+"  display: none;" +
+"}" +
+"" +
+"section.entry > footer {" +
+"  clear: both;" +
+"  display: block;" +
+"  margin-left: 0;" +
+"}" +
+"" +
+"section.entry > footer > span.buttons {" +
+"  white-space: nowrap;" +
+"}" +
+"" +
+"section.entry > footer > span.tags {" +
+"  float: right;" +
+"  opacity: .5;" +
+"}" +
+"" +
+"section.entry div.spacer {" +
+"  width: 90%;" +
+"}" +
+"" +
+"body.mobile section.star button.star, body.mobile section.share button.share {" +
+"  font-weight: bold;" +
+"}" +
+"" +
+"button.star {" +
+"  color: #8c8211;" +
+"}" +
+"" +
+"button.share {" +
+"  color: #8c6041;" +
+"}" +
+"" +
+"button.edit, button.comment {" +
+"  color: #4c8c4c;" +
+"}" +
+"" +
+"button.star, button.share, button.edit, button.comment, button.cancel {" +
+"  background: none;" +
+"  border: none;" +
+"}" +
+"" +
+"button {" +
+"  cursor: pointer;" +
+"}" +
+"" +
+"textarea {" +
+"  width: 95%;" +
+"}" +
+"" +
+"button var {" +
+"  font-style: normal;" +
+"}" +
+"" +
+"button var:empty:before, button var:empty:after {" +
+"  content: '';" +
+"}" +
+"" +
+"button var:after {" +
+"  content: ' ';" +
+"}" +
+"";
 /*
   OVERVIEW
   
@@ -174,7 +505,6 @@ function ui() {
       // on first load I must use smaller dimension, 
       // otherwise opera will not resize to smaller one later 
       head.appendChild(DOM('meta', {name: 'viewport', content: getMetaViewPortContent(true)}));
-      detectOrientation();
     }
 
     Array.prototype.slice.call(document.styleSheets, 0).forEach(function(ss){ ss.disabled = true; });
@@ -195,16 +525,6 @@ function ui() {
     ].join(', ');
   }
   
-  function detectOrientation() {
-    if (screen.width > screen.height) {
-      document.body.classList.add('landscape');
-      document.body.classList.remove('portrait');
-    } else {
-      document.body.classList.add('portrait');
-      document.body.classList.remove('landscape');
-    }
-  }
-  
   // add own css styles
   function addStyles() {
     document.body.previousElementSibling.appendChild(
@@ -215,29 +535,15 @@ function ui() {
   // create container with buttons
   function createHeader() {
     if (mobile) {
-      var paths = {
-        reload: 'M15.067,2.25c-5.979,0-11.035,3.91-12.778,9.309h3.213c1.602-3.705,5.271-6.301,9.565-6.309c5.764,0.01,10.428,4.674,10.437,10.437c-0.009,5.764-4.673,10.428-10.437,10.438c-4.294-0.007-7.964-2.605-9.566-6.311H2.289c1.744,5.399,6.799,9.31,12.779,9.312c7.419-0.002,13.437-6.016,13.438-13.438C28.504,8.265,22.486,2.252,15.067,2.25zM10.918,19.813l7.15-4.126l-7.15-4.129v2.297H-0.057v3.661h10.975V19.813z',
-        friends: 'M28.516,7.167H3.482l12.517,7.108L28.516,7.167zM16.74,17.303C16.51,17.434,16.255,17.5,16,17.5s-0.51-0.066-0.741-0.197L2.5,10.06v14.773h27V10.06L16.74,17.303z',
-        unread: 'M7.562,24.812c-3.313,0-6-2.687-6-6l0,0c0.002-2.659,1.734-4.899,4.127-5.684l0,0c0.083-2.26,1.937-4.064,4.216-4.066l0,0c0.73,0,1.415,0.19,2.01,0.517l0,0c1.266-2.105,3.57-3.516,6.208-3.517l0,0c3.947,0.002,7.157,3.155,7.248,7.079l0,0c2.362,0.804,4.062,3.034,4.064,5.671l0,0c0,3.313-2.687,6-6,6l0,0H7.562L7.562,24.812zM24.163,14.887c-0.511-0.095-0.864-0.562-0.815-1.079l0,0c0.017-0.171,0.027-0.336,0.027-0.497l0,0c-0.007-2.899-2.352-5.245-5.251-5.249l0,0c-2.249-0.002-4.162,1.418-4.911,3.41l0,0c-0.122,0.323-0.406,0.564-0.748,0.63l0,0c-0.34,0.066-0.694-0.052-0.927-0.309l0,0c-0.416-0.453-0.986-0.731-1.633-0.731l0,0c-1.225,0.002-2.216,0.993-2.22,2.218l0,0c0,0.136,0.017,0.276,0.045,0.424l0,0c0.049,0.266-0.008,0.54-0.163,0.762l0,0c-0.155,0.223-0.392,0.371-0.657,0.414l0,0c-1.9,0.313-3.352,1.949-3.35,3.931l0,0c0.004,2.209,1.792,3.995,4.001,4.001l0,0h15.874c2.209-0.006,3.994-1.792,3.999-4.001l0,0C27.438,16.854,26.024,15.231,24.163,14.887L24.163,14.887',
-        starred: 'M15.999,22.77l-8.884,6.454l3.396-10.44l-8.882-6.454l10.979,0.002l2.918-8.977l0.476-1.458l3.39,10.433h10.982l-8.886,6.454l3.397,10.443L15.999,22.77L15.999,22.77z',
-        shared: 'M4.135,16.762c3.078,0,5.972,1.205,8.146,3.391c2.179,2.187,3.377,5.101,3.377,8.202h4.745c0-9.008-7.299-16.335-16.269-16.335V16.762zM4.141,8.354c10.973,0,19.898,8.975,19.898,20.006h4.743c0-13.646-11.054-24.749-24.642-24.749V8.354zM10.701,25.045c0,1.815-1.471,3.287-3.285,3.287s-3.285-1.472-3.285-3.287c0-1.813,1.471-3.285,3.285-3.285S10.701,23.231,10.701,25.045z',
-        next: 'M10.129,22.186 16.316,15.999 10.129,9.812 13.665,6.276 23.389,15.999 13.665,25.725z',
-        prev: 'M21.871,9.814 15.684,16.001 21.871,22.188 18.335,25.725 8.612,16.001 18.335,6.276z'
-      };
-      function makeSVG(path) {
-        var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="2em" height="2em" preserveAspectRatio="xMidYMid"><path fill="#666666" d="{path}"/></svg>';
-        return '<img src="data:image/svg+xml,' + encodeURIComponent(svg.replace('{path}', path)) + '">'
-      }
       var titles = {
-        reload:  makeSVG(paths.reload),
-        friends: makeSVG(paths.friends),
-        unread:  makeSVG(paths.unread),
-        starred: makeSVG(paths.starred),
-        shared:  makeSVG(paths.shared),
-        next:    makeSVG(paths.next),
-        prev:    makeSVG(paths.prev)
+        reload: 'Reload',
+        friends: 'Comments',
+        unread: 'Unread',
+        starred: 'Starred',
+        shared: 'Shared',
+        next: 'Next',
+        prev: 'Previous'
       };
-    
     } else {
       titles = {
         reload: '⟳ Reload',
@@ -630,7 +936,7 @@ function ui() {
   function getAuthor(data) {
     return (
       // favicon
-      (mobile ? '' : '<img src="/s2/favicons?domain=' + data.domain + '">') +
+      (mobile ? '' : '<img src="http://www.google.com/s2/favicons?domain=' + data.domain + '">') +
       // author
       (data.author ? data.author + ' @ ' : '') +
       // site
@@ -788,7 +1094,6 @@ function ui() {
   function resizeHandler() {
     if (mobile) {
       document.querySelector('head>meta[name="viewport"]').setAttribute('content', getMetaViewPortContent());
-      detectOrientation();
       return;
     }
     
@@ -1375,3 +1680,220 @@ function ui() {
   };
 }
 
+function lib() {
+  // Following code is Prototype.js replacement for stupid Firefox's GreaseMonkey 
+
+  window.DOM = function(name, attributes, children) {
+    attributes = attributes || {};
+    
+    var parts = name.split('.');
+    name = parts[0];
+    
+    if (parts.length > 1) {
+      attributes.className = parts[1];
+    }
+    
+    var node = document.createElement(name);
+    if (attributes) {
+      for (name in attributes) {
+        node[name] = attributes[name];
+      }
+    }
+    if (children) {
+      children.forEach(function(child){
+        node.appendChild(child);
+      });
+    }
+    return node;
+  };
+  
+  function cloneArray(array) {
+    return Array.prototype.slice.call(array, 0);
+  }
+
+  Array.prototype.invoke = function(method) {
+    var args = cloneArray(arguments); // without this .shift() changes value of `method`
+    args.shift();
+    
+    return this.map(function(element){
+      element[method].apply(element, args);
+    });
+  };
+  
+  Array.prototype.pluck = function(name) {
+    return this.map(function(element){
+      return element[name];
+    });
+  };
+  
+  Array.prototype.find = function(condition) {
+    for (var index = 0; index < this.length; ++index) {
+      if (condition(this[index])) {
+        return this[index];
+      }
+    }
+    return undefined;
+  };
+  
+  Array.prototype.contains = function(what) {
+    for (var index = 0; index < this.length; ++index) {
+      if (this[index] === what) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // gecko doesn't allow patching of querySelectorAll,
+  // but allows to bring Array methods to NodeList
+  'invoke pluck find contains filter forEach map'.split(' ').forEach(function(method){
+    NodeList.prototype[method] = function(what) {
+      return Array.prototype[method].call(this, what);
+    }
+  });
+  
+  String.prototype.contains = function(what) {
+    return this.indexOf(what) > -1;
+  };
+  
+  String.prototype.stripTags = function() {
+    return this.replace(/<\/?[^>]+>/gi, '');
+  };
+  
+  Function.prototype.curry = function() {
+    var fun = this;
+    var args = cloneArray(arguments); // only Opera supports .concat for arguments
+    return function() {
+      return fun.apply(null, args.concat(cloneArray(arguments)));
+    }
+  };
+  
+  Event.prototype.findElement = function(selector) {
+    var matches = document.body.querySelectorAll(selector);
+    var target = this.target;
+    while (target && !matches.contains(target)) {
+      target = target.parentNode;
+    }
+    return target;
+  };
+
+  // in Opera querySelectorAll returns StaticNodeList, which is unavailable for
+  // monkey-patching, thus we patch querySelectorAll itself
+  var qsa = HTMLElement.prototype.querySelectorAll;
+  if (qsa && qsa.toString().match(/native|source/)) { // ignore maemo
+    HTMLElement.prototype.querySelectorAll = function() {
+      return cloneArray(qsa.apply(this, arguments));
+    };
+  }
+  
+  if (!document.body.classList) HTMLElement.prototype.__defineGetter__('classList', function() {
+    var element = this;
+    var classList = {
+      contains: function(name) { return element.className.contains(name); },
+      add:      function(name) { element.className += ' ' + name; },
+      remove:   function(name) { element.className = element.className.replace(new RegExp('\\b' + name + '\\b', 'g'), ''); },
+      toggle:   function(name) { if (classList.contains(name)) classList.remove(name); else classList.add(name); }
+    };
+    return classList;
+  });
+  
+  HTMLElement.prototype.previousSiblings = function() {
+    var siblings = cloneArray(this.parentNode.childNodes);// NB: <section> doesn't go to .children :(
+    return siblings.slice(0, siblings.indexOf(this));
+  };
+  
+  HTMLElement.prototype.nextSiblings = function() {
+    var siblings = cloneArray(this.parentNode.childNodes); // NB: <section> doesn't go to .children :(
+    return this.nextElementSibling ? siblings.slice(siblings.indexOf(this) + 1) : [];
+  };
+  
+  window.APIRequest = function (url, options) {
+    return AjaxRequest('/reader/api/0/' + url, options);
+  };
+  
+  function AjaxRequest(url, options) {
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function () {
+      if (request.readyState < 4) return;
+      
+      try {
+        if (request.status == 403) {
+          if (confirm('Re-authorization needed. Go to login page?')) {
+            window.location = 
+              'https://www.google.com/accounts/ServiceLogin?service=reader&btmpl=mobile&ltmpl=mobilex&' + 
+              'continue=' + encodeURIComponent(window.location.href);
+          }
+        } else if (request.status != 200) {
+          options.onFailure && options.onFailure();
+        } else {
+          if (request.responseText[0] == '{') request.responseJSON = JSON.parse(request.responseText);
+          options.onSuccess && options.onSuccess(request);
+        }
+        options.onComplete && options.onComplete(request);
+  
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    
+    var method = (options.method || 'get').toUpperCase();
+    
+    options.parameters = options.parameters || {};
+    options.parameters.client = options.parameters.client || 'userscript';
+    options.parameters.ck = options.parameters.ck || (new Date()).getTime();
+    
+    var params = [];
+    for (var param in options.parameters) {
+      params.push(param + '=' + encodeURIComponent(options.parameters[param]));
+    }
+    params = params.join('&');
+    if (method == 'GET' && params) {
+      url += '?' + params;
+    }
+    
+    request.open(method, url, true);
+    if (method == 'POST') {
+      request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded; charset=UTF-8');
+    }
+    request.send(method == 'POST' ? params : null);
+    
+    return request;
+  }
+
+}
+
+function onload() {
+  lib();
+  ui();
+}
+
+if (typeof GM_xmlhttpRequest != "undefined" && !navigator.userAgent.match(/Chrome/)) {
+  // GreaseMonkey, fuck you very much! I don't need your overprotection.
+  var script = document.createElement('script');
+  script.innerHTML =
+    defineSettings.toString() + lib.toString() + ui.toString() +
+    'defineSettings(); lib(); ui();';
+  document.body.appendChild(script);
+  setTimeout(function(){
+    var style = document.createElement('style');
+    style.innerHTML = settings.css;
+    document.body.previousElementSibling.appendChild(style);
+  }, 100);
+  
+} else if (document.readyState.match(/complete|loaded/)) {
+  onload();
+  
+} else {
+  window.addEventListener('DOMContentLoaded', onload, false);
+}
+
+window.opera && window.opera.addEventListener(
+  'BeforeExternalScript',
+  function(event){
+    var re = new RegExp('http://www.google.com/reader/ui/');
+    if (re.test(event.element.src)) event.preventDefault();
+    window._FR_scrollMain = function(){};
+  },
+  false);
+
+})();
