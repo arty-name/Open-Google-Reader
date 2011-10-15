@@ -234,8 +234,8 @@ function ui() {
         unread:  makeSVG(paths.unread),
         starred: makeSVG(paths.starred),
         shared:  makeSVG(paths.shared),
-        next:    makeSVG(paths.next),
-        prev:    makeSVG(paths.prev)
+        prev:    makeSVG(paths.prev),
+        next:    makeSVG(paths.next)
       };
     
     } else {
@@ -245,8 +245,8 @@ function ui() {
         unread: 'Unread',
         starred: '☆ Starred',
         shared: '⚐ Shared',
-        next: '▽ Next',
-        prev: '△ Previous'
+        prev: '△ Previous',
+        next: '▽ Next'
       };
     }
     return DOM('header', undefined, [
@@ -255,8 +255,8 @@ function ui() {
       createButton('unread',  titles.unread,  DOM('var')),
       createButton('starred', titles.starred),
       createButton('shared',  titles.shared),
-      createButton('next',    titles.next),
       createButton('prev',    titles.prev),
+      createButton('next',    titles.next),
       DOM('a.resetView', {
         href: 'http://google.com/reader/view#',
         innerHTML: 'Normal View'
