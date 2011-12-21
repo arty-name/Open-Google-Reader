@@ -39,7 +39,6 @@ Features
  * single click to assign tag
  * smart scrolling with spacebar
  * site favicons
- * "sharing" an item also "likes" it
  * as aggressive preloading as you like
  * convenient view of large images
  * shows tags by entry's author

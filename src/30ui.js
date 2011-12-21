@@ -131,7 +131,6 @@ function ui() {
     return {
       unread: tagPrefix + 'reading-list',
       read: tagPrefix + 'read',
-      like: tagPrefix + 'like',
       star: tagPrefix + 'starred',
       share: tagPrefix + 'broadcast',
       friends: tagPrefix + 'broadcast-friends-comments'
@@ -1121,7 +1120,6 @@ function ui() {
       if (checkIfAltered(currentEntry, true)) return;
       
       toggleEntryTag(currentEntry, 'share');
-      toggleEntryTag(currentEntry, 'like');
     },
 
     // dumb "show next/previous entry" buttons
