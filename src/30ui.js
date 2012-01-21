@@ -466,7 +466,7 @@ function ui() {
     settings.entryHtmlAlterations.invoke('call', null, item);
     
     // if entry marked to ignore or matches filter, mark it as read and skip it
-    if (item.ignore || matchesFilters(item.title, item.body)) {
+    if ((item.ignore || matchesFilters(item.title, item.body)) && currentView == 'unread') {
       item.read = false;
       toggleEntryTag(item, 'read');
       if (unreadCount) {
