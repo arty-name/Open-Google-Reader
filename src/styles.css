@@ -49,8 +49,7 @@ body > header > button {
 
 body > header > button.unread, 
 body > header > button.starred, 
-body > header > button.shared, 
-body > header > button.friends {
+body > header > button.shared {
   margin: 0;
   border-radius: 0.4em 0.4em 0 0;
   border: 0.1em solid #c2cff1;
@@ -60,21 +59,19 @@ body > header > button.friends {
 
 body.mobile > header > button.unread, 
 body.mobile > header > button.starred, 
-body.mobile > header > button.shared, 
-body.mobile > header > button.friends {
+body.mobile > header > button.shared {
   border-width: 0.1em;
 }
 
 body.mobile.landscape > header > button.unread, 
 body.mobile.landscape > header > button.starred, 
-body.mobile.landscape > header > button.shared, 
-body.mobile.landscape > header > button.friends {
+body.mobile.landscape > header > button.shared {
   height: 2.8em;
   width: 2.8em;
   border-radius: 0.4em 0 0 0.4em;
 }
 
-body > header > button.friends {
+body > header > button.unread {
   margin-left: .5em;
 }
 
@@ -84,8 +81,7 @@ body > header > button.shared {
 
 body>header.unread button.unread, 
 body>header.star button.starred, 
-body>header.share button.shared, 
-body>header.friends button.friends {
+body>header.share button.shared {
   font-weight: bold;
   background-color: white;
   border-bottom-color: white;
@@ -93,8 +89,7 @@ body>header.friends button.friends {
 
 body.mobile.landscape>header.unread button.unread, 
 body.mobile.landscape>header.star button.starred, 
-body.mobile.landscape>header.share button.shared, 
-body.mobile.landscape>header.friends button.friends {
+body.mobile.landscape>header.share button.shared {
   border-bottom-color: #c2cff1;
   border-right-color: white;
 }

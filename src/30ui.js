@@ -132,8 +132,7 @@ function ui() {
       unread: tagPrefix + 'reading-list',
       read: tagPrefix + 'read',
       star: tagPrefix + 'starred',
-      share: tagPrefix + 'broadcast',
-      friends: tagPrefix + 'broadcast-friends-comments'
+      share: tagPrefix + 'broadcast'
     }
   }
 
@@ -216,7 +215,6 @@ function ui() {
     if (mobile) {
       var paths = {
         reload: 'M15.067,2.25c-5.979,0-11.035,3.91-12.778,9.309h3.213c1.602-3.705,5.271-6.301,9.565-6.309c5.764,0.01,10.428,4.674,10.437,10.437c-0.009,5.764-4.673,10.428-10.437,10.438c-4.294-0.007-7.964-2.605-9.566-6.311H2.289c1.744,5.399,6.799,9.31,12.779,9.312c7.419-0.002,13.437-6.016,13.438-13.438C28.504,8.265,22.486,2.252,15.067,2.25zM10.918,19.813l7.15-4.126l-7.15-4.129v2.297H-0.057v3.661h10.975V19.813z',
-        friends: 'M28.516,7.167H3.482l12.517,7.108L28.516,7.167zM16.74,17.303C16.51,17.434,16.255,17.5,16,17.5s-0.51-0.066-0.741-0.197L2.5,10.06v14.773h27V10.06L16.74,17.303z',
         unread: 'M7.562,24.812c-3.313,0-6-2.687-6-6l0,0c0.002-2.659,1.734-4.899,4.127-5.684l0,0c0.083-2.26,1.937-4.064,4.216-4.066l0,0c0.73,0,1.415,0.19,2.01,0.517l0,0c1.266-2.105,3.57-3.516,6.208-3.517l0,0c3.947,0.002,7.157,3.155,7.248,7.079l0,0c2.362,0.804,4.062,3.034,4.064,5.671l0,0c0,3.313-2.687,6-6,6l0,0H7.562L7.562,24.812zM24.163,14.887c-0.511-0.095-0.864-0.562-0.815-1.079l0,0c0.017-0.171,0.027-0.336,0.027-0.497l0,0c-0.007-2.899-2.352-5.245-5.251-5.249l0,0c-2.249-0.002-4.162,1.418-4.911,3.41l0,0c-0.122,0.323-0.406,0.564-0.748,0.63l0,0c-0.34,0.066-0.694-0.052-0.927-0.309l0,0c-0.416-0.453-0.986-0.731-1.633-0.731l0,0c-1.225,0.002-2.216,0.993-2.22,2.218l0,0c0,0.136,0.017,0.276,0.045,0.424l0,0c0.049,0.266-0.008,0.54-0.163,0.762l0,0c-0.155,0.223-0.392,0.371-0.657,0.414l0,0c-1.9,0.313-3.352,1.949-3.35,3.931l0,0c0.004,2.209,1.792,3.995,4.001,4.001l0,0h15.874c2.209-0.006,3.994-1.792,3.999-4.001l0,0C27.438,16.854,26.024,15.231,24.163,14.887L24.163,14.887',
         starred: 'M15.999,22.77l-8.884,6.454l3.396-10.44l-8.882-6.454l10.979,0.002l2.918-8.977l0.476-1.458l3.39,10.433h10.982l-8.886,6.454l3.397,10.443L15.999,22.77L15.999,22.77z',
         shared: 'M4.135,16.762c3.078,0,5.972,1.205,8.146,3.391c2.179,2.187,3.377,5.101,3.377,8.202h4.745c0-9.008-7.299-16.335-16.269-16.335V16.762zM4.141,8.354c10.973,0,19.898,8.975,19.898,20.006h4.743c0-13.646-11.054-24.749-24.642-24.749V8.354zM10.701,25.045c0,1.815-1.471,3.287-3.285,3.287s-3.285-1.472-3.285-3.287c0-1.813,1.471-3.285,3.285-3.285S10.701,23.231,10.701,25.045z',
@@ -229,7 +227,6 @@ function ui() {
       }
       var titles = {
         reload:  makeSVG(paths.reload),
-        friends: makeSVG(paths.friends),
         unread:  makeSVG(paths.unread),
         starred: makeSVG(paths.starred),
         shared:  makeSVG(paths.shared),
@@ -240,7 +237,6 @@ function ui() {
     } else {
       titles = {
         reload: '⟳ Reload',
-        friends: '✉',
         unread: 'Unread',
         starred: '☆ Starred',
         shared: '⚐ Shared',
@@ -250,7 +246,6 @@ function ui() {
     }
     return DOM('header', undefined, [
       createButton('reload',  titles.reload),
-      createButton('friends', titles.friends, DOM('var')),
       createButton('unread',  titles.unread,  DOM('var')),
       createButton('starred', titles.starred),
       createButton('shared',  titles.shared),
@@ -298,14 +293,9 @@ function ui() {
         var count = 0;
         
         // summarize all values for feeds (not tags/folders)
-        var friends;
         data.unreadcounts.forEach(function(feed){
           if (feed.id.match(/^feed/)) count += feed.count;
-          if (feed.id == tags.friends) {
-            friends = feed.count;
-          }
         });
-        header.querySelector('button.friends > var').innerHTML = friends || '';
 
         // if unread count increased, current continuation isn't complete anymore
         // thus we get a new one
@@ -411,13 +401,6 @@ function ui() {
           container.appendChild(spacer);
         }
         
-        // Accessing friends comments view should be followed by setting last access time for that view.
-        // This is ugly, GR team!
-        // Can't think of a better place for that check… : (
-        if (view == 'friends') {
-          updateAllCommentsViewTime();
-        }
-        
         // clear current request
         dataRequest = undefined;
         checkNeedMoreEntries();
@@ -442,9 +425,6 @@ function ui() {
       parameters.xt = tags.read; // exclude read items
       parameters.r = sort.oldestFirst;
     } else {
-      if (view == 'friends') {
-        parameters.co = true; // items with comments only
-      }
       parameters.r = sort.newestFirst;
     }
     
@@ -776,14 +756,6 @@ function ui() {
     }
   }
 
-  function updateAllCommentsViewTime(opt_time) {
-    APIRequest('preference/set', { method: 'post', parameters: {
-      T: token,
-      k: 'last-allcomments-view',
-      v: opt_time || ((new Date()).getTime() * 1000) // right - that's microseconds
-    }});
-  }
-
   function resizeHandler() {
     if (mobile) {
       document.querySelector('head>meta[name="viewport"]').setAttribute('content', getMetaViewPortContent());
@@ -1060,7 +1032,6 @@ function ui() {
     unread: switchToView.curry('unread'), 
     starred: switchToView.curry('star'), 
     shared: switchToView.curry('share'), 
-    friends: switchToView.curry('friends'),
 
     reload: function() {
       resetView();
@@ -1270,57 +1241,6 @@ function ui() {
         // show next page, leaving last line of current page on the screen
         body.scrollTop = targetScroll - 20;
       }
-    },
-    
-    // add comment to an entry
-    comment: function(event) {
-      if (!currentEntry || !currentEntry.id) return;
-
-      var button = event.target;
-      var dd = button.parentNode;
-      dd.classList.remove('hidden'); // show all inputs
-      
-      var textarea = button.previousElementSibling;
-
-      if (!textarea) {
-        textarea = DOM('textarea.input', { rows: 4 });
-        dd.insertBefore(textarea, button);
-
-        var cancel = DOM('button.cancel input', { innerHTML: 'Cancel' });
-        cancel.addEventListener('click', function(){ dd.classList.add('hidden'); }, false);
-        dd.appendChild(cancel);
-      }
-
-      // if user haven't yet entered comment, halt
-      if (textarea.value.match(/^\s*$/)) {
-        return;
-      }
-
-      var parameters = {
-        T: token,
-        action: 'addcomment',
-        comment: textarea.value.replace(/\r/g, ''),
-        i: currentEntry.id,
-        s: tags.friends,
-        output: 'json'
-      };
-
-      return APIRequest('comment/edit', {
-        method: 'post',
-        parameters: parameters,
-        onSuccess: function(response) {
-          textarea.value = '';
-          dd.classList.add('hidden');
-
-          dd.parentNode.insertBefore(DOM('dt', { innerHTML: 'you' }), dd);
-          dd.parentNode.insertBefore(DOM('dd', { innerHTML: response.responseJSON.htmlContent }), dd);
-          
-          var id = response.responseJSON.commentId;
-          var time = parseInt(id.split(/#/)[1]) + 1000;
-          updateAllCommentsViewTime(time);
-        },
-        onFailure: updateToken.curry(actions.comment.curry(event))
-      });
     },
 
     // create new shared entry with altered title/content
