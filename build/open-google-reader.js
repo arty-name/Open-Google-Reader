@@ -839,7 +839,7 @@ function ui() {
     settings.entryHtmlAlterations.invoke('call', null, item);
     
     // if entry marked to ignore or matches filter, mark it as read and skip it
-    if (item.ignore || matchesFilters(item.title, item.body)) {
+    if ((item.ignore || matchesFilters(item.title, item.body)) && currentView == 'unread') {
       item.read = false;
       toggleEntryTag(item, 'read');
       if (unreadCount) {
@@ -1879,23 +1879,27 @@ function lib() {
   
   function AjaxRequest(url, options) {
     var request = new XMLHttpRequest();
-    request.onreadystatechange = function () {
-      if (request.readyState < 4) return;
-      
-      try {
-        if (request.status == 403) {
-          if (confirm('Re-authorization needed. Go to login page?')) {
+      request.onreadystatechange = function () {
+        if (request.status == 401) {
+          if (!AjaxRequest.redirected && confirm('Re-authorization needed. Go to login page?')) {
+            AjaxRequest.redirected = true;
             window.location = 
               'https://www.google.com/accounts/ServiceLogin?service=reader&btmpl=mobile&ltmpl=mobilex&' + 
               'continue=' + encodeURIComponent(window.location.href);
           }
-        } else if (request.status != 200) {
-          options.onFailure && options.onFailure();
-        } else {
-          if (request.responseText[0] == '{') request.responseJSON = JSON.parse(request.responseText);
-          options.onSuccess && options.onSuccess(request);
+          return;
         }
-        options.onComplete && options.onComplete(request);
+        
+        if (request.readyState < 4) return;
+        
+        try {
+          if (request.status != 200) {
+            options.onFailure && options.onFailure();
+          } else {
+            if (request.responseText[0] == '{') request.responseJSON = JSON.parse(request.responseText);
+            options.onSuccess && options.onSuccess(request);
+          }
+          options.onComplete && options.onComplete(request);
   
       } catch (e) {
         console.error(e);
