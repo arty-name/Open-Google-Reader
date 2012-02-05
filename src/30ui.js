@@ -252,7 +252,7 @@ function ui() {
       createButton('prev',    titles.prev),
       createButton('next',    titles.next),
       DOM('a.resetView', {
-        href: 'http://google.com/reader/view#',
+        href: '//www.google.com/reader/view#',
         innerHTML: 'Normal View'
       })
     ]);
