@@ -423,7 +423,7 @@ function ui() {
   var tags = initTags();  
   
   
-  var mobile = !!/mobi/i.test(window.navigator.userAgent);
+  var mobile = settings.mobile = !!/mobi/i.test(window.navigator.userAgent);
 
   var body = document.compatMode == 'CSS1Compat' ? document.documentElement : document.body;
   
