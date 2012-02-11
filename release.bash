@@ -1,9 +1,9 @@
 #!/bin/bash
 
-echo 'settings.css =' > 27styles
+echo 'function getStyles(){ return (' > 27styles
 sed 's/^/"/;s/$/" +/;' src/styles.css >> 27styles
 sed 's/^/"/;s/$/" +/;' src/styles.custom.css >> 27styles
-echo '"";' >> 27styles
+echo '"");}' >> 27styles
 
 cat \
   src/10meta.js \

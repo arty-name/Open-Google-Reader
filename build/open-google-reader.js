@@ -19,39 +19,38 @@
 
 if (!document.location.href.match(/^https?:..www.google.com.reader.view.1?$/)) return;
 
-defineSettings();
+function getSettings() {
 
-function defineSettings() {
+  var settings = {
 
-settings = {
+    // only required to be loaded on 404 url, i.e. http://www.google.com/reader/view/1
+    userId: '',
 
-  // only required to be loaded on 404 url, i.e. http://www.google.com/reader/view/1
-  userId: '',
-  
-  // lowercase words to filter entries out by title
-  titleFilters: [],
-  
-  // words to filter entries out by body (html included)
-  bodyFilters: [],
-  
-  // your device screen's horizontal resolution
-  mobileViewPort: '800x480',
-  
-  // filters to manipulate on entry content
-  // NB: set data.altered = true if you want these changes to be shared when you click "share"
-  entryHtmlAlterations: [],
-  entryDomAlterations: []
-  
-};
+    // lowercase words to filter entries out by title
+    titleFilters: [],
+
+    // words to filter entries out by body (html included)
+    bodyFilters: [],
+
+    // your device screen's horizontal resolution
+    mobileViewPort: '800x480',
+
+    // filters to manipulate on entry content
+    // NB: set data.altered = true if you want these changes to be shared when you click "share"
+    entryHtmlAlterations: [],
+    entryDomAlterations: []
+
+  };
 
   var parts = settings.mobileViewPort.split('x');
   settings.mobileViewPort = {
     max: Math.max(parts[0], parts[1]),
     min: Math.min(parts[0], parts[1])
   };
-
+  
+  return settings;
 }
-settings.css =
+function getStyles(){ return (
 "html, body {" +
 "  margin: 0;" +
 "  padding: 0;" +
@@ -365,7 +364,7 @@ settings.css =
 "  width: 2em; height: 100%; line-height: 2em; top: 0.1em;" +
 "}" +
 "" +
-"";
+"");}
 /*
   OVERVIEW
   
@@ -402,7 +401,7 @@ settings.css =
   in the same order, so you can read code from top to bottom.
 */
 
-function ui() {
+function ui(settings, css) {
 
   // static user id 
   var userId = settings.userId || window._USER_ID || (window.localStorage && localStorage.userId) || '-';
@@ -574,7 +573,7 @@ function ui() {
   // add own css styles
   function addStyles() {
     document.body.previousElementSibling.appendChild(
-      DOM('style', undefined, [document.createTextNode(settings.css)])
+      DOM('style', undefined, [document.createTextNode(css)])
     );
   }
 
@@ -1849,15 +1848,15 @@ function lib() {
 
 function onload() {
   lib();
-  ui();
+  ui(getSettings(), getStyles());
 }
 
 if (typeof GM_xmlhttpRequest != "undefined" && !navigator.userAgent.match(/Chrome/)) {
   // GreaseMonkey, fuck you very much! I don't need your overprotection.
   var script = document.createElement('script');
   script.innerHTML =
-    defineSettings.toString() + lib.toString() + ui.toString() +
-    'defineSettings(); lib(); ui();';
+    getSettings.toString() + getStyles.toString() + lib.toString() + ui.toString() +
+    'lib(); ui(getSettings(), getStyles());';
   document.body.appendChild(script);
   setTimeout(function(){
     var style = document.createElement('style');

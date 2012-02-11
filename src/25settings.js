@@ -1,8 +1,6 @@
-defineSettings();
+function getSettings() {
 
-function defineSettings() {
-
-  settings = {
+  var settings = {
 
     // only required to be loaded on 404 url, i.e. http://www.google.com/reader/view/1
     userId: '',
@@ -28,5 +26,6 @@ function defineSettings() {
     max: Math.max(parts[0], parts[1]),
     min: Math.min(parts[0], parts[1])
   };
-
+  
+  return settings;
 }

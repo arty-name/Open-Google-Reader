@@ -34,7 +34,7 @@
   in the same order, so you can read code from top to bottom.
 */
 
-function ui() {
+function ui(settings, css) {
 
   // static user id 
   var userId = settings.userId || window._USER_ID || (window.localStorage && localStorage.userId) || '-';
@@ -206,7 +206,7 @@ function ui() {
   // add own css styles
   function addStyles() {
     document.body.previousElementSibling.appendChild(
-      DOM('style', undefined, [document.createTextNode(settings.css)])
+      DOM('style', undefined, [document.createTextNode(css)])
     );
   }
 

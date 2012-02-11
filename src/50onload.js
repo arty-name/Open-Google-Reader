@@ -1,15 +1,15 @@
 
 function onload() {
   lib();
-  ui();
+  ui(getSettings(), getStyles());
 }
 
 if (typeof GM_xmlhttpRequest != "undefined" && !navigator.userAgent.match(/Chrome/)) {
   // GreaseMonkey, fuck you very much! I don't need your overprotection.
   var script = document.createElement('script');
   script.innerHTML =
-    defineSettings.toString() + lib.toString() + ui.toString() +
-    'defineSettings(); lib(); ui();';
+    getSettings.toString() + getStyles.toString() + lib.toString() + ui.toString() +
+    'lib(); ui(getSettings(), getStyles());';
   document.body.appendChild(script);
   setTimeout(function(){
     var style = document.createElement('style');
