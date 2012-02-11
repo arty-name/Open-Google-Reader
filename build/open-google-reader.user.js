@@ -892,6 +892,7 @@ function ui(settings, css) {
     var interval = setInterval(function(){
       if (!iframe.contentWindow || !iframe.contentWindow.name) return;
       clearInterval(interval);
+      article.removeChild(iframe);
 
       item.body = iframe.contentWindow.name;
       item.loaded = true;
