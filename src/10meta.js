@@ -11,3 +11,7 @@
 // @run-at       document-start
 // ==/UserScript==
 
+// OVERVIEW
+// To get general idea of how that script works,
+// see OVERVIEW below or in file 30ui.js
+

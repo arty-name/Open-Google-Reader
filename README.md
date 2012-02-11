@@ -12,7 +12,7 @@ scratch. It doesn't aim to cover all features of its elder brother, however
 it is much more suitable for most day-to-day tasks. Any time you need something
 not implemented here, there's a handy link to switch to full-featured interface.
 
-Another aim is to be flexible and customizable for everyone who knows a bit of
+Another goal is to be flexible and customizable for everyone who knows a bit of
 javascript. I do not want to make this bloated victim of creeping featuristis,
 thus feel free to fork the repo and roll your own.
 
@@ -28,6 +28,8 @@ You can easily change looks using css.
 Features
 --------
 
+ * do anything you like with entries: remove ads, tracking, useless images, whatever!
+ * direct loading of content from webpages is possible
  * forced reload of all feeds
  * filtering of unwanted entries
  * no more reloading to read entries published just now
@@ -41,8 +43,8 @@ Features
  * site favicons
  * as aggressive preloading as you like
  * convenient view of large images
- * shows tags by entry's author
- * amount of unread items goes first in title
+ * shows original entry's tags
+ * number of unread items goes first in title
  * unread view automatically reloads in background
  * when large image loads in read entry, page doesn't "jump"
 

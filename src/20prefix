@@ -1,8 +1,0 @@
-(function(){
-
-// OVERVIEW
-// To get general idea of how that script works,
-// see OVERVIEW below or in file 30ui.js
-
-if (!document.location.href.match(/^https?:..www.google.com.reader.view.1?$/)) return;
-

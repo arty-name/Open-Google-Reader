@@ -11,14 +11,11 @@
 // @run-at       document-start
 // ==/UserScript==
 
-(function(){
-
 // OVERVIEW
 // To get general idea of how that script works,
 // see OVERVIEW below or in file 30ui.js
 
-if (!document.location.href.match(/^https?:..www.google.com.reader.view.1?$/)) return;
-
+(function(){
 function getSettings() {
 
   var settings = {
@@ -38,7 +35,24 @@ function getSettings() {
     // filters to manipulate on entry content
     // NB: set data.altered = true if you want these changes to be shared when you click "share"
     entryHtmlAlterations: [],
-    entryDomAlterations: []
+    entryDomAlterations: [
+      // if image is not loaded in 10 seconds, replace it with link
+      function(item, article) {
+        article.querySelectorAll('img').forEach(function(image){
+          if (!image.complete) setTimeout(function(){
+            if (image.complete) return;
+            image.parentNode.replaceChild(
+              DOM('a', {href: image.src, innerHTML: '[unavailable]'}),
+              image
+            );
+          }, 10000);
+        });
+      }
+    ],
+    
+    // add values as 'url substring': 'css selector' to directly load content from pages
+    // to use that feature remove all @include lines from the beginning of file
+    contentProxySelectors: {}
 
   };
 
@@ -47,6 +61,9 @@ function getSettings() {
     max: Math.max(parts[0], parts[1]),
     min: Math.min(parts[0], parts[1])
   };
+  
+  settings.contentProxyDomains = [];
+  for (var urlPart in settings.contentProxySelectors) settings.contentProxyDomains.push(urlPart);
   
   return settings;
 }
@@ -799,19 +816,39 @@ function ui(settings, css) {
   }
   
   function addEntry(item, index){
-    // if userId is not yet known, try to detect it by entry tags
-    checkEmptyUserId(item, index);
-    
-    // skip entries which are already shown
-    if (displayedItems.contains(item.id)) {
-      return;
+    try {
+      // if userId is not yet known, try to detect it by entry tags
+      checkEmptyUserId(item, index);
+      
+      // skip entries which are already shown
+      if (displayedItems.contains(item.id)) return;
+      
+      item = transformEntry(item);
+      
+      // check if entry needs alteration
+      settings.entryHtmlAlterations.invoke('call', null, item);
+      
+      // create entry and add it to shown entries and to container
+      var entry = createEntry(item);
+      var article = entry.querySelector('article');
+      
+      // check if entry needs alteration
+      settings.entryDomAlterations.invoke('call', null, item, article, entry);
+      
+      if (entryIsIgnored(item)) return;
+
+      requestProxiedContent(item, article);
+      
+      container.appendChild(entry);
+      displayedItems.push(item.id);
+      
+    } catch (e) {
+      // fail of one entry shouldn't prevent other from displaying
+      console.error(e);
     }
-    
-    item = transformEntry(item);
-    
-    // check if entry needs alteration
-    settings.entryHtmlAlterations.invoke('call', null, item);
-    
+  }
+  
+  function entryIsIgnored(item) {
     // if entry marked to ignore or matches filter, mark it as read and skip it
     if ((item.ignore || matchesFilters(item.title, item.body)) && currentView == 'unread') {
       item.read = false;
@@ -820,35 +857,31 @@ function ui(settings, css) {
         unreadCount--;
         updateTitle();
       }
-      return;
+      return true;
     }
+    return false;
+  }
+  
+  function requestProxiedContent(item, article){
+    if (settings.mobile || item.loaded) return;
+    if (!(new RegExp(settings.contentProxyDomains.join('|'))).test(item.feed.url)) return;
+          
+    var iframe = DOM('iframe', {src: item.url, style: 'display: none'});
+    article.appendChild(iframe);
     
-    // create entry and add it to shown entries and to container
-    try {
-      var entry = createEntry(item);
-      var article = entry.querySelector('article');
-      
-      // check if entry needs alteration
-      settings.entryDomAlterations.invoke('call', null, item, article, entry);
-      
-      container.appendChild(entry);
-      displayedItems.push(item.id);
-    } catch (e) {
-      // fail of one entry shouldn't prevent other from displaying
-      console.error(e);
-      return;
-    }
+    var interval = setInterval(function(){
+      if (!iframe.contentWindow || !iframe.contentWindow.name) return;
+      clearInterval(interval);
 
-    // if image is not loaded in 10 seconds, replace it with link
-    article.querySelectorAll('img').forEach(function(image){
-      if (!image.complete) setTimeout(function(){
-        if (image.complete) return;
-        image.parentNode.replaceChild(
-          DOM('a', {href: image.src, innerHTML: '[unavailable]'}),
-          image
-        );
-      }, 10000);
-    });
+      item.body = iframe.contentWindow.name;
+      item.loaded = true;
+      
+      settings.entryHtmlAlterations.invoke('call', null, item);
+      article.innerHTML = item.body;
+      settings.entryDomAlterations.invoke('call', null, item, article, article.parentNode);
+    }, 100);
+    
+    setTimeout(function(){ clearInterval(interval) }, 60000);
   }
   
   function transformEntry(item) {
@@ -1851,21 +1884,28 @@ function onload() {
   ui(getSettings(), getStyles());
 }
 
-if (typeof GM_xmlhttpRequest != "undefined" && !navigator.userAgent.match(/Chrome/)) {
-  // GreaseMonkey, fuck you very much! I don't need your overprotection.
-  var script = document.createElement('script');
-  script.innerHTML =
-    getSettings.toString() + getStyles.toString() + lib.toString() + ui.toString() +
-    'lib(); ui(getSettings(), getStyles());';
-  document.body.appendChild(script);
-  
-} else if (document.readyState.match(/complete|loaded/)) {
-  onload();
-  
-} else {
-  window.addEventListener('DOMContentLoaded', onload, false);
+if (document.location.href.match(/^https?:..www.google.com.reader.view.1?$/)) {
+
+  if (typeof GM_xmlhttpRequest != "undefined" && !navigator.userAgent.match(/Chrome/)) {
+    // GreaseMonkey, fuck you very much! I don't need your overprotection.
+    var script = document.createElement('script');
+    script.innerHTML =
+      getSettings.toString() + getStyles.toString() + lib.toString() + ui.toString() +
+      'lib(); ui(getSettings(), getStyles());';
+    document.body.appendChild(script);
+    
+  } else if (document.readyState.match(/complete|loaded/)) {
+    onload();
+    
+  } else {
+    window.addEventListener('DOMContentLoaded', onload, false);
+  }
+
 }
 
+if (window.top != window) {
+  proxyContent(getSettings());
+}
 window.opera && window.opera.addEventListener(
   'BeforeExternalScript',
   function(event){

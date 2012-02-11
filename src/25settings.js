@@ -30,7 +30,11 @@ function getSettings() {
           }, 10000);
         });
       }
-    ]
+    ],
+    
+    // add values as 'url substring': 'css selector' to directly load content from pages
+    // to use that feature remove all @include lines from the beginning of file
+    contentProxySelectors: {}
 
   };
 
@@ -39,6 +43,9 @@ function getSettings() {
     max: Math.max(parts[0], parts[1]),
     min: Math.min(parts[0], parts[1])
   };
+  
+  settings.contentProxyDomains = [];
+  for (var urlPart in settings.contentProxySelectors) settings.contentProxyDomains.push(urlPart);
   
   return settings;
 }
