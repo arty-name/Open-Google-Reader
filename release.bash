@@ -1,16 +1,8 @@
 #!/bin/bash
 
-cp src/styles.css 27styles.tmp
-sed -i 's/^/"/' 27styles.tmp
-sed -i 's/$/" +/' 27styles.tmp
-
-cp src/styles.custom.css 28styles.tmp
-sed -i 's/^/"/' 28styles.tmp
-sed -i 's/$/" +/' 28styles.tmp
-
 echo 'settings.css =' > 27styles
-cat 27styles.tmp >> 27styles
-cat 28styles.tmp >> 27styles
+sed 's/^/"/;s/$/" +/;' src/styles.css >> 27styles
+sed 's/^/"/;s/$/" +/;' src/styles.custom.css >> 27styles
 echo '"";' >> 27styles
 
 cat src/10meta.js > build/open-google-reader.js
@@ -26,5 +18,3 @@ cat src/70postfix >> build/open-google-reader.js
 cp build/open-google-reader.js build/open-google-reader.user.js
 
 rm 27styles
-rm 27styles.tmp
-rm 28styles.tmp
