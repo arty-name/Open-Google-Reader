@@ -485,7 +485,7 @@ function ui(settings, css) {
     var articleButtons = article.nextSibling.lastChild;
     if (settings.mobile && !force) {
       articleButtons.appendChild(DOM('button', {
-        innerHTML: '↓ Load', 
+        innerHTML: 'Load', 
         className: 'direct-load',
         onclick: function(){ 
           requestProxiedContent(item, article, true); 
