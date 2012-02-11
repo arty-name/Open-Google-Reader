@@ -2,7 +2,7 @@ function proxyContent(settings) {
   var urlPart = settings.contentProxyDomains.filter(function(urlPart) {
     return (location.href.indexOf(urlPart) > -1);
   })[0];
-  if (!urlPart) return;
+  if (!settings.contentProxyDomains.length || !urlPart) return;
   
   var selector = settings.contentProxySelectors[urlPart];
 
