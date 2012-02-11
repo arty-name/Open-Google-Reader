@@ -445,16 +445,7 @@ function ui(settings, css) {
     // check if entry needs alteration
     settings.entryHtmlAlterations.invoke('call', null, item);
     
-    // if entry marked to ignore or matches filter, mark it as read and skip it
-    if ((item.ignore || matchesFilters(item.title, item.body)) && currentView == 'unread') {
-      item.read = false;
-      toggleEntryTag(item, 'read');
-      if (unreadCount) {
-        unreadCount--;
-        updateTitle();
-      }
-      return;
-    }
+    if (entryIsIgnored(item)) return;
     
     // create entry and add it to shown entries and to container
     try {
@@ -482,6 +473,20 @@ function ui(settings, css) {
         );
       }, 10000);
     });
+  }
+  
+  function entryIsIgnored(item) {
+    // if entry marked to ignore or matches filter, mark it as read and skip it
+    if ((item.ignore || matchesFilters(item.title, item.body)) && currentView == 'unread') {
+      item.read = false;
+      toggleEntryTag(item, 'read');
+      if (unreadCount) {
+        unreadCount--;
+        updateTitle();
+      }
+      return true;
+    }
+    return false;
   }
   
   function transformEntry(item) {
