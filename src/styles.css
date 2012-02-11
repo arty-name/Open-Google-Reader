@@ -280,7 +280,7 @@ button.edit, button.comment {
   color: #4c8c4c;
 }
 
-button.star, button.share, button.edit, button.comment, button.cancel {
+button.star, button.share, button.edit, button.comment, button.cancel, button.direct-load {
   background: none;
   border: none;
 }

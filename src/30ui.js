@@ -478,10 +478,30 @@ function ui(settings, css) {
     return false;
   }
   
-  function requestProxiedContent(item, article){
-    if (!settings.contentProxyDomains.length || settings.mobile || item.loaded) return;
+  function requestProxiedContent(item, article, force){
+    if (!settings.contentProxyDomains.length || item.loaded) return;
     if (!(new RegExp(settings.contentProxyDomains.join('|'))).test(item.feed.url)) return;
-          
+    
+    var articleButtons = article.nextSibling.lastChild;
+    if (settings.mobile && !force) {
+      articleButtons.appendChild(DOM('button', {
+        innerHTML: '↓ Load', 
+        className: 'direct-load',
+        onclick: function(){ 
+          requestProxiedContent(item, article, true); 
+        }
+      }));
+      
+    } else {
+      if (articleButtons.lastChild.classList.contains('direct-load')) {
+        articleButtons.removeChild(articleButtons.lastChild);
+      }
+      
+      downloadProxiedContent(item, article);
+    }
+  }
+  
+  function downloadProxiedContent(item, article){
     var iframe = DOM('iframe', {src: item.url, style: 'display: none'});
     article.appendChild(iframe);
     
