@@ -863,7 +863,7 @@ function ui(settings, css) {
   }
   
   function requestProxiedContent(item, article){
-    if (settings.mobile || item.loaded) return;
+    if (!settings.contentProxyDomains.length || settings.mobile || item.loaded) return;
     if (!(new RegExp(settings.contentProxyDomains.join('|'))).test(item.feed.url)) return;
           
     var iframe = DOM('iframe', {src: item.url, style: 'display: none'});
