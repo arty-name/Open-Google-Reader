@@ -17,7 +17,20 @@ function getSettings() {
     // filters to manipulate on entry content
     // NB: set data.altered = true if you want these changes to be shared when you click "share"
     entryHtmlAlterations: [],
-    entryDomAlterations: []
+    entryDomAlterations: [
+      // if image is not loaded in 10 seconds, replace it with link
+      function(item, article) {
+        article.querySelectorAll('img').forEach(function(image){
+          if (!image.complete) setTimeout(function(){
+            if (image.complete) return;
+            image.parentNode.replaceChild(
+              DOM('a', {href: image.src, innerHTML: '[unavailable]'}),
+              image
+            );
+          }, 10000);
+        });
+      }
+    ]
 
   };
 

@@ -462,17 +462,6 @@ function ui(settings, css) {
       console.error(e);
       return;
     }
-
-    // if image is not loaded in 10 seconds, replace it with link
-    article.querySelectorAll('img').forEach(function(image){
-      if (!image.complete) setTimeout(function(){
-        if (image.complete) return;
-        image.parentNode.replaceChild(
-          DOM('a', {href: image.src, innerHTML: '[unavailable]'}),
-          image
-        );
-      }, 10000);
-    });
   }
   
   function entryIsIgnored(item) {
