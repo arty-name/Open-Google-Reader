@@ -11,11 +11,6 @@ if (typeof GM_xmlhttpRequest != "undefined" && !navigator.userAgent.match(/Chrom
     getSettings.toString() + getStyles.toString() + lib.toString() + ui.toString() +
     'lib(); ui(getSettings(), getStyles());';
   document.body.appendChild(script);
-  setTimeout(function(){
-    var style = document.createElement('style');
-    style.innerHTML = settings.css;
-    document.body.previousElementSibling.appendChild(style);
-  }, 100);
   
 } else if (document.readyState.match(/complete|loaded/)) {
   onload();
