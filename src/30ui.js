@@ -444,8 +444,6 @@ function ui(settings, css) {
       // check if entry needs alteration
       settings.entryHtmlAlterations.invoke('call', null, item);
       
-      if (entryIsIgnored(item)) return;
-      
       // create entry and add it to shown entries and to container
       var entry = createEntry(item);
       var article = entry.querySelector('article');
@@ -453,6 +451,8 @@ function ui(settings, css) {
       // check if entry needs alteration
       settings.entryDomAlterations.invoke('call', null, item, article, entry);
       
+      if (entryIsIgnored(item)) return;
+
       container.appendChild(entry);
       displayedItems.push(item.id);
       
