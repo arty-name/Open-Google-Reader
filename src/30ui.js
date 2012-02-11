@@ -432,23 +432,21 @@ function ui(settings, css) {
   }
   
   function addEntry(item, index){
-    // if userId is not yet known, try to detect it by entry tags
-    checkEmptyUserId(item, index);
-    
-    // skip entries which are already shown
-    if (displayedItems.contains(item.id)) {
-      return;
-    }
-    
-    item = transformEntry(item);
-    
-    // check if entry needs alteration
-    settings.entryHtmlAlterations.invoke('call', null, item);
-    
-    if (entryIsIgnored(item)) return;
-    
-    // create entry and add it to shown entries and to container
     try {
+      // if userId is not yet known, try to detect it by entry tags
+      checkEmptyUserId(item, index);
+      
+      // skip entries which are already shown
+      if (displayedItems.contains(item.id)) return;
+      
+      item = transformEntry(item);
+      
+      // check if entry needs alteration
+      settings.entryHtmlAlterations.invoke('call', null, item);
+      
+      if (entryIsIgnored(item)) return;
+      
+      // create entry and add it to shown entries and to container
       var entry = createEntry(item);
       var article = entry.querySelector('article');
       
@@ -457,10 +455,10 @@ function ui(settings, css) {
       
       container.appendChild(entry);
       displayedItems.push(item.id);
+      
     } catch (e) {
       // fail of one entry shouldn't prevent other from displaying
       console.error(e);
-      return;
     }
   }
   
