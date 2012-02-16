@@ -15,6 +15,7 @@ cat \
 	27styles \
 	src/30ui.js \
 	src/40lib.js \
+	src/45proxy.js \
 	src/50onload.js \
 	src/60killDefault.js \
 	70postfix \

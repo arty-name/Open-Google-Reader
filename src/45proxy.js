@@ -31,6 +31,7 @@ function proxyContent(settings) {
         node.setAttribute('href', node.href);
       });
 
+      node.hasAttribute('style') && node.setAttribute('style', '');
       forEach(node.querySelectorAll('*[style]'), function(node) {
         node.setAttribute('style', '');
       });
