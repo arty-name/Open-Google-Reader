@@ -730,10 +730,23 @@ function ui(settings, css) {
     // if already loaded, call right away
     if (subscriptions) return continuation();
     
+    // get cached data from localstorage if it's fresh enough
+    if (localStorage.subscriptions && localStorage.subscriptionsUpdated) {
+      var now = new Date().getTime(),
+        diff = now - parseInt(localStorage.subscriptionsUpdated),
+        allowedDiff = 1000 * 60 * 60 * 24 * (mobile ? 10 : 1);
+      if (diff < allowedDiff) {
+        subscriptions = JSON.parse(localStorage.subscriptions);
+        return continuation();
+      }
+    }
+    
     // otherwise load data
     return APIRequest('subscription/list', {
       parameters: {output: 'json'},
       onSuccess: function(response) {
+        localStorage.subscriptionsUpdated = new Date().getTime();
+        localStorage.subscriptions = response.responseText;
         subscriptions = response.responseJSON.subscriptions;
         continuation();
       }
