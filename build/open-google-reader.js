@@ -736,7 +736,7 @@ function ui(settings, css) {
         diff = now - parseInt(localStorage.subscriptionsUpdated),
         allowedDiff = 1000 * 60 * 60 * 24 * (mobile ? 10 : 1);
       if (diff < allowedDiff) {
-        subscriptions = JSON.parse(localStorage.subscriptions);
+        subscriptions = JSON.parse(localStorage.subscriptions).subscriptions;
         return continuation();
       }
     }
