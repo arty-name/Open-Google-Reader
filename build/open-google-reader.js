@@ -470,6 +470,8 @@ function ui(settings, css) {
   
   // that's where we keep entries original data
   var storage = {};
+  
+  var proxiedContentCache = {};
 
   
   // handle to ajax request, used to fetch entries (only one used, previous is aborted)
@@ -898,25 +900,36 @@ function ui(settings, css) {
     }
   }
   
-  function downloadProxiedContent(item, article){
-    var iframe = DOM('iframe', {src: item.url, style: 'display: none'});
+  function downloadProxiedContent(item, article) {
+    var url = item.url;
+    var html = proxiedContentCache[url];
+    
+    if (html) return handleProxiedContent(item, article, html);
+    
+    var iframe = DOM('iframe', {src: url, style: 'display: none'});
     article.appendChild(iframe);
     
     var interval = setInterval(function(){
       if (!iframe.contentWindow || !iframe.contentWindow.name) return;
       clearInterval(interval);
 
-      item.body = iframe.contentWindow.name;
-      item.loaded = true;
-      
+      html = iframe.contentWindow.name;
       article.removeChild(iframe);
       
-      settings.entryHtmlAlterations.invoke('call', null, item);
-      article.innerHTML = item.body;
-      settings.entryDomAlterations.invoke('call', null, item, article, article.parentNode);
+      proxiedContentCache[url] = html;
+      handleProxiedContent(item, article, html);
     }, 100);
     
     setTimeout(function(){ clearInterval(interval) }, 60000);
+  }
+  
+  function handleProxiedContent(item, article, html) {
+    item.body = html;
+    item.loaded = true;
+    
+    settings.entryHtmlAlterations.invoke('call', null, item);
+    article.innerHTML = item.body;
+    settings.entryDomAlterations.invoke('call', null, item, article, article.parentNode);
   }
   
   function transformEntry(item) {
