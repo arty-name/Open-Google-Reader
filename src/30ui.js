@@ -269,7 +269,7 @@ function ui(settings, css) {
   // update unread count now, every minute and on every window focus
   function initUnreadCount() {
     updateUnreadCount(true);
-    setInterval(updateUnreadCount, 60000);
+    mobile || setInterval(updateUnreadCount, 60000);
     window.addEventListener('focus', updateUnreadCount, false);
   }
 
