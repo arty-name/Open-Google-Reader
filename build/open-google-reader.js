@@ -1356,7 +1356,8 @@ function ui(settings, css) {
         data[tag] = !state;
         if (entry.classList) entry.classList[state ? 'remove' : 'add'](tag); // sometimes entry is just data object
         entry.querySelectorAll && entry.querySelectorAll('button.' + tag).forEach(function(button){
-          button.innerHTML = button.innerHTML.replace(/^./, getButtonImage(data, tag));
+            var image = getButtonImage(data, tag);
+            if (image) button.innerHTML = button.innerHTML.replace(/^./, image);
         });
       },
       onFailure: updateToken.curry(toggleEntryTag.curry(entry, tag)),
