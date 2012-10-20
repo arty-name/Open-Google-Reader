@@ -12,7 +12,11 @@ if (document.location.href.match(/^https?:..www.google.com.reader.view.1?$/)) {
     script.innerHTML =
       getSettings.toString() + getStyles.toString() + lib.toString() + ui.toString() +
       'lib(); ui(getSettings(), getStyles());';
-    document.body.appendChild(script);
+    var interval = setInterval(function(){
+      if (!document.body) return;
+   		clearInterval(interval);
+      document.body.appendChild(script);
+    }, 1);
     
   } else if (document.readyState.match(/complete|loaded/)) {
     onload();
