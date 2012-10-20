@@ -9,6 +9,7 @@
 // @include      https://www.google.com/reader/view/
 // @include      https://www.google.com/reader/view/1
 // @run-at       document-start
+// @grant        none
 // ==/UserScript==
 
 // OVERVIEW
