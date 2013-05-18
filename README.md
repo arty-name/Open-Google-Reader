@@ -1,3 +1,14 @@
+Discontinued
+------------
+
+[Google Reader is going away on July 1st, 2013](http://googleblog.blogspot.de/2013/03/a-second-spring-of-cleaning.html).
+Since Open Google Reader relies on Google Reader servers to work, it will stop 
+working too. There are many alternatives, including open source ones. These you
+can have on your server and no big company will close it. I have hacked together
+something for myself. It works as a server for OGR but it's in no state to become 
+public yet.
+
+
 What is this about?
 -------------------
 
